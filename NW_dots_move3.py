@@ -7,7 +7,7 @@ import math
 room_size = 10
 N = 10 #number of people
 
-#define place people gravitate towards
+#define place people gravitate towards (circle)
 class area(object):
     def __init__(self, cx, cy, r):
         self.cx = cx
