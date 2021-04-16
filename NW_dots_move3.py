@@ -90,6 +90,16 @@ class person(object):
                 self.step_y = -1 * self.step_y
             return
 
+        def calc_dist_to_other_people(d): #d is the person, n is all the other people
+            dist_from_other_people = 999
+            for n in people:
+                if n != d: #make sure not doing same person in calc
+                    dist_from_person_n = distance(n.x, n.y, d.x, d.y)
+                    if dist_from_person_n < dist_from_other_people:
+                        dist_from_other_people = dist_from_person_n
+            return dist_from_other_people
+
+        #actual movement now stated using functions given above
         if np.random.random_sample() < 0.50:  # % chance the speed of person stays the same (constant step added to coord)
             self.x = self.x + self.step_x  # this is how the dot moves at constant rate (constant added to dot position)
             self.y = self.y + self.step_y
@@ -112,11 +122,24 @@ class person(object):
             self.y = 0
             self.step_y = -1 * self.step_y
 
-        if inside(self.x, self.y, 1, 1, 0.2): #NEED A WAY OF ACCESSING AREA CLASS????
+        if inside(self.x, self.y, 1, 1, 0.2): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS????
             stop(self)
 
-        if np.random.random_sample() < 1:  # % chance
+        if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
             move_towards(self, 1, 1) #NEED A WAY OF ACCESSING AREA CLASS????
+
+        if np.random.random_sample() < 0.5: #%chance to follow 2 meter rule
+            min_dist_to_someone = calc_dist_to_other_people(self)
+            if min_dist_to_someone < 2: #if closer than 2meters to someone
+                for i in range(1, 10): #creates 10 random step sizes for the person and checks if they go further from the person
+                    self.step_x = self.make_new_step_size()
+                    self.step_y = self.make_new_step_size()
+                    self.x = self.x + self.step_x #adds these steps to the current coords
+                    self.y = self.y + self.step_y
+                    if calc_dist_to_other_people(self) <= min_dist_to_someone:
+                        self.x = self.x - self.step_x
+                        self.y = self.y - self.step_y
+
 
 # animation function.  This is called sequentially
 def animate(i):
