@@ -61,7 +61,7 @@ class person(object):
 
             return (x_direction, y_direction)
 
-        def position_compared_to_circ(self, cx, cy):
+        def position_compared_to_object(self, cx, cy):
             if self.x - cx > 0:
                 x_position = 1 #'right of circle'
             elif self.x - cx < 0:
@@ -80,13 +80,24 @@ class person(object):
 
 
         def move_towards(self, cx, cy):
-            if position_compared_to_circ(self, cx, cy)[0] == 1 and direction(self)[0] == 'right':
+            if position_compared_to_object(self, cx, cy)[0] == 1 and direction(self)[0] == 'right':
                 self.step_x = -1 * self.step_x
-            if position_compared_to_circ(self, cx, cy)[1] == 1 and direction(self)[1] == 'up':
+            if position_compared_to_object(self, cx, cy)[1] == 1 and direction(self)[1] == 'up':
                 self.step_y = -1 * self.step_y
-            if position_compared_to_circ(self, cx, cy)[0] == -1 and direction(self)[0] == 'left':
+            if position_compared_to_object(self, cx, cy)[0] == -1 and direction(self)[0] == 'left':
                 self.step_x = -1 * self.step_x
-            if position_compared_to_circ(self, cx, cy)[1] == -1 and direction(self)[1] == 'down':
+            if position_compared_to_object(self, cx, cy)[1] == -1 and direction(self)[1] == 'down':
+                self.step_y = -1 * self.step_y
+            return
+
+        def move_away(self, cx, cy):
+            if position_compared_to_object(self, cx, cy)[0] == -1 and direction(self)[0] == 'right':
+                self.step_x = -1 * self.step_x
+            if position_compared_to_object(self, cx, cy)[1] == -1 and direction(self)[1] == 'up':
+                self.step_y = -1 * self.step_y
+            if position_compared_to_object(self, cx, cy)[0] == 1 and direction(self)[0] == 'left':
+                self.step_x = -1 * self.step_x
+            if position_compared_to_object(self, cx, cy)[1] == 1 and direction(self)[1] == 'down':
                 self.step_y = -1 * self.step_y
             return
 
@@ -97,7 +108,8 @@ class person(object):
                     dist_from_person_n = distance(n.x, n.y, d.x, d.y)
                     if dist_from_person_n < dist_from_other_people:
                         dist_from_other_people = dist_from_person_n
-            return dist_from_other_people
+                        closest_person = n
+            return (dist_from_other_people,closest_person)
 
         #actual movement now stated using functions given above
         if np.random.random_sample() < 0.50:  # % chance the speed of person stays the same (constant step added to coord)
@@ -128,17 +140,26 @@ class person(object):
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
             move_towards(self, 1, 1) #NEED A WAY OF ACCESSING AREA CLASS????
 
-        if np.random.random_sample() < 0.5: #%chance to follow 2 meter rule
-            min_dist_to_someone = calc_dist_to_other_people(self)
+        if np.random.random_sample() < 1: #%chance to follow 2 meter rule
+            min_dist_to_someone = calc_dist_to_other_people(self)[0]
+            closest_person = calc_dist_to_other_people(self)[1]
             if min_dist_to_someone < 2: #if closer than 2meters to someone
-                for i in range(1, 10): #creates 10 random step sizes for the person and checks if they go further from the person
-                    self.step_x = self.make_new_step_size()
-                    self.step_y = self.make_new_step_size()
-                    self.x = self.x + self.step_x #adds these steps to the current coords
-                    self.y = self.y + self.step_y
-                    if calc_dist_to_other_people(self) <= min_dist_to_someone:
-                        self.x = self.x - self.step_x
-                        self.y = self.y - self.step_y
+                move_away(self, closest_person.x, closest_person.y)
+
+
+#this also works for 2meter rule..
+        #if np.random.random_sample() < 1: #%chance to follow 2 meter rule
+            #min_dist_to_someone = calc_dist_to_other_people(self)[0]
+            #if min_dist_to_someone < 2:  # if closer than 2meters to someone
+                #for i in range(1, 10): #creates 10 random step sizes for the person and checks if they go further from the person
+                    #self.step_x = self.make_new_step_size()
+                    #self.step_y = self.make_new_step_size()
+                    #self.x = self.x + self.step_x #adds these steps to the current coords
+                    #self.y = self.y + self.step_y
+                    #if calc_dist_to_other_people(self)[0] <= min_dist_to_someone:
+                        #self.x = self.x - self.step_x
+                        #self.y = self.y - self.step_y
+
 
 
 # animation function.  This is called sequentially
