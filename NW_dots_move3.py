@@ -25,10 +25,11 @@ class person(object):
         self.step_x = self.make_new_step_size() #calls function to create a new step size for person
         self.step_y = self.make_new_step_size()
 
-    def make_new_step_size(self):
-        return (np.random.random_sample() - 0.5) / 5 #creates random number for step size 0 to 0.1
+    def make_new_step_size(self, max_step=1):
+        return (np.random.random_sample() - 0.5)*max_step / 5 #creates random number for step size 0 to 0.1
 
     def move(self):
+
         def distance(x1, y1, x2, y2):
             return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) #uses coords and calulates distance between two points
 
@@ -53,23 +54,41 @@ class person(object):
                 y_direction = 'up'
             if self.step_y < 0:
                 y_direction = 'down'
-            if self.step_x == 0 and self.step_y == 0:
+            if self.step_x == 0:
                 x_direction = 'stationary'
+            if self.step_y == 0:
                 y_direction = 'stationary'
 
             return (x_direction, y_direction)
 
+        def position_compared_to_circ(self, cx, cy):
+            if self.x - cx > 0:
+                x_position = 1 #'right of circle'
+            elif self.x - cx < 0:
+                x_position = -1 #'left of circle'
+            else:
+                x_position = 0 #'on circle'
 
-        def move_towards(self, cx, cy,):
-            if self.x - cx > 0 and direction(self)[0] == 'right':
-                self.step_x = -1 * self.step_x
-            if self.y - cy > 0 and direction(self)[0] == 'up':
-                self.step_y = -1 * self.step_y
-            if self.x - cx < 0 and direction(self)[1] == 'left':
-                self.step_x = -1 * self.step_x
-            if self.y - cy < 0 and direction(self)[1] == 'down':
-                self.step_y = -1 * self.step_y
+            if self.y - cy > 0:
+                y_position = 1 #'above circle'
+            elif self.y - cy < 0:
+                y_position = -1 #'below circle'
+            else:
+                y_position = 0 #'on circle'
 
+            return (x_position, y_position)
+
+
+        def move_towards(self, cx, cy):
+            if position_compared_to_circ(self, cx, cy)[0] == 1 and direction(self)[0] == 'right':
+                self.step_x = -1 * self.step_x
+            if position_compared_to_circ(self, cx, cy)[1] == 1 and direction(self)[1] == 'up':
+                self.step_y = -1 * self.step_y
+            if position_compared_to_circ(self, cx, cy)[0] == -1 and direction(self)[0] == 'left':
+                self.step_x = -1 * self.step_x
+            if position_compared_to_circ(self, cx, cy)[1] == -1 and direction(self)[1] == 'down':
+                self.step_y = -1 * self.step_y
+            return
 
         if np.random.random_sample() < 0.50:  # % chance the speed of person stays the same (constant step added to coord)
             self.x = self.x + self.step_x  # this is how the dot moves at constant rate (constant added to dot position)
@@ -97,15 +116,24 @@ class person(object):
             stop(self)
 
         if np.random.random_sample() < 1:  # % chance
-            move_towards(self, 1, 1,) #NEED A WAY OF ACCESSING AREA CLASS????
+            move_towards(self, 1, 1) #NEED A WAY OF ACCESSING AREA CLASS????
+
+# animation function.  This is called sequentially
+def animate(i):
+    for person in people: #goes through all people
+        person.move() #does all the move function (multiple functions inside) for person
+    d.set_data([person.x for person in people], #d is taken from the dots coords to plot
+               [person.y for person in people])
+    return d,
 
 
+if __name__ == "__main__":
 
 # Initialise people
-people = [person() for i in range(N)] #creates N amount of people from the object person eg person(1), person(2) ect
+    people = [person() for i in range(N)] #creates N amount of people from the object person eg person(1), person(2) ect
 
 # Initialise areas
-area1 = area(1, 1, 0.2)
+    area1 = area(1, 1, 0.2)
 
 
 # First set up the figure, the axis, and the plot element we want to animate
@@ -118,13 +146,7 @@ circle = area1.draw()
 ax.add_artist(circle) #add circle to axes plot
 
 
-# animation function.  This is called sequentially
-def animate(i):
-    for person in people: #goes through all people
-        person.move() #does all the move function (multiple functions inside) for person
-    d.set_data([person.x for person in people], #d is taken from the dots coords to plot
-               [person.y for person in people])
-    return d,
+
 
 # call the animator.  blit=True means only re-draw the parts that have changed.
 anim = animation.FuncAnimation(fig, animate, frames=200, interval=20) #in built function to keep updating plot to creates animation
