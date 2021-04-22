@@ -92,8 +92,6 @@ class COVID_MAP:
         # create matplot figure with subplots
         fig, axs = plt.subplots(2, 2,figsize=(15,8))
 
-
-
         sns.heatmap(np.transpose(heat_map), ax=axs[0,0], cbar=False, cmap='icefire', center=0).invert_yaxis()  # heatmap
         axs[0,0].set_title("Heat Map")
         axs[0,0].set_xlim(0, self.xsize)
