@@ -119,7 +119,7 @@ def Move(position_state):
     return position_state
 
 def Move2(position_state):
-    movement = np.random.randint(-3, 3, size=(
+    movement = np.random.randint(-3, 4, size=(
     pop_size, 2))  # creates a random array of -1 to 1 to add to the current positions
     coords = position_state[:, 0:2] + movement
     coords[coords < 1] = 1  # prevent movement below x and y axis
@@ -129,7 +129,7 @@ def Move2(position_state):
     return position_state
 
 def Move3(position_state):
-    movement = np.random.randint(-2, 1, size=(
+    movement = np.random.randint(-2, 3, size=(
     pop_size, 2))  # creates a random array of -1 to 1 to add to the current positions
     coords = position_state[:, 0:2] + movement
     coords[coords < 1] = 1  # prevent movement below x and y axis
@@ -167,7 +167,6 @@ def find_sus(position_state):
 
 
 #CREATE MAP INSTANCE
-#CREATE MAP INSTANCE
 map1 = COVID_MAP(heat, position_state, boundary, xsize, ysize)
 
 #ITERATE MAP 1 INSTANCE
@@ -181,7 +180,7 @@ while n < 100:
     heat = map1.calculate_heat_new()
 
     if (n / 2).is_integer():  # only move every other iteration
-        Move(position_state)
+        Move2(position_state)
     
     new2=np.array([np.count_nonzero(position_state[:, 2] == 2)])
     inf_count=np.append(inf_count,new2,axis=0)
