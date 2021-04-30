@@ -140,7 +140,7 @@ class person(object):
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
             move_towards(self, 1, 1) #NEED A WAY OF ACCESSING AREA CLASS????
 
-        if np.random.random_sample() < 1: #%chance to follow 2 meter rule
+        if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
             closest_person = calc_dist_to_other_people(self)[1]
             if min_dist_to_someone < 2: #if closer than 2meters to someone
