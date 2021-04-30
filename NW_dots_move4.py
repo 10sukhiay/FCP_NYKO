@@ -2,20 +2,40 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 import math
+import weakref
 
 #global variable
 room_size = 10
 N = 10 #number of people
 
+
+class IterArea(type): #using metaclasses?
+
+    _areas = weakref.WeakSet()
+
+    def __iter__(cls):
+        return iter(cls._areas)
+
 #define place people gravitate towards (circle)
-class area(object):
+class area(metaclass=IterArea):
+    __metaclass__ = IterArea
+
     def __init__(self, cx, cy, r):
         self.cx = cx
         self.cy = cy
         self.r = r
 
+
     def draw(self):
         return plt.Circle((self.cx, self.cy), self.r, color='b', fill=False) #creates circle coords cx cy and radius r (built in function)
+
+    def inside(x1, y1, cx, cy, r):
+        if distance(x1, y1, cx, cy) <= r:  # defines if point is inside a specific area (coord cx, cy and radius = r)
+            return True
+        else:
+            return False
+
+
 
 #create moving person class
 class person(object):
@@ -33,11 +53,11 @@ class person(object):
         def distance(x1, y1, x2, y2):
             return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) #uses coords and calulates distance between two points
 
-        def inside(x1, y1, cx, cy, r):
-            if distance(x1, y1, cx, cy) <= r:  # defines if dot is inside a specific area (coord cx, cy and radius = r)
-                return True
-            else:
-                return False
+        #def inside(x1, y1, cx, cy, r):
+         #   if distance(x1, y1, cx, cy) <= r:  # defines if dot is inside a specific area (coord cx, cy and radius = r)
+         #       return True
+         #   else:
+          #      return False
 
         def stop(self):
             self.step_x = 0
@@ -134,8 +154,9 @@ class person(object):
             self.y = 0
             self.step_y = -1 * self.step_y
 
-        if inside(self.x, self.y, 1, 1, 0.2): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS????
-            stop(self)
+        #for area_inst in area: #iterates through all area instances
+            #if area_inst.inside(self.x, self.y, area_inst.cx, area_inst.cy, area_inst.r) == True: #stop if reach area (access area class coords and function)
+                #stop(self)
 
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
             move_towards(self, 1, 1) #NEED A WAY OF ACCESSING AREA CLASS????
@@ -178,6 +199,7 @@ if __name__ == "__main__":
 
 # Initialise areas
     area1 = area(1, 1, 0.2)
+    area2 = area(5, 5, 0.2)
 
 
 # First set up the figure, the axis, and the plot element we want to animate
@@ -186,9 +208,10 @@ ax = plt.axes(xlim=(0, room_size), ylim=(0, room_size)) #axes limit room_size
 d, = ax.plot([person.x for person in people], #plot person coords x
              [person.y for person in people], 'ro') #plot person coords y
 
-circle = area1.draw()
-ax.add_artist(circle) #add circle to axes plot
-
+for areas in area:
+    #print(areas.r)
+    circle = areas.draw()
+    ax.add_artist(circle) #add circle to axes plot
 
 
 
