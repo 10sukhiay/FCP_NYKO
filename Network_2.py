@@ -16,6 +16,8 @@ import random
 
 N = 10 #number of people across the network
 number_nodes = 5
+person3_node = 4
+initial_node = [2,3,4]
 
 # setup the edgelist
 #edgelist=[(1,2),(1,3),(1,4),(1,5),(2,3),(3,4),(4,5),(2,5)]
@@ -59,9 +61,16 @@ class Position(object):
 # initialise people - x, y, node, status
 person1 = Position(1,1,2,0)
 person2 = Position(2,2,3,0)
+person3 = Position(2,2,initial_node[2], 0)
 
 # calling function for instance of the class
 nodes = []
 #for i in range(1,N)
 check = person1.move_node_connected()
 print(check)
+
+
+check2 = person3.move_node_connected()
+print(check2)
+person3_node = check2
+print(person3_node)
