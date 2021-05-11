@@ -13,6 +13,13 @@ import seaborn as sns
 import matplotlib.animation as animation
 
 
+inputs:
+
+heat_old # output from heatmap last iteration
+position_state # [x, y, room_number, health_state]
+xsize # [x size of room]
+ysize# [y size of room]
+
 
 
 # Heat Function
