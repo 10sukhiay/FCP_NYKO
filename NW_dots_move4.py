@@ -8,7 +8,6 @@ import weakref
 room_size = 10
 N = 10 #number of people
 
-
 class IterArea(type): #using metaclasses?
 
     _areas = weakref.WeakSet()
