@@ -5,10 +5,10 @@ import math
 
 
 #----------------------------------------------------------------------------#
-#                  Simulation classes                                         #
+#                  Simulation classes                                        #
 #----------------------------------------------------------------------------#
 
-#----------Nathans move function--#
+#--------------------------NATHAN CLASSES-----------#
 
 #global variable
 room_size = 10
@@ -167,6 +167,11 @@ class person(object):
                         #self.x = self.x - self.step_x
                         #self.y = self.y - self.step_y
 
+#----------------------------------------------------------------------------#
+#                  Animation classes                                         #
+#----------------------------------------------------------------------------#
+
+#------------------------(old Nathans ones) -------------#
 
 
 # animation function.  This is called sequentially

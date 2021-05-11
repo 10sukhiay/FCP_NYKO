@@ -190,8 +190,6 @@ circle = area1.draw()
 ax.add_artist(circle) #add circle to axes plot
 
 
-
-
 # call the animator.  blit=True means only re-draw the parts that have changed.
 anim = animation.FuncAnimation(fig, animate, frames=200, interval=20) #in built function to keep updating plot to creates animation
 
