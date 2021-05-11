@@ -13,16 +13,22 @@ import seaborn as sns
 import matplotlib.animation as animation
 
 
-inputs:
-
-heat_old # output from heatmap last iteration
-position_state # [x, y, room_number, health_state]
-xsize # [x size of room]
-ysize# [y size of room]
 
 
 
+# --------------------------------------------------------------------------------------------------------
 # Heat Function
+
+ # inputs:
+
+# heat_old:  output from heatmap last iteration
+# position_state:  [x, y, room_number, health_state]
+# xsize:  [x size of room]
+# ysize [y size of room]
+
+# outputs:
+# heat_new: array output of size [xsize, ysize]
+# position_state:  [x, y, room_number, health_state]
 
 class COVID_MAP:
     def __init__(self, heat_old, position_state, xsize, ysize): 
