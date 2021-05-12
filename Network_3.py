@@ -90,3 +90,8 @@ person3_node = check2
 #print(person3_node)
 
 print(parameters.iloc[1,:].to_string(header=False, index=False))
+
+## need to edit the code to be able to integrate with Kaelan
+position_state
+
+# look into the way to integrate with the command line.
