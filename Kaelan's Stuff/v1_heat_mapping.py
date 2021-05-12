@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
 
+# Code created 10/01/21
+# Kaelan Melville
+# Heat Mapping
 
 import argparse
 import numpy as np
@@ -16,12 +18,10 @@ import matplotlib.animation as animation
 
 
 
-# --------------------------------------------------------------------------------------------------------
 # Heat Function
+# inputs:
 
- # inputs:
-
-# heat_old:  heat array of size [x, y, room_number, health_state]
+# heat_old:  heat array of size [x, y, room_number, health_state(1 ,2, 3, 4, 5]
 # position_state:  [x, y, room_number, health_state]
 # xsize:  [x size of room]
 # ysize [y size of room]
