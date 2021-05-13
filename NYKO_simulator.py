@@ -2,8 +2,58 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 import math
+import networkx as nx
+import pandas as pd
+import random
+from numpy.random import randint
 
 
+<<<<<<< HEAD
+=======
+# Create dataframe dependant on input data
+#global variable
+room_size = 10
+N = 10 #number of people
+room_size_x = 10
+room_size_y = 10
+number_infected = 1
+
+# Input graph here
+#edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
+edgelist=[(1,2)]
+
+# Create a networkx graph from the edgelist.
+G = nx.Graph(edgelist)
+nx.draw(G, with_labels=True)
+#plt.show()   # this displays the graph - turn on as required.
+
+number_nodes = G.number_of_nodes()
+print(number_nodes)
+
+def create_people_array():
+    x_position = randint(0,room_size_x+1,N) # randomly assign x values for each person
+    y_position = randint(0,room_size_y+1,N) # randomly assign y values for each person
+    start_nodes = randint(1, number_nodes+1, N)
+    start_status = np.concatenate((([1]*number_infected), ([0]*(N-number_infected))))
+    #start_status = start_status.transpose()
+    data_in = np.stack((x_position, y_position, start_nodes, start_status), axis=1)
+    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status'])
+    return(position_state)
+
+position_state = create_people_array()
+print(position_state)
+
+def people_array_room(position_state):
+    room1 = pd.DataFrame(columns=['x', 'y', 'node', 'status'])
+    for i in range(1,len(position_state),1):
+        if position_state.iloc[i, 2] == 1:
+            room1.append(position_state.iloc[i, :])
+
+    return(room1)
+
+room1 = people_array_room(position_state)
+print(room1)
+>>>>>>> a6c80d9e4c1b3a331163e5b424763798ddd06b8c
 
 #----------------------------------------------------------------------------#
 #                  Simulation classes                                        #
@@ -12,11 +62,14 @@ import math
 #--------------------------NATHAN CLASSES-----------#
 
 
+<<<<<<< HEAD
 
 
 #global variable
 room_size = 10
 N = 10 #number of people
+=======
+>>>>>>> a6c80d9e4c1b3a331163e5b424763798ddd06b8c
 
 #define place people gravitate towards (circle)
 class area(object):

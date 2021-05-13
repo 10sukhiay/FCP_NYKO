@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+
 
 
 import argparse
@@ -19,7 +19,7 @@ import matplotlib.animation as animation
 
  # inputs:
 
-# heat_old:  output from heatmap last iteration
+# heat_old:  heat array of size [x, y, room_number, health_state]
 # position_state:  [x, y, room_number, health_state]
 # xsize:  [x size of room]
 # ysize [y size of room]

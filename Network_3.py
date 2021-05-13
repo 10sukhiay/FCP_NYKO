@@ -39,8 +39,8 @@ def create_people_array():
     start_status = np.concatenate((([1]*number_infected), ([0]*(N-number_infected))))
     #start_status = start_status.transpose()
     data_in = np.stack((x_position, y_position, start_nodes, start_status), axis=1)
-    people_parameters = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status'])
-    return(people_parameters)
+    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status'])
+    return(position_state)
 
 class Position(object):
 # this is to positions people on the first iterations and then
@@ -90,3 +90,7 @@ person3_node = check2
 #print(person3_node)
 
 print(parameters.iloc[1,:].to_string(header=False, index=False))
+
+## need to edit the code to be able to integrate with Kaelan
+
+# look into the way to integrate with the command line.
