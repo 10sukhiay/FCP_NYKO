@@ -7,16 +7,15 @@ import pandas as pd
 import random
 from numpy.random import randint
 
-
-<<<<<<< HEAD
-=======
-# Create dataframe dependant on input data
-#global variable
-room_size = 10
-N = 10 #number of people
+#USER inputs
+N = 10 #number of people in network
 room_size_x = 10
 room_size_y = 10
 number_infected = 1
+area_x = 1 #area coordinate to gravitate towards
+area_y = 1
+area_r = 0.2 #area radius
+
 
 # Input graph here
 #edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
@@ -28,6 +27,7 @@ nx.draw(G, with_labels=True)
 #plt.show()   # this displays the graph - turn on as required.
 
 number_nodes = G.number_of_nodes()
+print('number of nodes is:')
 print(number_nodes)
 
 def create_people_array():
@@ -41,6 +41,7 @@ def create_people_array():
     return(position_state)
 
 position_state = create_people_array()
+print('original position_state array:')
 print(position_state)
 
 def people_array_room(position_state):
@@ -52,24 +53,15 @@ def people_array_room(position_state):
     return(room1)
 
 room1 = people_array_room(position_state)
+print('room1 array:')
 print(room1)
->>>>>>> a6c80d9e4c1b3a331163e5b424763798ddd06b8c
+
 
 #----------------------------------------------------------------------------#
 #                  Simulation classes                                        #
 #----------------------------------------------------------------------------#
 
 #--------------------------NATHAN CLASSES-----------#
-
-
-<<<<<<< HEAD
-
-
-#global variable
-room_size = 10
-N = 10 #number of people
-=======
->>>>>>> a6c80d9e4c1b3a331163e5b424763798ddd06b8c
 
 #define place people gravitate towards (circle)
 class area(object):
@@ -81,11 +73,12 @@ class area(object):
     def draw(self):
         return plt.Circle((self.cx, self.cy), self.r, color='b', fill=False) #creates circle coords cx cy and radius r (built in function)
 
-#create moving person class
+#create moving person class with original x, y and node inputs
 class person(object):
-    def __init__(self):
-        self.x = room_size * np.random.random_sample() #creates random number x coord 1 to room_size
-        self.y = room_size * np.random.random_sample() #creates random number y coord 1 to room_size
+    def __init__(self, x, y, node):
+        self.x = x
+        self.y = y
+        self.node = node
         self.step_x = self.make_new_step_size() #calls function to create a new step size for person
         self.step_y = self.make_new_step_size()
 
@@ -185,24 +178,24 @@ class person(object):
             self.vely = self.make_new_step_size()
             self.x = self.x + self.step_x   # the coord is updated with that new constant (different amount than before so dot looks like it sped up/slowed down)
             self.y = self.y + self.step_y
-        if self.x >= room_size:  # so cannot go outside boundary of 10x10 grid
-            self.x = room_size
+        if self.x >= room_size_x:  # so cannot go outside boundary of 10x10 grid
+            self.x = room_size_x
             self.step_x = -1 * self.step_x
         if self.x <= 0:  # so cannot go outside boundary of 10x10 grid
             self.x = 0
             self.step_x = -1 * self.step_x
-        if self.y >= room_size:  # so cannot go outside boundary of 10x10 grid
-            self.y = room_size
+        if self.y >= room_size_y:  # so cannot go outside boundary of 10x10 grid
+            self.y = room_size_y
             self.step_y = -1 * self.step_y
         if self.y <= 0:  # so cannot go outside boundary of 10x10 grid
             self.y = 0
             self.step_y = -1 * self.step_y
 
-        if inside(self.x, self.y, 1, 1, 0.2): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS????
+        if inside(self.x, self.y, area_x, area_y, area_r): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS if want multiple areas????
             stop(self)
 
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
-            move_towards(self, 1, 1) #NEED A WAY OF ACCESSING AREA CLASS????
+            move_towards(self, area_x, area_y) #NEED A WAY OF ACCESSING AREA CLASS????
 
         if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
@@ -224,13 +217,14 @@ class person(object):
                         #self.x = self.x - self.step_x
                         #self.y = self.y - self.step_y
 
+
 #----------------------------------------------------------------------------#
-#                  Animation classes                                         #
+#                  End of simulation classes                                        #
 #----------------------------------------------------------------------------#
 
-#------------------------(old Nathans ones) -------------#
 
 
+#REPLACE THIS WITH YAZ CODE
 # animation function.  This is called sequentially
 def animate(i):
     for person in people: #goes through all people
@@ -242,16 +236,18 @@ def animate(i):
 
 if __name__ == "__main__":
 
-# Initialise people
-    people = [person() for i in range(N)] #creates N amount of people from the object person eg person(1), person(2) ect
+# Initialise people using the position_state array (array -> person class instances)
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
+            range(len(position_state))]  # creates people for each row in the array
 
 # Initialise areas
-    area1 = area(1, 1, 0.2)
+    area1 = area(area_x, area_y, area_r)
+
 
 
 # First set up the figure, the axis, and the plot element we want to animate
 fig = plt.figure() #empty figure
-ax = plt.axes(xlim=(0, room_size), ylim=(0, room_size)) #axes limit room_size
+ax = plt.axes(xlim=(0, room_size_x), ylim=(0, room_size_y)) #axes limit room_size
 d, = ax.plot([person.x for person in people], #plot person coords x
              [person.y for person in people], 'ro') #plot person coords y
 
@@ -259,7 +255,25 @@ circle = area1.draw()
 ax.add_artist(circle) #add circle to axes plot
 
 
-# call the animator.  blit=True means only re-draw the parts that have changed.
+# call the animator.
 anim = animation.FuncAnimation(fig, animate, frames=200, interval=20) #in built function to keep updating plot to creates animation
 
 plt.show() #shows plot
+
+
+print('check original position_state array:')
+print(position_state) # original array
+position_state.iloc[:, :2] = 0
+print('empty array x and y:')
+print(position_state) #array emptied for x y only
+
+# this code adds values from people objects back into array
+k = 0
+for t in people:
+    position_state.iloc[k, 0] = t.x
+    position_state.iloc[k, 1] = t.y
+    position_state.iloc[k, 2] = t.node
+    k +=1 # iterator for picking the correct row
+
+print('move run finished and this is new position_state array:')
+print(position_state) # array refilled with people
