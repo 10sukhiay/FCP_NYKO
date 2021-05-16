@@ -11,11 +11,11 @@ import argparse
 def main(*args):
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--test', metavar='N', type=int, default=10,
+    parser.add_argument('--number', metavar='N', type=int, default=10,
                         help='Use a N x N simulation grid')
     args = parser.parse_args(args)
 
-    print(args.test)
+    print(args.number)
 
 
 #USER inputs
@@ -253,6 +253,8 @@ if __name__ == "__main__":
     # Command line entry point
     import sys
     main(*sys.argv[1:])
+
+    
 
 # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
