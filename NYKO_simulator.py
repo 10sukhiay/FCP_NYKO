@@ -26,6 +26,7 @@ number_infected = 1
 area_x = 1 #area coordinate to gravitate towards
 area_y = 1
 area_r = 0.2 #area radius
+following_two_meter = 0.5
 
 
 # Input graph here
@@ -46,9 +47,12 @@ def create_people_array(room_size_x, room_size_y, N, number_nodes, number_infect
     y_position = randint(0,room_size_y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
     start_status = np.concatenate((([1]*number_infected), ([0]*(N-number_infected))))
+    follow = round(N*following_two_meter)
+    no_follow = round(N*(1-following_two_meter))
+    two_meter = np.concatenate((([1]*follow), ([0]*no_follow)))
     #start_status = start_status.transpose()
-    data_in = np.stack((x_position, y_position, start_nodes, start_status), axis=1)
-    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status'])
+    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter), axis=1)
+    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter'])
     return(position_state)
 
 
