@@ -6,6 +6,17 @@ import networkx as nx
 import pandas as pd
 import random
 from numpy.random import randint
+import argparse
+
+def main(*args):
+    parser = argparse.ArgumentParser(description='Animate an epidemic')
+
+    parser.add_argument('--test', metavar='N', type=int, default=10,
+                        help='Use a N x N simulation grid')
+    args = parser.parse_args(args)
+
+    print(args.test)
+
 
 #USER inputs
 N = 10 #number of people in network
@@ -45,17 +56,14 @@ print('original position_state array:')
 print(position_state)
 
 def people_array_room(position_state,i):
-    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room = position_state[position_state["node"] == i]
     return(room)
 
-def people_array_room2(position_state):
-    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
-    room2 = position_state[position_state["node"] == 2]
-    return(room2)
-
+# Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
 room1 = people_array_room(position_state,1)
-room2 = people_array_room(position_state,1)
+room2 = people_array_room(position_state,2)
+room3 = people_array_room(position_state,3)
+
 print('room1 array:')
 print(room1)
 
@@ -241,6 +249,10 @@ def animate(i):
 
 
 if __name__ == "__main__":
+
+    # Command line entry point
+    import sys
+    main(*sys.argv[1:])
 
 # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
