@@ -44,17 +44,23 @@ position_state = create_people_array()
 print('original position_state array:')
 print(position_state)
 
-def people_array_room(position_state):
-    room1 = pd.DataFrame(columns=['x', 'y', 'node', 'status'])
-    for i in range(1,len(position_state),1):
-        if position_state.iloc[i, 2] == 1:
-            room1.append(position_state.iloc[i, :])
+def people_array_room(position_state,i):
+    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
+    room = position_state[position_state["node"] == i]
+    return(room)
 
-    return(room1)
+def people_array_room2(position_state):
+    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
+    room2 = position_state[position_state["node"] == 2]
+    return(room2)
 
-room1 = people_array_room(position_state)
+room1 = people_array_room(position_state,1)
+room2 = people_array_room(position_state,1)
 print('room1 array:')
 print(room1)
+
+
+
 
 
 #----------------------------------------------------------------------------#
