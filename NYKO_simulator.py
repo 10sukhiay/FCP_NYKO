@@ -41,7 +41,7 @@ number_nodes = G.number_of_nodes()
 print('number of nodes is:')
 print(number_nodes)
 
-def create_people_array():
+def create_people_array(room_size_x, room_size_y, N, number_nodes, number_infected):
     x_position = randint(0,room_size_x+1,N) # randomly assign x values for each person
     y_position = randint(0,room_size_y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
@@ -51,21 +51,13 @@ def create_people_array():
     position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status'])
     return(position_state)
 
-position_state = create_people_array()
-print('original position_state array:')
-print(position_state)
+
 
 def people_array_room(position_state,i):
     room = position_state[position_state["node"] == i]
     return(room)
 
-# Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
-room1 = people_array_room(position_state,1)
-room2 = people_array_room(position_state,2)
-room3 = people_array_room(position_state,3)
 
-print('room1 array:')
-print(room1)
 
 
 
@@ -254,7 +246,18 @@ if __name__ == "__main__":
     import sys
     main(*sys.argv[1:])
 
-    
+    position_state = create_people_array(room_size_x, room_size_y, N, number_nodes, number_infected)
+    print('original position_state array:')
+    print(position_state)
+
+    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
+    room1 = people_array_room(position_state, 1)
+    room2 = people_array_room(position_state, 2)
+    room3 = people_array_room(position_state, 3)
+
+    print('room1 array:')
+    print(room1)
+
 
 # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
