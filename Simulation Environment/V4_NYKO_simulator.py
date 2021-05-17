@@ -80,7 +80,6 @@ def main(*args):
     heat_maps = [Room_map(heat_new=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y) for i in range(args.rooms)]
 
 
-
     simulate(days=args.days)
 
 def create_edgelist(rooms):
@@ -274,12 +273,14 @@ class person(object):
             self.y = 0
             self.step_y = -1 * self.step_y
 
-        if inside(self.x, self.y, self.AREA_X, self.AREA_Y, self.AREA_R): #stop if reach table area
-            stop(self)
+        if inside(self.x, self.y, self.AREA_X, self.AREA_Y, self.AREA_R): #if at table area
+            if self.gravitate == 1: #if meant to be at table stay there
+                stop(self)
+            if np.random.random_sample() < 0.5: #have a %chance of leaving the table
+                self.gravitate = 0
 
-        if np.random.random_sample() < 1:  # % chance to gravitate towards point
+        if self.gravitating == 1:   # if gravitate on
             move_towards(self, self.AREA_X, self.AREA_Y)
-
 
         if self.two_meter == 1: #follow 2 meter rule
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
