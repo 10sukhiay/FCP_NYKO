@@ -11,9 +11,9 @@ import argparse
 #GLOBAL CONSTANTS
 ROOM_SIZE_X = 10
 ROOM_SIZE_Y = 10
-AREA_X = 5 #area coordinate to gravitate towards
-AREA_Y = 5
-AREA_R = 0.2 #area radius
+AREA_X = 2 #area coordinate to gravitate towards
+AREA_Y = 2
+AREA_R = 0.5 #area radius
 
 def main(*args):
     parser = argparse.ArgumentParser(description='Animate an epidemic')
