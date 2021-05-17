@@ -404,23 +404,3 @@ ax.add_artist(circle) #add circle to axes plot
 anim = animation.FuncAnimation(fig, animate, frames=200, interval=100, repeat=False) #in built function to keep updating plot to creates animation
 
 plt.show() #shows plot
-
-
-<<<<<<< Updated upstream
-def update_position_state(position_state):
-    position_state.iloc[:, :2] = 0 #array emptied for x y only
-    # this code adds values from people objects back into array
-    k = 0
-    for t in people:
-        position_state.iloc[k, 0] = t.x
-        position_state.iloc[k, 1] = t.y
-        position_state.iloc[k, 2] = t.node
-        k +=1 # iterator for picking the correct row
-
-    print('iteration finished and this is new position_state array:')
-    print(position_state)  # array refilled with people
-    return(position_state)
-=======
-
->>>>>>> Stashed changes
-
