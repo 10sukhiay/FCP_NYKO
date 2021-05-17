@@ -348,7 +348,7 @@ class Room_map:
 
 #REPLACE THIS WITH YAZ CODE
 # animation function.  This is called sequentially
-def animate(people):
+def animate():
     plt.show()
 
 
