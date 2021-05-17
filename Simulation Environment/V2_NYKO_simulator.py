@@ -71,9 +71,11 @@ def main(*args):
 
     simulate()
 
-    update_node(position_state)
+    nodes = possible_paths(position_state, G)
 
-    possible_paths(position_state, G)
+    update_node(position_state, nodes)
+
+
 
 def create_edgelist(rooms):
     # Define the edge list dependant on number of rooms. Could also look at connectivity such as:
@@ -125,10 +127,14 @@ def people_array_room(position_state,i):
     return(room)
 
 
-def update_node(position_state):
+def update_node(position_state, nodes):
     print('position state pre update:')
     print(position_state)
-
+    for i in range(0, len(position_state),1):
+        position_state.iloc[i,2] = random.choice(nodes[i])
+    print('position state after update:')
+    print(position_state)
+    return position_state
 
 def possible_paths(position_state, G):
     nodes =[]
