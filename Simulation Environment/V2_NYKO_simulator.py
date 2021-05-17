@@ -12,7 +12,7 @@ def main(*args):
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
     parser.add_argument('--number', metavar='N', type=int, default=10,
-                        help='Use a N x N simulation grid')
+                        help='Size of population')
     parser.add_argument('--cases', metavar='N', type=int, default=2,
                         help='Number of initial infected people')
     parser.add_argument('--distance', metavar='D', type=float, default=0.5,
@@ -59,8 +59,12 @@ def main(*args):
     print(rooms)
 
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r) for i in
-              range(len(position_state))]  # creates people for each row in the array
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r) for i in range(len(position_state))] # creates people for each row in the array
+
+    # prints x value for each person
+    for obj in people:
+        print(obj.x)
+
     # Initialise areas
     area1 = area(args.table_x, args.table_y, args.table_r)
     circle = area1.draw()
