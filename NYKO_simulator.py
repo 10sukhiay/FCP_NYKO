@@ -358,9 +358,8 @@ if __name__ == "__main__":
     import sys
     people = main(*sys.argv[1:])
     #main(*sys.argv[1:])
-    #update_position_state(position_state)
-    print('iteration finished and this is new position_state array:')
-    print(position_state)  # array refilled with people
+    update_position_state(position_state)
+
 
 
     #position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter)
@@ -402,6 +401,8 @@ def update_position_state(position_state):
         position_state.iloc[k, 1] = t.y
         position_state.iloc[k, 2] = t.node
         k +=1 # iterator for picking the correct row
-
+        
+    print('iteration finished and this is new position_state array:')
+    print(position_state)  # array refilled with people
     return(position_state)
 
