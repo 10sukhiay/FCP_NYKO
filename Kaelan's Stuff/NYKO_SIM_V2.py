@@ -55,7 +55,7 @@ def main(*args):
     print(room1)
 
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r) for i in
               range(len(position_state))]  # creates people for each row in the array
     # Initialise areas
     area1 = area(args.table_x, args.table_y, args.table_r)
@@ -132,12 +132,15 @@ class area(object):
 
 #create moving person class with original x, y and node inputs
 class person(object):
-    def __init__(self, x, y, node):
+    def __init__(self, x, y, node, AREA_X, AREA_Y, AREA_Z):
         self.x = x
         self.y = y
         self.node = node
         self.step_x = self.make_new_step_size() #calls function to create a new step size for person
         self.step_y = self.make_new_step_size()
+        self.AREA_X = AREA_X
+        self.AREA_Y = AREA_Y
+        self.AREA_Z = AREA_Z
 
     def make_new_step_size(self, max_step=1):
         return (np.random.random_sample() - 0.5)*max_step / 5 #creates random number for step size 0 to 0.1
