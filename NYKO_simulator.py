@@ -50,8 +50,15 @@ def main(*args):
     print('room1 array:')
     print(room1)
 
+    # Initialise people using the position_state array (array -> person class instances)
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
+              range(len(position_state))]  # creates people for each row in the array
 
-    return(position_state)
+    #update_position_state(position_state)
+    print('move run finished and this is new position_state array:')
+    print(position_state)  # array refilled with people
+
+    return(people)
 
 
 def create_network(edgelist):
@@ -266,7 +273,9 @@ if __name__ == "__main__":
 
     # Command line entry point
     import sys
-    position_state = main(*sys.argv[1:])
+    people = main(*sys.argv[1:])
+    #main(*sys.argv[1:])
+
 
     #position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter)
     #print('original position_state array:')
@@ -275,15 +284,13 @@ if __name__ == "__main__":
 
 
 
-# Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
-            range(len(position_state))]  # creates people for each row in the array
+
 
 # Initialise areas
     area1 = area(AREA_X, AREA_Y, AREA_R)
 
 
-
+### turn this into a function to be called from the main - called Animation
 # First set up the figure, the axis, and the plot element we want to animate
 fig = plt.figure() #empty figure
 ax = plt.axes(xlim=(0, ROOM_SIZE_X), ylim=(0, ROOM_SIZE_Y)) #axes limit room_size
@@ -310,9 +317,5 @@ def update_position_state(position_state):
         position_state.iloc[k, 2] = t.node
         k +=1 # iterator for picking the correct row
 
-
     return(position_state)
 
-update_position_state(position_state)
-print('move run finished and this is new position_state array:')
-print(position_state) # array refilled with people
