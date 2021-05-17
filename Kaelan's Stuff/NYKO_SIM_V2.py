@@ -251,11 +251,11 @@ class person(object):
             self.y = 0
             self.step_y = -1 * self.step_y
 
-        if inside(self.x, self.y, AREA_X, AREA_Y, AREA_R): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS if want multiple areas????
+        if inside(self.x, self.y, self.AREA_X, self.AREA_Y, self.AREA_R): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS if want multiple areas????
             stop(self)
 
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
-            move_towards(self, AREA_X, AREA_Y) #NEED A WAY OF ACCESSING AREA CLASS????
+            move_towards(self, self.AREA_X, self.AREA_Y) #NEED A WAY OF ACCESSING AREA CLASS????
 
         #if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
            # min_dist_to_someone = calc_dist_to_other_people(self)[0]
