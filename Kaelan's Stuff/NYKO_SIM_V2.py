@@ -60,7 +60,7 @@ def main(*args):
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
               range(len(position_state))]  # creates people for each row in the array
 
-    return(people)
+    simulate()
 
 
 def create_network(edgelist):
@@ -366,6 +366,24 @@ def update_position_state(position_state):
     print(position_state)  # array refilled with people
     return (position_state)
 
+
+def simulate():
+    fig = plt.figure() #empty figure
+    ax = plt.axes(xlim=(0, ROOM_SIZE_X), ylim=(0, ROOM_SIZE_Y)) #axes limit room_size
+    d, = ax.plot([person.x for person in people], #plot person coords x
+                 [person.y for person in people], 'ro') #plot person coords y
+
+    circle = area1.draw()
+    ax.add_artist(circle) #add circle to axes plot
+
+
+    # call the animator.
+    anim = animation.FuncAnimation(fig, animate, frames=200, interval=100, repeat=False) #in built function to keep updating plot to creates animation
+
+    plt.show() #shows plot
+
+
+
 if __name__ == "__main__":
 
     # Command line entry point
@@ -392,20 +410,7 @@ if __name__ == "__main__":
 ### turn this into a function to be called from the main - called Animation
 # First set up the figure, the axis, and the plot element we want to animate
 
-def simulate():
-    fig = plt.figure() #empty figure
-    ax = plt.axes(xlim=(0, ROOM_SIZE_X), ylim=(0, ROOM_SIZE_Y)) #axes limit room_size
-    d, = ax.plot([person.x for person in people], #plot person coords x
-                 [person.y for person in people], 'ro') #plot person coords y
 
-    circle = area1.draw()
-    ax.add_artist(circle) #add circle to axes plot
-
-
-    # call the animator.
-    anim = animation.FuncAnimation(fig, animate, frames=200, interval=100, repeat=False) #in built function to keep updating plot to creates animation
-
-    plt.show() #shows plot
 
 
 
