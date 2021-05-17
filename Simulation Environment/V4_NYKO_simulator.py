@@ -270,31 +270,13 @@ class person(object):
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
             move_towards(self, self.AREA_X, self.AREA_Y) #NEED A WAY OF ACCESSING AREA CLASS????
 
-        #if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
-           # min_dist_to_someone = calc_dist_to_other_people(self)[0]
-           # closest_person = calc_dist_to_other_people(self)[1]
-           # if min_dist_to_someone < 2: #if closer than 2meters to someone
-                #move_away(self, closest_person.x, closest_person.y)
 
-        if np.random.random_sample() < 0.00001: #follow 2 meter rule if person labelled to
+        if np.random.random_sample() < 1: #follow 2 meter rule if person labelled to
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
             closest_person = calc_dist_to_other_people(self)[1]
             if min_dist_to_someone < 2: #if closer than 2meters to someone
                 move_away(self, closest_person.x, closest_person.y)
 
-
-#this also works for 2meter rule..
-        #if np.random.random_sample() < 1: #%chance to follow 2 meter rule
-            #min_dist_to_someone = calc_dist_to_other_people(self)[0]
-            #if min_dist_to_someone < 2:  # if closer than 2meters to someone
-                #for i in range(1, 10): #creates 10 random step sizes for the person and checks if they go further from the person
-                    #self.step_x = self.make_new_step_size()
-                    #self.step_y = self.make_new_step_size()
-                    #self.x = self.x + self.step_x #adds these steps to the current coords
-                    #self.y = self.y + self.step_y
-                    #if calc_dist_to_other_people(self)[0] <= min_dist_to_someone:
-                        #self.x = self.x - self.step_x
-                        #self.y = self.y - self.step_y
 
 #----------------------------------------------------------------------------#
 #                  Kaelan Room Heatmap classes                               #
