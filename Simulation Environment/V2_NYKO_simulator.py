@@ -184,7 +184,6 @@ def possible_paths(position_state, G):
     for i in range(0, len(position_state),1):
         possible_nodes = list(nx.single_source_shortest_path(G, source=position_state.iloc[i,2], cutoff=1))
         nodes.append(possible_nodes)
-    print(nodes)
     return(nodes)
 
 def update_node(position_state, nodes):
