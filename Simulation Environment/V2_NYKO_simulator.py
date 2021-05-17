@@ -35,6 +35,17 @@ from numpy.random import randint
 import argparse
 
 def main(*args):
+    """Command line entry point.
+## Currently these are just examples, to be finalised at the end of the code #######
+        $ python simulator.py                        # show animation on screen
+        $ python simulator.py --file=video.mp4       # save animation to video
+        $ python simulator.py --plot                 # show plot on screen
+
+        """
+    #
+    # Argparse has been used to handle parsing the command line arguments.
+    #   https://docs.python.org/3/library/argparse.html
+    #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
     parser.add_argument('--number', metavar='N', type=int, default=10,
@@ -63,6 +74,7 @@ def main(*args):
                         help='y coordinate of table')
     args = parser.parse_args(args)
 
+    # Create edgelist
     edgelist = create_edgelist(args.rooms)
 
     # Create network
@@ -110,7 +122,7 @@ def main(*args):
 
 
 def create_edgelist(rooms):
-    # Define the edge list dependant on number of rooms. Could also look at connectivity such as:
+    """Define the edge list dependant on number of rooms."""
     # #edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
     if rooms == 2:
         edgelist = [(1, 2)]
@@ -120,19 +132,21 @@ def create_edgelist(rooms):
     return(edgelist)
 
 def create_network(edgelist):
-    # Create a networkx graph from the edgelist.
+    """Create a networkx graph from the edgelist."""
     G = nx.Graph(edgelist)
     nx.draw(G, with_labels=True)
     #plt.show()   # this displays the graph - turn on as required.
     return(G)
 
 def network_number_nodes(G):
+    """Calculate the number of nodes within the networkx graph"""
     number_nodes = G.number_of_nodes()
     print('number of nodes is:')
     print(number_nodes)
     return(number_nodes)
 
 def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter, gravitate_table, using_mask, travel):
+    """Set-up the array of people dependant on inputs. """
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
@@ -158,12 +172,14 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     return(position_state)
 
 def people_array_room(position_state,i):
+    """Create array of people dependant on node location"""
     room = position_state[position_state["node"] == i]
     return(room)
 
 
 def possible_paths(position_state, G):
-    # this creates a list of the possible nodes that people can travel to
+    """Creates a list of the possible nodes that people can travel to"""
+    # need to be careful so that people can only travel to connected nodes. 
     nodes =[]
     for i in range(0, len(position_state),1):
         possible_nodes = list(nx.single_source_shortest_path(G, source=position_state.iloc[i,2], cutoff=1))
@@ -172,13 +188,13 @@ def possible_paths(position_state, G):
     return(nodes)
 
 def update_node(position_state, nodes):
-    # update position_state dependant on connected nodes for each person
+    """Update position_state dependant on connected nodes for each person"""
     for i in range(0, len(position_state),1):
         position_state.iloc[i,2] = random.choice(nodes[i])
     return position_state
 
 def update_node_travel_prob(position_state, nodes):
-    # update position_state dependant on connected nodes and travel probability
+    """Update position_state dependant on connected nodes and travel probability"""
     for i in range(0, len(position_state),1):
         if position_state.iloc[i,7] ==1:
             position_state.iloc[i,2] = random.choice(nodes[i])
