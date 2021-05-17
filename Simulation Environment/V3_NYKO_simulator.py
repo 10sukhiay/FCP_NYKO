@@ -12,7 +12,7 @@ def main(*args):
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
     parser.add_argument('--number', metavar='N', type=int, default=10,
-                        help='Use a N x N simulation grid')
+                        help='Size of population')
     parser.add_argument('--cases', metavar='N', type=int, default=2,
                         help='Number of initial infected people')
     parser.add_argument('--distance', metavar='D', type=float, default=0.5,
@@ -23,6 +23,8 @@ def main(*args):
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=2,
                         help='Number of rooms to simulate')
+    parser.add_argument('--travel', metavar='T', type=float, default=0.5,
+                        help='Proportion of people that move between rooms')
     parser.add_argument('--size_x', metavar='R', type=int, default=10,
                         help='size of room along x axis')
     parser.add_argument('--size_y', metavar='R', type=int, default=10,
@@ -44,7 +46,7 @@ def main(*args):
     # Create array to track people
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
-                                         args.table, args.mask)
+                                         args.table, args.mask, args.travel)
 
     # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room1 = people_array_room(position_state, 1)
@@ -59,12 +61,26 @@ def main(*args):
     print(rooms)
 
     # Initialise people using the position_state array (array -> person class instances)
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], mask=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r, ROOM_SIZE_X=args.size_x, ROOM_SIZE_Y=args.size_y) for i in range(len(position_state))]  # creates people for each row in the array
+
+    # prints x value for each person
+    for obj in people:
+        obj.move()
+
+    update_position_state(position_state, people) #update table after 1 iteration and print it
+
 
     # Initialise areas
     area1 = area(args.table_x, args.table_y, args.table_r)
     circle = area1.draw()
 
-    simulate(people)
+    simulate()
+
+    nodes = possible_paths(position_state, G)
+
+    update_node_travel_prob(position_state, nodes)
+
+    #update_node_prob(position_state, nodes, args.travel)
 
 
 def create_edgelist(rooms):
@@ -90,7 +106,7 @@ def network_number_nodes(G):
     print(number_nodes)
     return(number_nodes)
 
-def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter, gravitate_table, using_mask):
+def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter, gravitate_table, using_mask, travel):
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
@@ -107,14 +123,40 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     masked = round(N*using_mask)
     no_masked = round(N*(1-using_mask))
     number_masked = np.concatenate((([1]*masked), ([0]*no_masked)))
-
-    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked), axis=1)
-    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask'])
+    # travelling round
+    travelling = round(N*travel)
+    no_travelling = round(N*(1-travel))
+    number_travelling = np.concatenate((([1]*masked), ([0]*no_masked)))
+    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling), axis=1)
+    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask', 'travelling'])
     return(position_state)
 
 def people_array_room(position_state,i):
     room = position_state[position_state["node"] == i]
     return(room)
+
+
+def possible_paths(position_state, G):
+    # this creates a list of the possible nodes that people can travel to
+    nodes =[]
+    for i in range(0, len(position_state),1):
+        possible_nodes = list(nx.single_source_shortest_path(G, source=position_state.iloc[i,2], cutoff=1))
+        nodes.append(possible_nodes)
+    print(nodes)
+    return(nodes)
+
+def update_node(position_state, nodes):
+    # update position_state dependant on connected nodes for each person
+    for i in range(0, len(position_state),1):
+        position_state.iloc[i,2] = random.choice(nodes[i])
+    return position_state
+
+def update_node_travel_prob(position_state, nodes):
+    # update position_state dependant on connected nodes and travel probability
+    for i in range(0, len(position_state),1):
+        if position_state.iloc[i,7] ==1:
+            position_state.iloc[i,2] = random.choice(nodes[i])
+    return position_state
 
 
 #----------------------------------------------------------------------------#
@@ -230,7 +272,7 @@ class person(object):
         def calc_dist_to_other_people(d): #d is the person, n is all the other people
             dist_from_other_people = 999
             for n in people:
-                if n.node == d.node:#make sure in same room
+                if n.node == d.node:
                     if n != d: #make sure not doing same person in calc
                         dist_from_person_n = distance(n.x, n.y, d.x, d.y)
                         if dist_from_person_n < dist_from_other_people:
@@ -267,11 +309,31 @@ class person(object):
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
             move_towards(self, self.AREA_X, self.AREA_Y) #NEED A WAY OF ACCESSING AREA CLASS????
 
-        if self.two_meter == 1: #follow 2 meter rule
+        #if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
+           # min_dist_to_someone = calc_dist_to_other_people(self)[0]
+           # closest_person = calc_dist_to_other_people(self)[1]
+           # if min_dist_to_someone < 2: #if closer than 2meters to someone
+                #move_away(self, closest_person.x, closest_person.y)
+
+        if self.two_meter == 0.0001: #follow 2 meter rule
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
             closest_person = calc_dist_to_other_people(self)[1]
             if min_dist_to_someone < 2: #if closer than 2meters to someone
                 move_away(self, closest_person.x, closest_person.y)
+
+
+#this also works for 2meter rule..
+        #if np.random.random_sample() < 1: #%chance to follow 2 meter rule
+            #min_dist_to_someone = calc_dist_to_other_people(self)[0]
+            #if min_dist_to_someone < 2:  # if closer than 2meters to someone
+                #for i in range(1, 10): #creates 10 random step sizes for the person and checks if they go further from the person
+                    #self.step_x = self.make_new_step_size()
+                    #self.step_y = self.make_new_step_size()
+                    #self.x = self.x + self.step_x #adds these steps to the current coords
+                    #self.y = self.y + self.step_y
+                    #if calc_dist_to_other_people(self)[0] <= min_dist_to_someone:
+                        #self.x = self.x - self.step_x
+                        #self.y = self.y - self.step_y
 
 #----------------------------------------------------------------------------#
 #                  Kaelan Room Heatmap classes                               #
@@ -344,14 +406,15 @@ class Room_map:
 #                  End of simulation classes                                        #
 #----------------------------------------------------------------------------#
 
+
+
 #REPLACE THIS WITH YAZ CODE
 # animation function.  This is called sequentially
 def animate():
     plt.show()
 
 
-
-def update_position_state(position_state):
+def update_position_state(position_state, people):
     position_state.iloc[:, :2] = 0  # array emptied for x y only
     # this code adds values from people objects back into array
     k = 0
@@ -367,8 +430,7 @@ def update_position_state(position_state):
 
 # placeholder simulate function
 def simulate():
-    for person in people: #goes through all people
-        person.move() #does all the move function (multiple functions inside) for person
+
     animate()
 
 
@@ -377,13 +439,6 @@ if __name__ == "__main__":
     # Command line entry point
     import sys
     main(*sys.argv[1:])
-
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2],
-                     status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4],
-                     gravitating=position_state.iloc[i, 5], mask=position_state.iloc[i, 5], AREA_X=args.table_x,
-                     AREA_Y=args.table_y, AREA_Z=args.table_r, ROOM_SIZE_X=args.size_x, ROOM_SIZE_Y=args.size_y) for i
-              in
-              range(len(position_state))]  # creates people for each row in the array
 
 
 
