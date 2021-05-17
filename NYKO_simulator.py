@@ -8,6 +8,13 @@ import random
 from numpy.random import randint
 import argparse
 
+#GLOBAL CONSTANTS
+ROOM_SIZE_X = 10
+ROOM_SIZE_Y = 10
+AREA_X = 5 #area coordinate to gravitate towards
+AREA_Y = 5
+AREA_R = 0.2 #area radius
+
 def main(*args):
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
@@ -33,19 +40,10 @@ def main(*args):
     # Set number of nodes
     number_nodes = network_number_nodes(G)
     # Create array to track people
-    position_state = create_people_array(room_size_x, room_size_y, args.number, number_nodes, args.cases, args.distance)
+    position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, args.number, number_nodes, args.cases, args.distance)
 
     return(position_state)
 
-#USER inputs
-#N = 10 #number of people in network
-room_size_x = 10
-room_size_y = 10
-#number_infected = 1
-area_x = 1 #area coordinate to gravitate towards
-area_y = 1
-area_r = 0.2 #area radius
-#following_two_meter = 0.5
 
 
 
@@ -63,9 +61,9 @@ def network_number_nodes(G):
     print(number_nodes)
     return(number_nodes)
 
-def create_people_array(room_size_x, room_size_y, N, number_nodes, number_infected, following_two_meter):
-    x_position = randint(0,room_size_x+1,N) # randomly assign x values for each person
-    y_position = randint(0,room_size_y+1,N) # randomly assign y values for each person
+def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter):
+    x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
+    y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
     start_status = np.concatenate((([1]*number_infected), ([0]*(N-number_infected))))
     follow = round(N*following_two_meter)
@@ -76,16 +74,9 @@ def create_people_array(room_size_x, room_size_y, N, number_nodes, number_infect
     position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter'])
     return(position_state)
 
-
-
 def people_array_room(position_state,i):
     room = position_state[position_state["node"] == i]
     return(room)
-
-
-
-
-
 
 
 #----------------------------------------------------------------------------#
@@ -209,24 +200,24 @@ class person(object):
             self.vely = self.make_new_step_size()
             self.x = self.x + self.step_x   # the coord is updated with that new constant (different amount than before so dot looks like it sped up/slowed down)
             self.y = self.y + self.step_y
-        if self.x >= room_size_x:  # so cannot go outside boundary of 10x10 grid
-            self.x = room_size_x
+        if self.x >= ROOM_SIZE_X:  # so cannot go outside boundary of 10x10 grid
+            self.x = ROOM_SIZE_X
             self.step_x = -1 * self.step_x
         if self.x <= 0:  # so cannot go outside boundary of 10x10 grid
             self.x = 0
             self.step_x = -1 * self.step_x
-        if self.y >= room_size_y:  # so cannot go outside boundary of 10x10 grid
-            self.y = room_size_y
+        if self.y >= ROOM_SIZE_Y:  # so cannot go outside boundary of 10x10 grid
+            self.y = ROOM_SIZE_Y
             self.step_y = -1 * self.step_y
         if self.y <= 0:  # so cannot go outside boundary of 10x10 grid
             self.y = 0
             self.step_y = -1 * self.step_y
 
-        if inside(self.x, self.y, area_x, area_y, area_r): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS if want multiple areas????
+        if inside(self.x, self.y, AREA_X, AREA_Y, AREA_R): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS if want multiple areas????
             stop(self)
 
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
-            move_towards(self, area_x, area_y) #NEED A WAY OF ACCESSING AREA CLASS????
+            move_towards(self, AREA_X, AREA_Y) #NEED A WAY OF ACCESSING AREA CLASS????
 
         if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
@@ -271,9 +262,9 @@ if __name__ == "__main__":
     import sys
     position_state = main(*sys.argv[1:])
 
-    #position_state = create_people_array(room_size_x, room_size_y, N, number_nodes, number_infected, following_two_meter)
-    print('original position_state array:')
-    print(position_state)
+    #position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter)
+    #print('original position_state array:')
+    #print(position_state)
 
     # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room1 = people_array_room(position_state, 1)
@@ -289,13 +280,13 @@ if __name__ == "__main__":
             range(len(position_state))]  # creates people for each row in the array
 
 # Initialise areas
-    area1 = area(area_x, area_y, area_r)
+    area1 = area(AREA_X, AREA_Y, AREA_R)
 
 
 
 # First set up the figure, the axis, and the plot element we want to animate
 fig = plt.figure() #empty figure
-ax = plt.axes(xlim=(0, room_size_x), ylim=(0, room_size_y)) #axes limit room_size
+ax = plt.axes(xlim=(0, ROOM_SIZE_X), ylim=(0, ROOM_SIZE_Y)) #axes limit room_size
 d, = ax.plot([person.x for person in people], #plot person coords x
              [person.y for person in people], 'ro') #plot person coords y
 
