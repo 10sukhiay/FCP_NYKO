@@ -22,7 +22,7 @@ def main(*args):
                         help='Use a N x N simulation grid')
     parser.add_argument('--cases', metavar='N', type=int, default=2,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='D', type=float, default=0.5,
+    parser.add_argument('--distance', metavar='D', type=float, default=1,
                         help='Probability of following two meter social distancing')
     parser.add_argument('--rooms', metavar='R', type=int, default=2,
                         help='Number of rooms to simulate')
