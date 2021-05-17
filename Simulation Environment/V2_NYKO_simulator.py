@@ -1,3 +1,29 @@
+#!/usr/bin/env python3
+"""
+
+XXXXXX.py
+Nathan Wooster, Kaelan Melville, Oscar Bond, Yazad Sukhia
+May 2021
+
+This script runs simulations of an epidemic (e.g. coronavirus) for the
+air borne spreading of the virus through a network, taking.
+The script can be used to:
+
+    1. XXXXX
+
+This is all done using the same simulation code which can also be imported
+from this file and used in other ways.
+
+The command line interface to the script makes it possible to run different
+simulations without needing to edit the code e.g.:
+
+    $ python simulator.py               # run simulation with default settings
+    $ python simulator.py --number=10   # sets size of population to 10
+    $ python simulator.py --help        # show all command line options
+
+"""
+
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
@@ -434,8 +460,10 @@ def simulate():
 
 
 if __name__ == "__main__":
-
-    # Command line entry point
+    #
+    # CLI entry point. The main() function can also be imported and called
+    # with string arguments.
+    #
     import sys
     main(*sys.argv[1:])
 
