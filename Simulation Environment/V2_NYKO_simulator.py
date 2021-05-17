@@ -59,11 +59,14 @@ def main(*args):
     print(rooms)
 
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r) for i in range(len(position_state))] # creates people for each row in the array
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], mask=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r, ROOM_SIZE_X=args.size_x, ROOM_SIZE_Y=args.size_y) for i in range(len(position_state))]  # creates people for each row in the array
 
     # prints x value for each person
     for obj in people:
-        print(obj.x)
+        obj.move()
+
+    update_position_state(position_state, people) #update table after 1 iteration and print it
+
 
     # Initialise areas
     area1 = area(args.table_x, args.table_y, args.table_r)
@@ -161,15 +164,21 @@ class area(object):
 
 #create moving person class with original x, y and node inputs
 class person(object):
-    def __init__(self, x, y, node, AREA_X, AREA_Y, AREA_Z):
+    def __init__(self, x, y, node, status, two_meter, gravitating, mask, AREA_X, AREA_Y, AREA_Z, ROOM_SIZE_X, ROOM_SIZE_Y):
         self.x = x
         self.y = y
         self.node = node
+        self.status = status
+        self.two_meter = two_meter
+        self.gravitating = gravitating
+        self.mask = mask
         self.step_x = self.make_new_step_size() #calls function to create a new step size for person
         self.step_y = self.make_new_step_size()
         self.AREA_X = AREA_X
         self.AREA_Y = AREA_Y
         self.AREA_Z = AREA_Z
+        self.ROOM_SIZE_X = ROOM_SIZE_X
+        self.ROOM_SIZE_Y = ROOM_SIZE_Y
 
     def make_new_step_size(self, max_step=1):
         return (np.random.random_sample() - 0.5)*max_step / 5 #creates random number for step size 0 to 0.1
@@ -267,20 +276,20 @@ class person(object):
             self.vely = self.make_new_step_size()
             self.x = self.x + self.step_x   # the coord is updated with that new constant (different amount than before so dot looks like it sped up/slowed down)
             self.y = self.y + self.step_y
-        if self.x >= ROOM_SIZE_X:  # so cannot go outside boundary of 10x10 grid
-            self.x = ROOM_SIZE_X
+        if self.x >= self.ROOM_SIZE_X:  # so cannot go outside boundary of 10x10 grid
+            self.x = self.ROOM_SIZE_X
             self.step_x = -1 * self.step_x
         if self.x <= 0:  # so cannot go outside boundary of 10x10 grid
             self.x = 0
             self.step_x = -1 * self.step_x
-        if self.y >= ROOM_SIZE_Y:  # so cannot go outside boundary of 10x10 grid
-            self.y = ROOM_SIZE_Y
+        if self.y >= self.ROOM_SIZE_Y:  # so cannot go outside boundary of 10x10 grid
+            self.y = self.ROOM_SIZE_Y
             self.step_y = -1 * self.step_y
         if self.y <= 0:  # so cannot go outside boundary of 10x10 grid
             self.y = 0
             self.step_y = -1 * self.step_y
 
-        if inside(self.x, self.y, self.AREA_X, self.AREA_Y, self.AREA_R): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS if want multiple areas????
+        if inside(self.x, self.y, self.AREA_X, self.AREA_Y, self.AREA_Z): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS if want multiple areas????
             stop(self)
 
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
@@ -391,7 +400,7 @@ def animate():
     plt.show()
 
 
-def update_position_state(position_state):
+def update_position_state(position_state, people):
     position_state.iloc[:, :2] = 0  # array emptied for x y only
     # this code adds values from people objects back into array
     k = 0
