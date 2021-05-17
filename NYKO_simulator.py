@@ -401,7 +401,7 @@ def update_position_state(position_state):
         position_state.iloc[k, 1] = t.y
         position_state.iloc[k, 2] = t.node
         k +=1 # iterator for picking the correct row
-        
+
     print('iteration finished and this is new position_state array:')
     print(position_state)  # array refilled with people
     return(position_state)
