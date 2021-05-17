@@ -404,3 +404,7 @@ ax.add_artist(circle) #add circle to axes plot
 anim = animation.FuncAnimation(fig, animate, frames=200, interval=100, repeat=False) #in built function to keep updating plot to creates animation
 
 plt.show() #shows plot
+
+
+
+
