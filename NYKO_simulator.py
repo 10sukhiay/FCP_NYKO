@@ -42,10 +42,16 @@ def main(*args):
     # Create array to track people
     position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, args.number, number_nodes, args.cases, args.distance)
 
+    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
+    room1 = people_array_room(position_state, 1)
+    room2 = people_array_room(position_state, 2)
+    room3 = people_array_room(position_state, 3)
+
+    print('room1 array:')
+    print(room1)
+
+
     return(position_state)
-
-
-
 
 
 def create_network(edgelist):
@@ -266,13 +272,7 @@ if __name__ == "__main__":
     #print('original position_state array:')
     #print(position_state)
 
-    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
-    room1 = people_array_room(position_state, 1)
-    room2 = people_array_room(position_state, 2)
-    room3 = people_array_room(position_state, 3)
 
-    print('room1 array:')
-    print(room1)
 
 
 # Initialise people using the position_state array (array -> person class instances)
@@ -300,19 +300,19 @@ anim = animation.FuncAnimation(fig, animate, frames=200, interval=20) #in built 
 plt.show() #shows plot
 
 
-print('check original position_state array:')
-print(position_state) # original array
-position_state.iloc[:, :2] = 0
-print('empty array x and y:')
-print(position_state) #array emptied for x y only
+def update_position_state(position_state):
+    position_state.iloc[:, :2] = 0 #array emptied for x y only
+    # this code adds values from people objects back into array
+    k = 0
+    for t in people:
+        position_state.iloc[k, 0] = t.x
+        position_state.iloc[k, 1] = t.y
+        position_state.iloc[k, 2] = t.node
+        k +=1 # iterator for picking the correct row
 
-# this code adds values from people objects back into array
-k = 0
-for t in people:
-    position_state.iloc[k, 0] = t.x
-    position_state.iloc[k, 1] = t.y
-    position_state.iloc[k, 2] = t.node
-    k +=1 # iterator for picking the correct row
 
+    return(position_state)
+
+update_position_state(position_state)
 print('move run finished and this is new position_state array:')
 print(position_state) # array refilled with people
