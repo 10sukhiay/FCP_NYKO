@@ -51,8 +51,12 @@ def main(*args):
     room2 = people_array_room(position_state, 2)
     room3 = people_array_room(position_state, 3)
 
-    print('room1 array:')
-    print(room1)
+    rooms = []
+    for i in range(1, (args.rooms+1)):
+        rooms.append(people_array_room(position_state, i))
+
+    print('room arrays:')
+    print(rooms)
 
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r) for i in
@@ -60,7 +64,6 @@ def main(*args):
     # Initialise areas
     area1 = area(args.table_x, args.table_y, args.table_r)
     circle = area1.draw()
-
 
     simulate()
 
@@ -288,7 +291,7 @@ class person(object):
 #----------------------------------------------------------------------------#
 
 class Room_map:
-    def __init__(self, heat_new, position_state, xsize, ysize, ):
+    def __init__(self, heat_new, position_state, xsize, ysize):
         self.heat_old = heat_new
         self.position_state = position_state
         self.xsize = xsize
