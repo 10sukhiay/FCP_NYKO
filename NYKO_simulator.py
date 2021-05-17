@@ -60,10 +60,6 @@ def main(*args):
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
               range(len(position_state))]  # creates people for each row in the array
 
-    #update_position_state(position_state)
-    print('iteration finished and this is new position_state array:')
-    print(position_state)  # array refilled with people
-
     return(people)
 
 
@@ -247,7 +243,13 @@ class person(object):
         if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
             move_towards(self, AREA_X, AREA_Y) #NEED A WAY OF ACCESSING AREA CLASS????
 
-        if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
+        #if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
+           # min_dist_to_someone = calc_dist_to_other_people(self)[0]
+           # closest_person = calc_dist_to_other_people(self)[1]
+           # if min_dist_to_someone < 2: #if closer than 2meters to someone
+                #move_away(self, closest_person.x, closest_person.y)
+
+        if np.random.random_sample() < 0.00001: #follow 2 meter rule if person labelled to
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
             closest_person = calc_dist_to_other_people(self)[1]
             if min_dist_to_someone < 2: #if closer than 2meters to someone
@@ -358,6 +360,7 @@ if __name__ == "__main__":
     #main(*sys.argv[1:])
 
 
+
     #position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter)
     #print('original position_state array:')
     #print(position_state)
@@ -397,6 +400,10 @@ def update_position_state(position_state):
         position_state.iloc[k, 1] = t.y
         position_state.iloc[k, 2] = t.node
         k +=1 # iterator for picking the correct row
+
+    #update_position_state(position_state)
+    print('iteration finished and this is new position_state array:')
+    print(position_state)  # array refilled with people
 
     return(position_state)
 
