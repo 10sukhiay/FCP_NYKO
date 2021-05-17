@@ -23,9 +23,9 @@ def main(*args):
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=2,
                         help='Number of rooms to simulate')
-    parser.add_argument('--size_x', metavar='R', type=int, default=10,
+    parser.add_argument('--size_x', metavar='R', type=int, default=20,
                         help='size of room along x axis')
-    parser.add_argument('--size_y', metavar='R', type=int, default=10,
+    parser.add_argument('--size_y', metavar='R', type=int, default=15,
                         help='size of room along y axis')
     parser.add_argument('--table_r', metavar='R', type=int, default=0.5,
                         help='radius of table')
@@ -72,7 +72,9 @@ def main(*args):
 
 
     #create heat maps for each room
-    heat_maps = [Room_map(heat_new, position_state, xsize, ysize) for i in range(args.rooms)]
+    heat_new = np.zeros((args.size_y, args.size_x))
+    heat_maps = [Room_map(heat_new=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y) for i in range(args.rooms)]
+
 
 
     simulate(days=args.days)
@@ -96,8 +98,8 @@ def create_network(edgelist):
 
 def network_number_nodes(G):
     number_nodes = G.number_of_nodes()
-    print('number of nodes is:')
-    print(number_nodes)
+    #print('number of nodes is:')
+    #print(number_nodes)
     return(number_nodes)
 
 def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter, gravitate_table, using_mask):
