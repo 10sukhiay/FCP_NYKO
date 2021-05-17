@@ -60,7 +60,7 @@ def main(*args):
 
 
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r) for i in range(len(position_state))]
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r) for i in range(len(position_state))]
 
 
     # Initialise areas
@@ -151,10 +151,13 @@ class area(object):
 
 #create moving person class with original x, y and node inputs
 class person(object):
-    def __init__(self, x, y, node, AREA_X, AREA_Y, AREA_R):
+    def __init__(self, x, y, node, status, two_meter, gravitating, AREA_X, AREA_Y, AREA_R):
         self.x = x
         self.y = y
         self.node = node
+        self.status = status
+        self.two_meter = two_meter
+        self.gravitating = gravitating
         self.step_x = self.make_new_step_size() #calls function to create a new step size for person
         self.step_y = self.make_new_step_size()
         self.AREA_X = AREA_X
@@ -271,14 +274,14 @@ class person(object):
             self.y = 0
             self.step_y = -1 * self.step_y
 
-        if inside(self.x, self.y, self.AREA_X, self.AREA_Y, self.AREA_R): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS if want multiple areas????
+        if inside(self.x, self.y, self.AREA_X, self.AREA_Y, self.AREA_R): #stop if reach table area
             stop(self)
 
-        if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
-            move_towards(self, self.AREA_X, self.AREA_Y) #NEED A WAY OF ACCESSING AREA CLASS????
+        if np.random.random_sample() < 1:  # % chance to gravitate towards point
+            move_towards(self, self.AREA_X, self.AREA_Y)
 
 
-        if np.random.random_sample() < 1: #follow 2 meter rule if person labelled to
+        if self.two_meter == 1: #follow 2 meter rule
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
             closest_person = calc_dist_to_other_people(self)[1]
             if min_dist_to_someone < 2: #if closer than 2meters to someone
