@@ -68,7 +68,7 @@ def main(*args):
     circle = area1.draw()
 
     for i in people:
-        i.move(size_x=args.size_x, size_y=args.size_y)
+        i.move(size_x=args.size_x, size_y=args.size_y, people=people)
 
 
     #create heat maps for each room
@@ -160,7 +160,7 @@ class person(object):
     def make_new_step_size(self, max_step=1):
         return (np.random.random_sample() - 0.5)*max_step / 5 #creates random number for step size 0 to 0.1
 
-    def move(self, size_x, size_y):
+    def move(self, size_x, size_y, people):
 
         def distance(x1, y1, x2, y2):
             return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) #uses coords and calulates distance between two points
@@ -278,7 +278,7 @@ class person(object):
            # if min_dist_to_someone < 2: #if closer than 2meters to someone
                 #move_away(self, closest_person.x, closest_person.y)
 
-        if np.random.random_sample() < 0.00001: #follow 2 meter rule if person labelled to
+        if np.random.random_sample() < 1: #follow 2 meter rule if person labelled to
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
             closest_person = calc_dist_to_other_people(self)[1]
             if min_dist_to_someone < 2: #if closer than 2meters to someone
