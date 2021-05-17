@@ -8,13 +8,6 @@ import random
 from numpy.random import randint
 import argparse
 
-#GLOBAL CONSTANTS
-ROOM_SIZE_X = 10
-ROOM_SIZE_Y = 10
-AREA_X = 2 #area coordinate to gravitate towards
-AREA_Y = 2
-AREA_R = 0.5 #area radius
-
 def main(*args):
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
@@ -30,6 +23,16 @@ def main(*args):
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=2,
                         help='Number of rooms to simulate')
+    parser.add_argument('--size_x', metavar='R', type=int, default=10,
+                        help='size of room along x axis')
+    parser.add_argument('--size_y', metavar='R', type=int, default=10,
+                        help='size of room along y axis')
+    parser.add_argument('--table_r', metavar='R', type=int, default=0.5,
+                        help='radius of table')
+    parser.add_argument('--table_x', metavar='R', type=int, default=2,
+                        help='x coordinate of table')
+    parser.add_argument('--table_y', metavar='R', type=int, default=2,
+                        help='y coordinate of table')
     args = parser.parse_args(args)
 
     edgelist = create_edgelist(args.rooms)
@@ -39,7 +42,7 @@ def main(*args):
     # Set number of nodes
     number_nodes = network_number_nodes(G)
     # Create array to track people
-    position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, args.number,
+    position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask)
 
@@ -55,7 +58,7 @@ def main(*args):
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
               range(len(position_state))]  # creates people for each row in the array
     # Initialise areas
-    area1 = area(AREA_X, AREA_Y, AREA_R)
+    area1 = area(args.table_x, args.table_y, args.table_r)
     circle = area1.draw()
 
 
