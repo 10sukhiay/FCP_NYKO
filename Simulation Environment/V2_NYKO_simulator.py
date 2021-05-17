@@ -71,6 +71,10 @@ def main(*args):
 
     simulate()
 
+    update_node(position_state)
+
+    possible_paths(position_state, G)
+
 def create_edgelist(rooms):
     # Define the edge list dependant on number of rooms. Could also look at connectivity such as:
     # #edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
@@ -119,6 +123,20 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
 def people_array_room(position_state,i):
     room = position_state[position_state["node"] == i]
     return(room)
+
+
+def update_node(position_state):
+    print('position state pre update:')
+    print(position_state)
+
+
+def possible_paths(position_state, G):
+    nodes =[]
+    for i in range(0, len(position_state),1):
+        possible_nodes = list(nx.single_source_shortest_path(G, source=position_state.iloc[i,2], cutoff=1))
+        nodes.append(possible_nodes)
+    print(nodes)
+    return(nodes)
 
 
 #----------------------------------------------------------------------------#
