@@ -61,11 +61,13 @@ def main(*args):
     print(rooms)
 
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], mask=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r, ROOM_SIZE_X=args.size_x, ROOM_SIZE_Y=args.size_y) for i in range(len(position_state))]  # creates people for each row in the array
+    people = []
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], mask=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r, ROOM_SIZE_X=args.size_x, ROOM_SIZE_Y=args.size_y, people=people) for i in range(len(position_state))]
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], mask=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_Z=args.table_r, ROOM_SIZE_X=args.size_x, ROOM_SIZE_Y=args.size_y, people=people) for i in range(len(position_state))]  # creates people for each row in the array
 
     # prints x value for each person
     for obj in people:
-        obj.move()
+        obj.move(people)
 
     update_position_state(position_state, people) #update table after 1 iteration and print it
 
@@ -177,7 +179,8 @@ class area(object):
 
 #create moving person class with original x, y and node inputs
 class person(object):
-    def __init__(self, x, y, node, status, two_meter, gravitating, mask, AREA_X, AREA_Y, AREA_Z, ROOM_SIZE_X, ROOM_SIZE_Y):
+
+    def __init__(self, x, y, node, status, two_meter, gravitating, mask, AREA_X, AREA_Y, AREA_Z, ROOM_SIZE_X, ROOM_SIZE_Y, people):
         self.x = x
         self.y = y
         self.node = node
@@ -192,11 +195,12 @@ class person(object):
         self.AREA_Z = AREA_Z
         self.ROOM_SIZE_X = ROOM_SIZE_X
         self.ROOM_SIZE_Y = ROOM_SIZE_Y
+        people = people
 
     def make_new_step_size(self, max_step=1):
         return (np.random.random_sample() - 0.5)*max_step / 5 #creates random number for step size 0 to 0.1
 
-    def move(self):
+    def move(self,people):
 
         def distance(x1, y1, x2, y2):
             return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) #uses coords and calulates distance between two points
@@ -269,7 +273,7 @@ class person(object):
                 self.step_y = -1 * self.step_y
             return
 
-        def calc_dist_to_other_people(d): #d is the person, n is all the other people
+        def calc_dist_to_other_people(d,people): #d is the person, n is all the other people
             dist_from_other_people = 999
             for n in people:
                 if n.node == d.node:
@@ -315,9 +319,9 @@ class person(object):
            # if min_dist_to_someone < 2: #if closer than 2meters to someone
                 #move_away(self, closest_person.x, closest_person.y)
 
-        if self.two_meter == 0.0001: #follow 2 meter rule
-            min_dist_to_someone = calc_dist_to_other_people(self)[0]
-            closest_person = calc_dist_to_other_people(self)[1]
+        if self.two_meter == 1: #follow 2 meter rule
+            min_dist_to_someone = calc_dist_to_other_people(self,people)[0]
+            closest_person = calc_dist_to_other_people(self,people)[1]
             if min_dist_to_someone < 2: #if closer than 2meters to someone
                 move_away(self, closest_person.x, closest_person.y)
 
