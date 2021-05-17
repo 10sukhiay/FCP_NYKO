@@ -391,19 +391,21 @@ if __name__ == "__main__":
 
 ### turn this into a function to be called from the main - called Animation
 # First set up the figure, the axis, and the plot element we want to animate
-fig = plt.figure() #empty figure
-ax = plt.axes(xlim=(0, ROOM_SIZE_X), ylim=(0, ROOM_SIZE_Y)) #axes limit room_size
-d, = ax.plot([person.x for person in people], #plot person coords x
-             [person.y for person in people], 'ro') #plot person coords y
 
-circle = area1.draw()
-ax.add_artist(circle) #add circle to axes plot
+def simulate():
+    fig = plt.figure() #empty figure
+    ax = plt.axes(xlim=(0, ROOM_SIZE_X), ylim=(0, ROOM_SIZE_Y)) #axes limit room_size
+    d, = ax.plot([person.x for person in people], #plot person coords x
+                 [person.y for person in people], 'ro') #plot person coords y
+
+    circle = area1.draw()
+    ax.add_artist(circle) #add circle to axes plot
 
 
-# call the animator.
-anim = animation.FuncAnimation(fig, animate, frames=200, interval=100, repeat=False) #in built function to keep updating plot to creates animation
+    # call the animator.
+    anim = animation.FuncAnimation(fig, animate, frames=200, interval=100, repeat=False) #in built function to keep updating plot to creates animation
 
-plt.show() #shows plot
+    plt.show() #shows plot
 
 
 
