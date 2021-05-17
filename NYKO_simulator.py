@@ -24,6 +24,10 @@ def main(*args):
                         help='Number of initial infected people')
     parser.add_argument('--distance', metavar='D', type=float, default=0.5,
                         help='Probability of following two meter social distancing')
+    parser.add_argument('--table', metavar='T', type=float, default=0.1,
+                        help='Probability of gravitating to the table')
+    parser.add_argument('--mask', metavar='M', type=float, default=0.5,
+                        help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=2,
                         help='Number of rooms to simulate')
     args = parser.parse_args(args)
@@ -40,7 +44,9 @@ def main(*args):
     # Set number of nodes
     number_nodes = network_number_nodes(G)
     # Create array to track people
-    position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, args.number, number_nodes, args.cases, args.distance)
+    position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, args.number,
+                                         number_nodes, args.cases, args.distance,
+                                         args.table, args.mask)
 
     # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room1 = people_array_room(position_state, 1)
@@ -74,17 +80,26 @@ def network_number_nodes(G):
     print(number_nodes)
     return(number_nodes)
 
-def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter):
+def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter, gravitate_table, using_mask):
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
     start_status = np.concatenate((([1]*number_infected), ([0]*(N-number_infected))))
+    # following two meter rule
     follow = round(N*following_two_meter)
     no_follow = round(N*(1-following_two_meter))
     two_meter = np.concatenate((([1]*follow), ([0]*no_follow)))
-    #start_status = start_status.transpose()
-    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter), axis=1)
-    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter'])
+    #gravitating towards the table
+    gravitate = round(N*gravitate_table)
+    no_gravitate = round(N*(1-gravitate_table))
+    number_gravitating = np.concatenate((([1]*gravitate), ([0]*no_gravitate)))
+    #wearing a mask
+    masked = round(N*using_mask)
+    no_masked = round(N*(1-using_mask))
+    number_masked = np.concatenate((([1]*masked), ([0]*no_masked)))
+
+    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked), axis=1)
+    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask'])
     return(position_state)
 
 def people_array_room(position_state,i):
