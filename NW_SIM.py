@@ -49,8 +49,10 @@ def main(*args):
 
     print('room1 array:')
     print(room1)
-
-
+    print('room2 array:')
+    print(room2)
+    print('room3 array:')
+    print(room3)
     return(position_state)
 
 
@@ -103,10 +105,12 @@ class area(object):
 
 #create moving person class with original x, y and node inputs
 class person(object):
-    def __init__(self, x, y, node):
+    def __init__(self, x, y, node, status, two_meter):
         self.x = x
         self.y = y
         self.node = node
+        self.status = status
+        self.two_meter = two_meter
         self.step_x = self.make_new_step_size() #calls function to create a new step size for person
         self.step_y = self.make_new_step_size()
 
@@ -189,11 +193,12 @@ class person(object):
         def calc_dist_to_other_people(d): #d is the person, n is all the other people
             dist_from_other_people = 999
             for n in people:
-                if n != d: #make sure not doing same person in calc
-                    dist_from_person_n = distance(n.x, n.y, d.x, d.y)
-                    if dist_from_person_n < dist_from_other_people:
-                        dist_from_other_people = dist_from_person_n
-                        closest_person = n
+                if n.node == d.node:
+                    if n != d: #make sure not doing same person in calc
+                        dist_from_person_n = distance(n.x, n.y, d.x, d.y)
+                        if dist_from_person_n < dist_from_other_people:
+                            dist_from_other_people = dist_from_person_n
+                            closest_person = n
             return (dist_from_other_people,closest_person)
 
         #actual movement now stated using functions given above
@@ -222,14 +227,20 @@ class person(object):
         if inside(self.x, self.y, AREA_X, AREA_Y, AREA_R): #stop if reach table #NEED A WAY OF ACCESSING AREA CLASS if want multiple areas????
             stop(self)
 
-        if np.random.random_sample() < 1:  # % chance to gravitate towards point 1,1
+        if np.random.random_sample() < 0.000000001:  # % chance to gravitate towards point 1,1
             move_towards(self, AREA_X, AREA_Y) #NEED A WAY OF ACCESSING AREA CLASS????
 
-        if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
+        if self.two_meter == 1: #follow 2 meter rule
             min_dist_to_someone = calc_dist_to_other_people(self)[0]
             closest_person = calc_dist_to_other_people(self)[1]
             if min_dist_to_someone < 2: #if closer than 2meters to someone
                 move_away(self, closest_person.x, closest_person.y)
+
+        #if np.random.random_sample() < 0.00001: #%chance to follow 2 meter rule
+         #   min_dist_to_someone = calc_dist_to_other_people(self)[0]
+           # closest_person = calc_dist_to_other_people(self)[1]
+          #  if min_dist_to_someone < 2: #if closer than 2meters to someone
+           #     move_away(self, closest_person.x, closest_person.y)
 
 
 #this also works for 2meter rule..
@@ -276,7 +287,7 @@ if __name__ == "__main__":
 
 
 # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4])  for i in
             range(len(position_state))]  # creates people for each row in the array
 
 # Initialise areas
