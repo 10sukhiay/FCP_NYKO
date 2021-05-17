@@ -61,7 +61,7 @@ def main(*args):
               range(len(position_state))]  # creates people for each row in the array
 
     #update_position_state(position_state)
-    print('move run finished and this is new position_state array:')
+    print('iteration finished and this is new position_state array:')
     print(position_state)  # array refilled with people
 
     return(people)
