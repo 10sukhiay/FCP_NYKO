@@ -375,6 +375,7 @@ def update_position_state(position_state,people):
         position_state.iloc[k, 0] = t.x
         position_state.iloc[k, 1] = t.y
         position_state.iloc[k, 2] = t.node
+        position_state.iloc[k, 5] = t.gravitating
         k += 1  # iterator for picking the correct row
     # check
     print('iteration finished and this is new position_state array:')
