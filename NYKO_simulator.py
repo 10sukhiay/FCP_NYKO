@@ -11,14 +11,28 @@ import argparse
 def main(*args):
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=20,
+    parser.add_argument('--number', metavar='N', type=int, default=10,
                         help='Use a N x N simulation grid')
     parser.add_argument('--cases', metavar='N', type=int, default=2,
                         help='Number of initial infected people')
     parser.add_argument('--distance', metavar='D', type=float, default=0.5,
                         help='Probability of following two meter social distancing')
+    parser.add_argument('--rooms', metavar='R', type=int, default=2,
+                        help='Number of rooms to simulate')
     args = parser.parse_args(args)
 
+    # Define the edge list dependant on number of rooms. Could also look at connectivity such as:
+    # #edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
+    if args.rooms == 2:
+        edgelist = [(1, 2)]
+    if args.rooms == 3:
+        edgelist = [(1, 2), (1,3), (2,3)]
+
+    # Create network
+    G = create_network(edgelist)
+    # Set number of nodes
+    number_nodes = network_number_nodes(G)
+    # Create array to track people
     position_state = create_people_array(room_size_x, room_size_y, args.number, number_nodes, args.cases, args.distance)
 
     return(position_state)
@@ -34,18 +48,20 @@ area_r = 0.2 #area radius
 #following_two_meter = 0.5
 
 
-# Input graph here
-#edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
-edgelist=[(1,2)]
 
-# Create a networkx graph from the edgelist.
-G = nx.Graph(edgelist)
-nx.draw(G, with_labels=True)
-#plt.show()   # this displays the graph - turn on as required.
 
-number_nodes = G.number_of_nodes()
-print('number of nodes is:')
-print(number_nodes)
+def create_network(edgelist):
+    # Create a networkx graph from the edgelist.
+    G = nx.Graph(edgelist)
+    nx.draw(G, with_labels=True)
+    #plt.show()   # this displays the graph - turn on as required.
+    return(G)
+
+def network_number_nodes(G):
+    number_nodes = G.number_of_nodes()
+    print('number of nodes is:')
+    print(number_nodes)
+    return(number_nodes)
 
 def create_people_array(room_size_x, room_size_y, N, number_nodes, number_infected, following_two_meter):
     x_position = randint(0,room_size_x+1,N) # randomly assign x values for each person
