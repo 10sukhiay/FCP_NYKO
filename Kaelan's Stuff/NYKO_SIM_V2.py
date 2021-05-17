@@ -59,6 +59,10 @@ def main(*args):
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2]) for i in
               range(len(position_state))]  # creates people for each row in the array
+    # Initialise areas
+    area1 = area(AREA_X, AREA_Y, AREA_R)
+    circle = area1.draw()
+
 
     simulate()
 
@@ -344,12 +348,8 @@ class Room_map:
 
 #REPLACE THIS WITH YAZ CODE
 # animation function.  This is called sequentially
-def animate(i):
-    for person in people: #goes through all people
-        person.move() #does all the move function (multiple functions inside) for person
-    d.set_data([person.x for person in people], #d is taken from the dots coords to plot
-               [person.y for person in people])
-    return d,
+def animate(people):
+    plt.show()
 
 
 def update_position_state(position_state):
@@ -366,22 +366,10 @@ def update_position_state(position_state):
     print(position_state)  # array refilled with people
     return (position_state)
 
-
+# placeholder simulate function
 def simulate():
-    fig = plt.figure() #empty figure
-    ax = plt.axes(xlim=(0, ROOM_SIZE_X), ylim=(0, ROOM_SIZE_Y)) #axes limit room_size
-    d, = ax.plot([person.x for person in people], #plot person coords x
-                 [person.y for person in people], 'ro') #plot person coords y
 
-    circle = area1.draw()
-    ax.add_artist(circle) #add circle to axes plot
-
-
-    # call the animator.
-    anim = animation.FuncAnimation(fig, animate, frames=200, interval=100, repeat=False) #in built function to keep updating plot to creates animation
-
-    plt.show() #shows plot
-
+    animate()
 
 
 if __name__ == "__main__":
@@ -403,12 +391,10 @@ if __name__ == "__main__":
 
 
 
-# Initialise areas
-    area1 = area(AREA_X, AREA_Y, AREA_R)
 
 
-### turn this into a function to be called from the main - called Animation
-# First set up the figure, the axis, and the plot element we want to animate
+
+
 
 
 
