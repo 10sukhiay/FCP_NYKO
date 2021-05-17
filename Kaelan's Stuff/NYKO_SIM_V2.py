@@ -376,15 +376,7 @@ if __name__ == "__main__":
 
     # Command line entry point
     import sys
-    people = main(*sys.argv[1:])
-    #main(*sys.argv[1:])
-    #update_position_state(position_state)
-
-
-
-    #position_state = create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter)
-    #print('original position_state array:')
-    #print(position_state)
+    main(*sys.argv[1:])
 
 
 
