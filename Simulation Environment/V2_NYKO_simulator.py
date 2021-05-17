@@ -23,6 +23,8 @@ def main(*args):
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=2,
                         help='Number of rooms to simulate')
+    parser.add_argument('--travel', metavar='T', type=float, default=0.5,
+                        help='Proportion of people that move between rooms')
     parser.add_argument('--size_x', metavar='R', type=int, default=10,
                         help='size of room along x axis')
     parser.add_argument('--size_y', metavar='R', type=int, default=10,
@@ -44,7 +46,7 @@ def main(*args):
     # Create array to track people
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
-                                         args.table, args.mask)
+                                         args.table, args.mask, args.travel)
 
     # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room1 = people_array_room(position_state, 1)
@@ -76,8 +78,9 @@ def main(*args):
 
     nodes = possible_paths(position_state, G)
 
-    update_node(position_state, nodes)
+    update_node_travel_prob(position_state, nodes)
 
+    #update_node_prob(position_state, nodes, args.travel)
 
 
 def create_edgelist(rooms):
@@ -103,7 +106,7 @@ def network_number_nodes(G):
     print(number_nodes)
     return(number_nodes)
 
-def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter, gravitate_table, using_mask):
+def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter, gravitate_table, using_mask, travel):
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
@@ -120,21 +123,18 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     masked = round(N*using_mask)
     no_masked = round(N*(1-using_mask))
     number_masked = np.concatenate((([1]*masked), ([0]*no_masked)))
-
-    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked), axis=1)
-    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask'])
+    # travelling round
+    travelling = round(N*travel)
+    no_travelling = round(N*(1-travel))
+    number_travelling = np.concatenate((([1]*masked), ([0]*no_masked)))
+    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling), axis=1)
+    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask', 'travelling'])
     return(position_state)
 
 def people_array_room(position_state,i):
     room = position_state[position_state["node"] == i]
     return(room)
 
-
-def update_node(position_state, nodes):
-    # this is a simple update dependant on connected nodes for each person. Not everyone will move
-    for i in range(0, len(position_state),1):
-        position_state.iloc[i,2] = random.choice(nodes[i])
-    return position_state
 
 def possible_paths(position_state, G):
     # this creates a list of the possible nodes that people can travel to
@@ -144,6 +144,19 @@ def possible_paths(position_state, G):
         nodes.append(possible_nodes)
     print(nodes)
     return(nodes)
+
+def update_node(position_state, nodes):
+    # update position_state dependant on connected nodes for each person
+    for i in range(0, len(position_state),1):
+        position_state.iloc[i,2] = random.choice(nodes[i])
+    return position_state
+
+def update_node_travel_prob(position_state, nodes):
+    # update position_state dependant on connected nodes and travel probability
+    for i in range(0, len(position_state),1):
+        if position_state.iloc[i,7] ==1:
+            position_state.iloc[i,2] = random.choice(nodes[i])
+    return position_state
 
 
 #----------------------------------------------------------------------------#
