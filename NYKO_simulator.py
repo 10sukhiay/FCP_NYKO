@@ -11,22 +11,27 @@ import argparse
 def main(*args):
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=10,
+    parser.add_argument('--number', metavar='N', type=int, default=20,
                         help='Use a N x N simulation grid')
+    parser.add_argument('--cases', metavar='N', type=int, default=2,
+                        help='Number of initial infected people')
+    parser.add_argument('--distance', metavar='D', type=float, default=0.5,
+                        help='Probability of following two meter social distancing')
     args = parser.parse_args(args)
 
-    print(args.number)
+    position_state = create_people_array(room_size_x, room_size_y, args.number, number_nodes, args.cases, args.distance)
 
+    return(position_state)
 
 #USER inputs
-N = 10 #number of people in network
+#N = 10 #number of people in network
 room_size_x = 10
 room_size_y = 10
-number_infected = 1
+#number_infected = 1
 area_x = 1 #area coordinate to gravitate towards
 area_y = 1
 area_r = 0.2 #area radius
-following_two_meter = 0.5
+#following_two_meter = 0.5
 
 
 # Input graph here
@@ -42,7 +47,7 @@ number_nodes = G.number_of_nodes()
 print('number of nodes is:')
 print(number_nodes)
 
-def create_people_array(room_size_x, room_size_y, N, number_nodes, number_infected):
+def create_people_array(room_size_x, room_size_y, N, number_nodes, number_infected, following_two_meter):
     x_position = randint(0,room_size_x+1,N) # randomly assign x values for each person
     y_position = randint(0,room_size_y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
@@ -248,9 +253,9 @@ if __name__ == "__main__":
 
     # Command line entry point
     import sys
-    main(*sys.argv[1:])
+    position_state = main(*sys.argv[1:])
 
-    position_state = create_people_array(room_size_x, room_size_y, N, number_nodes, number_infected)
+    #position_state = create_people_array(room_size_x, room_size_y, N, number_nodes, number_infected, following_two_meter)
     print('original position_state array:')
     print(position_state)
 
