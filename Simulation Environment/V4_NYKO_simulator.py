@@ -67,9 +67,13 @@ def main(*args):
     area1 = area(args.table_x, args.table_y, args.table_r)
     circle = area1.draw()
 
+    #check
+    print('room arrays:')
+    print(rooms)
+
     for i in people:
         i.move(size_x=args.size_x, size_y=args.size_y, people=people)
-
+    update_position_state(position_state, people)
 
     #create heat maps for each room
     heat_new = np.zeros((args.size_y, args.size_x))
@@ -236,12 +240,13 @@ class person(object):
         def calc_dist_to_other_people(d): #d is the person, n is all the other people
             dist_from_other_people = 999
             for n in people:
-                if n != d: #make sure not doing same person in calc
-                    dist_from_person_n = distance(n.x, n.y, d.x, d.y)
-                    if dist_from_person_n < dist_from_other_people:
-                        dist_from_other_people = dist_from_person_n
-                        closest_person = n
-            return (dist_from_other_people, closest_person)
+                if n.node == d.node:
+                    if n != d: #make sure not doing same person in calc
+                        dist_from_person_n = distance(n.x, n.y, d.x, d.y)
+                        if dist_from_person_n < dist_from_other_people:
+                            dist_from_other_people = dist_from_person_n
+                            closest_person = n
+            return (dist_from_other_people,closest_person)
 
         #actual movement now stated using functions given above
         if np.random.random_sample() < 0.50:  # % chance the speed of person stays the same (constant step added to coord)
@@ -359,7 +364,7 @@ def animate():
     plt.show()
 
 
-def update_position_state(position_state):
+def update_position_state(position_state,people):
     position_state.iloc[:, :2] = 0  # array emptied for x y only
     # this code adds values from people objects back into array
     k = 0
@@ -368,7 +373,7 @@ def update_position_state(position_state):
         position_state.iloc[k, 1] = t.y
         position_state.iloc[k, 2] = t.node
         k += 1  # iterator for picking the correct row
-
+    # check
     print('iteration finished and this is new position_state array:')
     print(position_state)  # array refilled with people
     return (position_state)
