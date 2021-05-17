@@ -128,15 +128,13 @@ def people_array_room(position_state,i):
 
 
 def update_node(position_state, nodes):
-    print('position state pre update:')
-    print(position_state)
+    # this is a simple update dependant on connected nodes for each person. Not everyone will move
     for i in range(0, len(position_state),1):
         position_state.iloc[i,2] = random.choice(nodes[i])
-    print('position state after update:')
-    print(position_state)
     return position_state
 
 def possible_paths(position_state, G):
+    # this creates a list of the possible nodes that people can travel to
     nodes =[]
     for i in range(0, len(position_state),1):
         possible_nodes = list(nx.single_source_shortest_path(G, source=position_state.iloc[i,2], cutoff=1))
