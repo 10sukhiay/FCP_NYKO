@@ -32,12 +32,7 @@ def main(*args):
                         help='Number of rooms to simulate')
     args = parser.parse_args(args)
 
-    # Define the edge list dependant on number of rooms. Could also look at connectivity such as:
-    # #edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
-    if args.rooms == 2:
-        edgelist = [(1, 2)]
-    if args.rooms == 3:
-        edgelist = [(1, 2), (1,3), (2,3)]
+    edgelist = create_edgelist(args.rooms)
 
     # Create network
     G = create_network(edgelist)
@@ -66,6 +61,15 @@ def main(*args):
 
     simulate()
 
+def create_edgelist(rooms):
+    # Define the edge list dependant on number of rooms. Could also look at connectivity such as:
+    # #edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
+    if rooms == 2:
+        edgelist = [(1, 2)]
+    if rooms == 3:
+        edgelist = [(1, 2), (1,3), (2,3)]
+
+    return(edgelist)
 
 def create_network(edgelist):
     # Create a networkx graph from the edgelist.
