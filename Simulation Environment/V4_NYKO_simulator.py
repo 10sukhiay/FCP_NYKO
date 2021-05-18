@@ -126,7 +126,7 @@ def main(*args):
     # update_node_prob(position_state, nodes, args.travel)
 
 def create_edgelist(rooms):
-    # Define the edge list dependant on number of rooms. Could also look at connectivity such as:
+    """Define the edge list dependant on number of rooms."""
     # #edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
     if rooms == 2:
         edgelist = [(1, 2)]
@@ -136,13 +136,14 @@ def create_edgelist(rooms):
     return(edgelist)
 
 def create_network(edgelist):
-    # Create a networkx graph from the edgelist.
+    """Create a networkx graph from the edgelist."""
     G = nx.Graph(edgelist)
     nx.draw(G, with_labels=True)
     #plt.show()   # this displays the graph - turn on as required.
     return(G)
 
 def network_number_nodes(G):
+    """Calculate the number of nodes within the networkx graph"""
     number_nodes = G.number_of_nodes()
     #print('number of nodes is:')
     #print(number_nodes)
@@ -175,6 +176,7 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     return(position_state)
 
 def people_array_room(position_state,i):
+    """Create array of people dependant on node location"""
     room = position_state[position_state["node"] == i]
     return(room)
 
