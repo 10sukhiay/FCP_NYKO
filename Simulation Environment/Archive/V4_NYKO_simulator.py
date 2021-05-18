@@ -194,16 +194,16 @@ def possible_paths(position_state, G):
     return(nodes)
 
 def update_node_travel_prob(position_state, nodes, limit,number_nodes):
-    """Update position_state dependant on connected nodes and travel probability"""
+    """Update position_state dependant on limited number of people in each room"""
     if limit == 0:
         random_node_choice(position_state, nodes)
     if limit == 1:
         while max(node_count_individuals(position_state, number_nodes))>11:
             random_node_choice(position_state, nodes)
-            print('too many people in room')
     return position_state
 
 def random_node_choice(position_state, nodes):
+    """Update position_state dependant on connected nodes"""
     for i in range(0, len(position_state), 1):
         if position_state.iloc[i, 7] == 1:
             position_state.iloc[i, 2] = random.choice(nodes[i])

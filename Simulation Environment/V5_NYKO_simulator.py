@@ -90,6 +90,11 @@ def main(*args):
                                          args.table, args.mask, args.travel)
     print(position_state)
 
+    # check nodes are within limits
+    nodes = possible_paths(position_state, G)
+    position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
+
+
     # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room1 = people_array_room(position_state, 1)
     room2 = people_array_room(position_state, 2)
@@ -123,7 +128,7 @@ def main(*args):
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Draw updated node graph after simulation
-    draw_network(position_state, G, number_nodes)
+    #draw_network(position_state, G, number_nodes)
 
 
 def create_edgelist(rooms):
@@ -198,16 +203,16 @@ def possible_paths(position_state, G):
     return(nodes)
 
 def update_node_travel_prob(position_state, nodes, limit,number_nodes):
-    """Update position_state dependant on connected nodes and travel probability"""
+    """Update position_state dependant on limited number of people in each room"""
     if limit == 0:
         random_node_choice(position_state, nodes)
     if limit == 1:
-        while max(node_count_individuals(position_state, number_nodes))>11:
+        while max(node_count_individuals(position_state, number_nodes))>((len(position_state)/number_nodes)+1):
             random_node_choice(position_state, nodes)
-            print('too many people in room')
     return position_state
 
 def random_node_choice(position_state, nodes):
+    """Update position_state dependant on connected nodes"""
     for i in range(0, len(position_state), 1):
         if position_state.iloc[i, 7] == 1:
             position_state.iloc[i, 2] = random.choice(nodes[i])
