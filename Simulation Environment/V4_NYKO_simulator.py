@@ -203,6 +203,7 @@ def update_node_travel_prob(position_state, nodes):
     return position_state
 
 def node_count_individuals(position_state, number_nodes):
+    """Count the number of individual at each node"""
     node_count = []
     for n in range(1, number_nodes + 1):
         a = 0
@@ -213,7 +214,7 @@ def node_count_individuals(position_state, number_nodes):
     return(node_count)
 
 def draw_network(position_state, G, number_nodes):
-
+    """Draw network graph"""
     node_count = node_count_individuals(position_state, number_nodes)
 
     for i in range(1, number_nodes+1):
@@ -227,6 +228,7 @@ def draw_network(position_state, G, number_nodes):
     nx.draw(G, pos, node_size=(node_count_size))
     node_labels = nx.get_node_attributes(G, 'Number')
     nx.draw_networkx_labels(G, pos, labels=node_labels)
+    plt.legend(['Room - Number of People in the Room'])
     plt.show()
 
 #----------------------------------------------------------------------------#

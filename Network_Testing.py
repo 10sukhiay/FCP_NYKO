@@ -26,5 +26,6 @@ pos = nx.spring_layout(G)
 nx.draw(G, pos, node_size=[100,200,100,200,100])
 node_labels = nx.get_node_attributes(G,'Number')
 nx.draw_networkx_labels(G, pos, labels = node_labels)
+plt.legend(['Net'])
 
 plt.show()
