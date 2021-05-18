@@ -109,6 +109,7 @@ class COVID_MAP:
         axs[1,0].set(xlabel='number of iterations', ylabel='population')
         axs[1,0].set_xlim(0,iter)
         axs[1,0].set_ylim(0,pop_size)
+        # test
 
 #POSITION AND MOVEMENT
 def Move(position_state):
