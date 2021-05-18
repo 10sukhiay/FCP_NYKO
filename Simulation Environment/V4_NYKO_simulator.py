@@ -185,12 +185,6 @@ def possible_paths(position_state, G):
         nodes.append(possible_nodes)
     return(nodes)
 
-def update_node(position_state, nodes):
-    """Update position_state dependant on connected nodes for each person"""
-    for i in range(0, len(position_state),1):
-        position_state.iloc[i,2] = random.choice(nodes[i])
-    return position_state
-
 def update_node_travel_prob(position_state, nodes):
     """Update position_state dependant on connected nodes and travel probability"""
     for i in range(0, len(position_state),1):
