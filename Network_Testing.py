@@ -21,8 +21,10 @@ G.nodes[3]['Number'] = 13
 G.nodes[4]['Number'] = 14
 G.nodes[5]['Number'] = 15
 
+pos = nx.spring_layout(G)
 
-
-nx.draw(G, with_labels=True)
+nx.draw(G, pos, node_size=[100,200,100,200,100])
+node_labels = nx.get_node_attributes(G,'Number')
+nx.draw_networkx_labels(G, pos, labels = node_labels)
 
 plt.show()
