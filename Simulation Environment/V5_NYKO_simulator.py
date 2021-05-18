@@ -107,7 +107,6 @@ def main(*args):
     #initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
     heat_maps = [Room_map(heat_new=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(args.rooms)]
-    print(position_state)
     for map in heat_maps:
         map.position_state = position_state
         map.heat_new = map.calculate_heat_new()
