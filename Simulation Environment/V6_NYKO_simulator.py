@@ -298,7 +298,7 @@ class person(object):
         self.size_x = size_x
         self.size_y = size_y
 
-    def make_new_step_size(self, max_step=1):
+    def make_new_step_size(self, max_step=10):
         return (np.random.random_sample() - 0.5)*max_step / 5 #creates random number for step size 0 to 0.1
 
     def move(self, people):
@@ -438,7 +438,6 @@ class Room_map(object):
 
     def map_position_states(self):
         pos_map = np.zeros((self.ysize, self.xsize))
-
         for row in range(0, len(self.occupants)):
             pos_map[round(self.occupants['y'].iloc[row]), round(self.occupants['x'].iloc[row])] = self.occupants['status'].iloc[row]
         return pos_map
@@ -519,11 +518,12 @@ def simulate(it, people, heat_maps, position_state, axes):
     # move each person
     for i in people:
         i.move(people=people)
-    update_position_state(position_state, people)
+    position_state = update_position_state(position_state, people)
+
 
     # update heat maps
     for map in heat_maps:
-        map.position_state = position_state
+        map.occupants = position_state
         map.calculate_heat_new()
 
         # introduce some transmission function to infect new people
