@@ -88,17 +88,14 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
-    print(position_state)
-
-    # check nodes are within limits
-    nodes = possible_paths(position_state, G)
-    position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-
 
     # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room1 = people_array_room(position_state, 1)
     room2 = people_array_room(position_state, 2)
     room3 = people_array_room(position_state, 3)
+
+    # this loop creates separate arrays per room
+
 
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
@@ -128,7 +125,7 @@ def main(*args):
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Draw updated node graph after simulation
-    #draw_network(position_state, G, number_nodes)
+    draw_network(position_state, G, number_nodes)
 
 
 def create_edgelist(rooms):
@@ -160,14 +157,7 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
-
-    # SUSCEPTIBLE 1
-    # INFECTED    2
-    # INFECTIOUS  3
-    # RECOVERED   4
-    # DECEASED    5
-    start_status = np.concatenate((([3]*number_infected), ([1]*(N-number_infected))))
-    random.shuffle(start_status)
+    start_status = np.concatenate((([1]*number_infected), ([0]*(N-number_infected))))
     # following two meter rule
     follow = round(N*following_two_meter)
     no_follow = round(N*(1-following_two_meter))
@@ -203,16 +193,16 @@ def possible_paths(position_state, G):
     return(nodes)
 
 def update_node_travel_prob(position_state, nodes, limit,number_nodes):
-    """Update position_state dependant on limited number of people in each room"""
+    """Update position_state dependant on connected nodes and travel probability"""
     if limit == 0:
         random_node_choice(position_state, nodes)
     if limit == 1:
-        while max(node_count_individuals(position_state, number_nodes))>((len(position_state)/number_nodes)+1):
+        while max(node_count_individuals(position_state, number_nodes))>11:
             random_node_choice(position_state, nodes)
+            print('too many people in room')
     return position_state
 
 def random_node_choice(position_state, nodes):
-    """Update position_state dependant on connected nodes"""
     for i in range(0, len(position_state), 1):
         if position_state.iloc[i, 7] == 1:
             position_state.iloc[i, 2] = random.choice(nodes[i])
@@ -423,8 +413,8 @@ class Room_map(object):
         pos_map = np.zeros((self.ysize, self.xsize))
         occupants = self.position_state[self.position_state['node'] == self.node]
 
-        for row in range(0, len(occupants)):
-            pos_map[round(occupants['y'].iloc[row]), round(occupants['x'].iloc[row])] = occupants['status'].iloc[row]
+        for row in range(0, len(self.position_state)):
+            pos_map[round(self.position_state['y'].iloc[row]), round(self.position_state['x'].iloc[row])] = self.position_state['status'].iloc[row]
         return pos_map
 
     def heat_source(self):  # will add heat source to map based on individuals new position
@@ -451,11 +441,11 @@ class Room_map(object):
         heat_new[0, :] = heat_new[1, :]
         heat_new[-1, :] = heat_new[-2, :]
 
-        self.heat_old = heat_new
+        return heat_new
 
     def show_map(self):  # creates a heatmap and position map
         # create marker for healthy individuals in heatmap
-        heat_map = self.heat_old
+        heat_map = self.calculate_heat_new()
         pos = self.map_position_states()
         heat_map[pos == 1] = -100
 
@@ -500,11 +490,68 @@ def simulate(people, heat_maps, position_state):
 
         for map in heat_maps:
             map.position_state = position_state
-            heat = map.calculate_heat_new()
-            map.heat_new = heat
+            map.heat_new = map.calculate_heat_new()
 
-    for map in heat_maps:
-        map.show_map()
+    map.show_map()
+
+#----------------------------------------------------------------------------#
+#                  Animation classes                                         #
+#----------------------------------------------------------------------------#
+
+class Animation:
+
+    def __init__(self, simulation, duration):
+        self.simulation = simulation
+        self.duration = duration
+
+        self.figure = plt.figure(figsize=(8, 4))
+        #self.axes_heat = self.figure.add_subplot(1, 3, 1)
+        self.axes_grid = self.figure.add_subplot(1, 3, 2)
+        self.axes_line = self.figure.add_subplot(1, 3, 3)
+
+        #self.heatanimation = HeatAnimation(self.axes_grid, self.simulation)
+        self.gridanimation = GridAnimation(self.axes_grid, self.simulation)
+        self.lineanimation = LineAnimation(self.axes_line, self.simulation, duration)
+
+    def show(self):
+        """Run the animation on screen"""
+        animation = FuncAnimation(self.figure, self.update, frames=range(200),
+                init_func = self.init, blit=True, interval=200)
+        plt.show()
+
+###def save ()
+
+    def init(self):
+        """Initialise the animation (called by FuncAnimation)"""
+        # We could generalise this to a loop and then it would work for any
+        # numer of *animation objects.
+        actors = []
+        #actors += self.heatanimation.init()
+        actors += self.gridanimation.init()
+        actors += self.lineanimation.init()
+        return actors
+
+    def update(self, framenumber):
+        """Update the animation (called by FuncAnimation)"""
+        self.simulation.update()
+        actors = []
+        #actors += self.heatanimation.update(framenumber)
+        actors += self.gridanimation.update(framenumber)
+        actors += self.lineanimation.update(framenumber)
+        return actors
+
+class HeatAnimation:
+    """Animate a grid showing status of people at each position"""
+
+class GridAnimation:
+    """Animate a grid showing status of people at each position"""
+
+class LineAnimation:
+    """Animate a line series showing numbers of people in each status"""
+
+#----------------------------------------------------------------------------#
+#                  End of Animation classes                                        #
+#----------------------------------------------------------------------------#
 
 if __name__ == "__main__":
 

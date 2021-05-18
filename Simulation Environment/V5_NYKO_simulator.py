@@ -33,6 +33,7 @@ import random
 from numpy.random import randint
 import argparse
 import seaborn as sns
+from matplotlib.animation import FuncAnimation
 
 def main(*args):
     """Command line entry point.
@@ -88,6 +89,7 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
+    print(position_state)
 
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
@@ -99,9 +101,6 @@ def main(*args):
     room2 = people_array_room(position_state, 2)
     room3 = people_array_room(position_state, 3)
 
-    # this loop creates separate arrays per room
-
-
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
 
@@ -111,7 +110,7 @@ def main(*args):
 
     #initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
-    heat_maps = [Room_map(heat_new=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(args.rooms)]
+    heat_maps = [Room_map(heat_old=heat_new, occupants=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
     for map in heat_maps:
         map.position_state = position_state
         map.heat_new = map.calculate_heat_new()
@@ -119,13 +118,17 @@ def main(*args):
 
 
 
-    simulate(people=people, heat_maps=heat_maps, position_state=position_state)
+    #simulate(it = 0, people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+
+
+    #use animate function instead of simulate. Simulate is nested!!!
+    animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
     # Drawing a node graph
-    draw_network(position_state, G, number_nodes)
+    #draw_network(position_state, G, number_nodes)
 
     # Update the position state for new nodes.
-    nodes = possible_paths(position_state, G)
+    #nodes = possible_paths(position_state, G)
 
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
@@ -162,7 +165,14 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
-    start_status = np.concatenate((([1]*number_infected), ([0]*(N-number_infected))))
+
+    # SUSCEPTIBLE 1
+    # INFECTED    2
+    # INFECTIOUS  3
+    # RECOVERED   4
+    # DECEASED    5
+    start_status = np.concatenate((([3]*number_infected), ([1]*(N-number_infected))))
+    random.shuffle(start_status)
     # following two meter rule
     follow = round(N*following_two_meter)
     no_follow = round(N*(1-following_two_meter))
@@ -242,6 +252,18 @@ def draw_network(position_state, G, number_nodes):
     nx.draw_networkx_labels(G, pos, labels=node_labels)
     plt.legend(['Room - Number of People in the Room'])
     plt.show()
+
+def transmission(position_state, heat):
+    for x in range(0, len(position_state)):
+
+        if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
+
+            if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
+
+                    if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > np.random.randint(0,101):
+
+                        position_state.iloc[x]['status'] = 2 # stands for infected
+    return position_state
 
 #----------------------------------------------------------------------------#
 #                  Simulation classes                                        #
@@ -407,19 +429,18 @@ class person(object):
 #----------------------------------------------------------------------------#
 
 class Room_map(object):
-    def __init__(self, heat_new, position_state, xsize, ysize, node):
-        self.heat_old = heat_new
-        self.position_state = position_state
+    def __init__(self, heat_old, occupants, xsize, ysize, node):
+        self.heat_old = heat_old
         self.node = node
+        self.occupants = occupants[occupants['node'] == self.node]
         self.xsize = xsize+1
         self.ysize = ysize+1
 
     def map_position_states(self):
         pos_map = np.zeros((self.ysize, self.xsize))
-        occupants = self.position_state[self.position_state['node'] == self.node]
 
-        for row in range(0, len(self.position_state)):
-            pos_map[round(self.position_state['y'].iloc[row]), round(self.position_state['x'].iloc[row])] = self.position_state['status'].iloc[row]
+        for row in range(0, len(self.occupants)):
+            pos_map[round(self.occupants['y'].iloc[row]), round(self.occupants['x'].iloc[row])] = self.occupants['status'].iloc[row]
         return pos_map
 
     def heat_source(self):  # will add heat source to map based on individuals new position
@@ -446,18 +467,17 @@ class Room_map(object):
         heat_new[0, :] = heat_new[1, :]
         heat_new[-1, :] = heat_new[-2, :]
 
-        return heat_new
+        self.heat_old = heat_new
 
     def show_map(self):  # creates a heatmap and position map
         # create marker for healthy individuals in heatmap
-        heat_map = self.calculate_heat_new()
-        pos = self.map_position_states()
-        heat_map[pos == 1] = -100
+        heat_map = self.heat_old
+        #pos = self.map_position_states()
+        #heat_map[pos == 1] = -100
 
         # create matplot figure with subplots
 
-        sns.heatmap(np.transpose(heat_map), cbar=False, cmap='icefire', center=0)  # heatmap
-        plt.show()
+        return heat_map # heatmap
 #----------------------------------------------------------------------------#
 #                  End of simulation classes                                        #
 #----------------------------------------------------------------------------#
@@ -466,9 +486,17 @@ class Room_map(object):
 
 #REPLACE THIS WITH YAZ CODE
 # animation function.  This is called sequentially
-def animate():
-    plt.show()
+def animate(people, heat_maps, position_state, rooms):
 
+    grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
+    fig, axes = plt.subplots(1, rooms, figsize=(15, 5))
+    anim = FuncAnimation(fig=fig, func=simulate,
+                         frames=100,
+                         fargs=(people, heat_maps, position_state, axes),
+                         interval=50,
+                         blit=False,
+                         repeat=False)
+    plt.show()
 
 def update_position_state(position_state,people):
     position_state.iloc[:, :2] = 0  # array emptied for x y only
@@ -486,20 +514,33 @@ def update_position_state(position_state,people):
     return (position_state)
 
 # placeholder simulate function
-def simulate(people, heat_maps, position_state):
-
-    for it in range(10):
-        for i in people:
-            i.move(people=people)
-        update_position_state(position_state, people)
-        #print(position_state)
-
-        for map in heat_maps:
-            map.position_state = position_state
-            map.heat_new = map.calculate_heat_new()
+def simulate(it, people, heat_maps, position_state, axes):
 
 
-    map.show_map()
+
+    # move each person
+    for i in people:
+        i.move(people=people)
+    update_position_state(position_state, people)
+
+    # update heat maps
+    for map in heat_maps:
+        map.position_state = position_state
+        map.calculate_heat_new()
+
+        # introduce some transmission function to infect new people
+        transmission(map.occupants, map.heat_old)
+
+    for map in heat_maps:
+        sns.heatmap(map.show_map(),
+                    ax=axes[map.node-1],
+                    cbar=False,
+                    cmap='icefire',
+                    center=0,
+                    vmin =0,
+                    vmax=100,
+                    )
+        axes[map.node-1].set_title(f'Room {map.node} Heat Map')
 
 if __name__ == "__main__":
 

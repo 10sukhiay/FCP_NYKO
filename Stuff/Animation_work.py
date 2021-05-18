@@ -26,10 +26,11 @@ simulations without needing to edit the code e.g.:
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation #########
 import math
 import networkx as nx
 import pandas as pd
+import seaborn as sns
 import random
 from numpy.random import randint
 import argparse
@@ -97,7 +98,6 @@ def main(*args):
     for i in range(1, (args.rooms+1)):
         rooms.append(people_array_room(position_state, i))
 
-
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r) for i in range(len(position_state))]
 
@@ -113,6 +113,11 @@ def main(*args):
     for i in people:
         i.move(size_x=args.size_x, size_y=args.size_y, people=people)
     update_position_state(position_state, people)
+
+    x = position_state.x
+    y = position_state.y
+    plt.scatter(x,y)
+    plt.show()
 
     #create heat maps for each room
     heat_new = np.zeros((args.size_y, args.size_x))
@@ -449,7 +454,62 @@ def simulate(days):
 
     heat_new = np
 
+#----------------------------------------------------------------------------#
+#                  Animation classes                                         #
+#----------------------------------------------------------------------------#
 
+class Animation:
+
+    def __init__(self, simulation, duration):
+        self.simulation = simulation
+        self.duration = duration
+
+        self.figure = plt.figure(figsize=(8, 4))
+        #self.axes_heat = self.figure.add_subplot(1, 3, 1)
+        self.axes_grid = self.figure.add_subplot(1, 3, 2)
+        self.axes_line = self.figure.add_subplot(1, 3, 3)
+
+        #self.heatanimation = HeatAnimation(self.axes_grid, self.simulation)
+        self.gridanimation = GridAnimation(self.axes_grid, self.simulation)
+        self.lineanimation = LineAnimation(self.axes_line, self.simulation, duration)
+
+    def show(self):
+        """Run the animation on screen"""
+        animation = FuncAnimation(self.figure, self.update, frames=range(200),
+                init_func = self.init, blit=True, interval=200)
+        plt.show()
+
+###def save ()
+
+    def init(self):
+        """Initialise the animation (called by FuncAnimation)"""
+        # We could generalise this to a loop and then it would work for any
+        # numer of *animation objects.
+        actors = []
+        #actors += self.heatanimation.init()
+        actors += self.gridanimation.init()
+        actors += self.lineanimation.init()
+        return actors
+
+    def update(self, framenumber):
+        """Update the animation (called by FuncAnimation)"""
+        self.simulation.update()
+        actors = []
+        #actors += self.heatanimation.update(framenumber)
+        actors += self.gridanimation.update(framenumber)
+        actors += self.lineanimation.update(framenumber)
+        return actors
+
+class HeatAnimation:
+    """Animate a grid showing status of people at each position"""
+
+class GridAnimation:
+    """Animate a grid showing status of people at each position"""
+
+
+#----------------------------------------------------------------------------#
+#                  End of Animation classes                                        #
+#----------------------------------------------------------------------------#
 
 if __name__ == "__main__":
 
