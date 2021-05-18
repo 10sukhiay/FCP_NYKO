@@ -109,7 +109,7 @@ def main(*args):
 
     #initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
-    heat_maps = [Room_map(heat_new=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(args.rooms)]
+    heat_maps = [Room_map(heat_old=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
     for map in heat_maps:
         map.position_state = position_state
         map.heat_new = map.calculate_heat_new()
@@ -120,10 +120,10 @@ def main(*args):
     simulate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
     # Drawing a node graph
-    draw_network(position_state, G, number_nodes)
+    #draw_network(position_state, G, number_nodes)
 
     # Update the position state for new nodes.
-    nodes = possible_paths(position_state, G)
+    #nodes = possible_paths(position_state, G)
 
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
@@ -412,8 +412,8 @@ class person(object):
 #----------------------------------------------------------------------------#
 
 class Room_map(object):
-    def __init__(self, heat_new, position_state, xsize, ysize, node):
-        self.heat_old = heat_new
+    def __init__(self, heat_old, position_state, xsize, ysize, node):
+        self.heat_old = heat_old
         self.position_state = position_state
         self.node = node
         self.xsize = xsize+1
@@ -456,8 +456,8 @@ class Room_map(object):
     def show_map(self):  # creates a heatmap and position map
         # create marker for healthy individuals in heatmap
         heat_map = self.heat_old
-        pos = self.map_position_states()
-        heat_map[pos == 1] = -100
+        #pos = self.map_position_states()
+        #heat_map[pos == 1] = -100
 
         # create matplot figure with subplots
 
@@ -503,7 +503,8 @@ def simulate(people, heat_maps, position_state, rooms):
 
     fig, axes = plt.subplots(1, rooms, figsize=(15, 5))
     for map in heat_maps:
-        sns.heatmap(map.show_map(), ax=axes[map.node], cbar=False, cmap='icefire', center=0)
+        sns.heatmap(map.show_map(), ax=axes[map.node-1], cbar=False, cmap='icefire', center=0)
+        axes[map.node-1].set_title(f'Room {map.node} Heat Map')
     plt.show()
 
 if __name__ == "__main__":
