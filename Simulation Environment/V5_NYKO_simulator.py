@@ -33,6 +33,7 @@ import random
 from numpy.random import randint
 import argparse
 import seaborn as sns
+from matplotlib.animation import FuncAnimation
 
 def main(*args):
     """Command line entry point.
@@ -117,11 +118,11 @@ def main(*args):
 
 
 
-    simulate(it = 0, people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+    #simulate(it = 0, people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
 
     #use animate function instead of simulate. Simulate is nested!!!
-    #animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+    animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
     # Drawing a node graph
     #draw_network(position_state, G, number_nodes)
@@ -255,11 +256,13 @@ def draw_network(position_state, G, number_nodes):
 def transmission(position_state, heat):
     for x in range(0, len(position_state)):
 
-        if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
+        if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
 
-                if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > np.random.randint(0,101):
+            if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
 
-                    position_state.iloc[x]['status'] = 2 # stands for infected
+                    if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > np.random.randint(0,101):
+
+                        position_state.iloc[x]['status'] = 2 # stands for infected
     return position_state
 
 #----------------------------------------------------------------------------#
@@ -488,12 +491,12 @@ def animate(people, heat_maps, position_state, rooms):
     grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
     fig, axes = plt.subplots(1, rooms, figsize=(15, 5))
     anim = FuncAnimation(fig=fig, func=simulate,
-                         frames=200,
-                         fargs=(people, heat_maps, position_state, rooms),
+                         frames=100,
+                         fargs=(people, heat_maps, position_state, axes),
                          interval=50,
                          blit=False,
                          repeat=False)
-
+    plt.show()
 
 def update_position_state(position_state,people):
     position_state.iloc[:, :2] = 0  # array emptied for x y only
@@ -511,8 +514,7 @@ def update_position_state(position_state,people):
     return (position_state)
 
 # placeholder simulate function
-def simulate(it, people, heat_maps, position_state, rooms):
-
+def simulate(it, people, heat_maps, position_state, axes):
 
     # move each person
     for i in people:
@@ -527,9 +529,8 @@ def simulate(it, people, heat_maps, position_state, rooms):
         # introduce some transmission function to infect new people
         transmission(map.occupants, map.heat_old)
 
-    fig, axes = plt.subplots(1, rooms, )
     for map in heat_maps:
-        sns.heatmap(map.show_map()[it, ...],
+        sns.heatmap(map.show_map(),
                     ax=axes[map.node-1],
                     cbar=False,
                     cmap='icefire',
@@ -538,7 +539,6 @@ def simulate(it, people, heat_maps, position_state, rooms):
                     vmax=100,
                     )
         axes[map.node-1].set_title(f'Room {map.node} Heat Map')
-    plt.show()
 
 if __name__ == "__main__":
 
