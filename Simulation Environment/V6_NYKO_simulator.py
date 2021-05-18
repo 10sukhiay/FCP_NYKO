@@ -110,7 +110,7 @@ def main(*args):
 
     #initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
-    heat_maps = [Room_map(heat_old=heat_new, occupants=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
+    heat_maps = [Room_map(heat_old=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
     for map in heat_maps:
         map.position_state = position_state
         map.heat_new = map.calculate_heat_new()
@@ -253,16 +253,16 @@ def draw_network(position_state, G, number_nodes):
     plt.legend(['Room - Number of People in the Room'])
     plt.show()
 
-def transmission(position_state, heat):
+def transmission(position_state, heat, node):
     for x in range(0, len(position_state)):
+        if position_state.iloc[x]['node'] == node: # checks person is in correct room
+            if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
 
-        if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
+                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
 
-            if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
+                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > np.random.randint(0,101):
 
-                    if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > np.random.randint(0,101):
-
-                        position_state.iloc[x]['status'] = 2 # stands for infected
+                            position_state.iloc[x]['status'] = 2 # stands for infected
     return position_state
 
 #----------------------------------------------------------------------------#
@@ -429,12 +429,15 @@ class person(object):
 #----------------------------------------------------------------------------#
 
 class Room_map(object):
-    def __init__(self, heat_old, occupants, xsize, ysize, node):
+    def __init__(self, heat_old, position_state, xsize, ysize, node):
         self.heat_old = heat_old
         self.node = node
-        self.occupants = occupants[occupants['node'] == self.node]
         self.xsize = xsize+1
         self.ysize = ysize+1
+        self.update_occupants(position_state)
+
+    def update_occupants(self, position_state):
+        self.occupants = position_state[position_state["node"] == self.node]
 
     def map_position_states(self):
         pos_map = np.zeros((self.ysize, self.xsize))
@@ -492,7 +495,7 @@ def animate(people, heat_maps, position_state, rooms):
     anim = FuncAnimation(fig=fig, func=simulate,
                          frames=100,
                          fargs=(people, heat_maps, position_state, axes),
-                         interval=50,
+                         interval=20,
                          blit=False,
                          repeat=False)
     plt.show()
@@ -520,14 +523,13 @@ def simulate(it, people, heat_maps, position_state, axes):
         i.move(people=people)
     position_state = update_position_state(position_state, people)
 
-
     # update heat maps
-    for map in heat_maps:
-        map.occupants = position_state
-        map.calculate_heat_new()
-
-        # introduce some transmission function to infect new people
-        transmission(map.occupants, map.heat_old)
+    for x in range(2):
+        for map in heat_maps:
+            map.update_occupants(position_state)
+            map.calculate_heat_new()
+            # introduce some transmission function to infect new people
+            transmission(position_state, map.heat_old, map.node)
 
     for map in heat_maps:
         sns.heatmap(map.show_map(),
@@ -537,7 +539,7 @@ def simulate(it, people, heat_maps, position_state, axes):
                     center=0,
                     vmin =0,
                     vmax=100,
-                    )
+                    ).invert_yaxis()
         axes[map.node-1].set_title(f'Room {map.node} Heat Map')
 
 if __name__ == "__main__":
