@@ -117,7 +117,7 @@ def main(*args):
 
 
 
-    simulate(people=people, heat_maps=heat_maps, position_state=position_state)
+    simulate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
     # Drawing a node graph
     draw_network(position_state, G, number_nodes)
@@ -461,8 +461,7 @@ class Room_map(object):
 
         # create matplot figure with subplots
 
-        sns.heatmap(np.transpose(heat_map), cbar=False, cmap='icefire', center=0)  # heatmap
-        plt.show()
+        return heat_map # heatmap
 #----------------------------------------------------------------------------#
 #                  End of simulation classes                                        #
 #----------------------------------------------------------------------------#
@@ -491,7 +490,7 @@ def update_position_state(position_state,people):
     return (position_state)
 
 # placeholder simulate function
-def simulate(people, heat_maps, position_state):
+def simulate(people, heat_maps, position_state, rooms):
 
     for it in range(200):
         for i in people:
@@ -500,11 +499,12 @@ def simulate(people, heat_maps, position_state):
 
         for map in heat_maps:
             map.position_state = position_state
-            heat = map.calculate_heat_new()
-            map.heat_new = heat
+            map.calculate_heat_new()
 
+    fig, axes = plt.subplots(1, rooms, figsize=(15, 5))
     for map in heat_maps:
-        map.show_map()
+        sns.heatmap(map.show_map(), ax=axes[map.node], cbar=False, cmap='icefire', center=0)
+    plt.show()
 
 if __name__ == "__main__":
 
