@@ -119,9 +119,18 @@ def main(*args):
 
     simulate(days=args.days)
 
+    # Drawing a node graph
+    # Count the number of people at each node
+    node_count = number_of_people_at_node(position_state, number_nodes)
+    # Draw the network based on positions.
+    draw_network(position_state, G, node_count, number_nodes)
+
+    # Update the position state for new nodes.
     nodes = possible_paths(position_state, G)
 
-    update_node_travel_prob(position_state, nodes)
+    position_state = update_node_travel_prob(position_state, nodes)
+    print(position_state)
+
 
 def create_edgelist(rooms):
     """Define the edge list dependant on number of rooms."""
@@ -130,13 +139,15 @@ def create_edgelist(rooms):
         edgelist = [(1, 2)]
     if rooms == 3:
         edgelist = [(1, 2), (1,3), (2,3)]
+    if rooms == 5:
+        edgelist = [(1, 2), (1, 4), (2, 5), (3, 5), (2, 3)]
 
     return(edgelist)
 
 def create_network(edgelist):
     """Create a networkx graph from the edgelist."""
     G = nx.Graph(edgelist)
-    nx.draw(G, with_labels=True)
+    #nx.draw(G, with_labels=True)
     #plt.show()   # this displays the graph - turn on as required.
     return(G)
 
@@ -191,6 +202,31 @@ def update_node_travel_prob(position_state, nodes):
         if position_state.iloc[i,7] ==1:
             position_state.iloc[i,2] = random.choice(nodes[i])
     return position_state
+
+def number_of_people_at_node(position_state, number_nodes):
+    count = []
+    for n in range(1,number_nodes+1):
+        a = 0
+        for i in range(0,len(position_state)):
+            if position_state.iloc[i,2] == n:
+                a = a + 1
+        count.append(a)
+    print(count)
+    return(count)
+
+def draw_network(position_state, G, node_count, number_nodes):
+
+    for i in range(1, number_nodes+1):
+        G.nodes[i]['Number'] =  node_count[i-1]
+
+    pos = nx.spring_layout(G)
+    # increase size of nodes to be able to see
+    node_count_size = [i * 100 for i in node_count]
+
+    nx.draw(G, pos, node_size=(node_count_size))
+    node_labels = nx.get_node_attributes(G, 'Number')
+    nx.draw_networkx_labels(G, pos, labels=node_labels)
+    plt.show()
 
 #----------------------------------------------------------------------------#
 #                  Simulation classes                                        #
