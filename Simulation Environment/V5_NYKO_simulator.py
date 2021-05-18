@@ -88,14 +88,12 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
+    print(position_state)
 
     # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room1 = people_array_room(position_state, 1)
     room2 = people_array_room(position_state, 2)
     room3 = people_array_room(position_state, 3)
-
-    # this loop creates separate arrays per room
-
 
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
@@ -157,7 +155,14 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
-    start_status = np.concatenate((([1]*number_infected), ([0]*(N-number_infected))))
+
+    # SUSCEPTIBLE 1
+    # INFECTED    2
+    # INFECTIOUS  3
+    # RECOVERED   4
+    # DECEASED    5
+    start_status = np.concatenate((([3]*number_infected), ([1]*(N-number_infected))))
+    random.shuffle(start_status)
     # following two meter rule
     follow = round(N*following_two_meter)
     no_follow = round(N*(1-following_two_meter))
@@ -413,8 +418,8 @@ class Room_map(object):
         pos_map = np.zeros((self.ysize, self.xsize))
         occupants = self.position_state[self.position_state['node'] == self.node]
 
-        for row in range(0, len(self.position_state)):
-            pos_map[round(self.position_state['y'].iloc[row]), round(self.position_state['x'].iloc[row])] = self.position_state['status'].iloc[row]
+        for row in range(0, len(occupants)):
+            pos_map[round(occupants['y'].iloc[row]), round(occupants['x'].iloc[row])] = occupants['status'].iloc[row]
         return pos_map
 
     def heat_source(self):  # will add heat source to map based on individuals new position
@@ -441,11 +446,11 @@ class Room_map(object):
         heat_new[0, :] = heat_new[1, :]
         heat_new[-1, :] = heat_new[-2, :]
 
-        return heat_new
+        self.heat_old = heat_new
 
     def show_map(self):  # creates a heatmap and position map
         # create marker for healthy individuals in heatmap
-        heat_map = self.calculate_heat_new()
+        heat_map = self.heat_old
         pos = self.map_position_states()
         heat_map[pos == 1] = -100
 
@@ -490,10 +495,11 @@ def simulate(people, heat_maps, position_state):
 
         for map in heat_maps:
             map.position_state = position_state
-            map.heat_new = map.calculate_heat_new()
+            heat = map.calculate_heat_new()
+            map.heat_new = heat
 
-
-    map.show_map()
+    for map in heat_maps:
+        map.show_map()
 
 if __name__ == "__main__":
 
