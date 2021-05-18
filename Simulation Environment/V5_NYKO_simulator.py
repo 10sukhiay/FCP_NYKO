@@ -501,27 +501,30 @@ def update_position_state(position_state,people):
 # placeholder simulate function
 def simulate(people, heat_maps, position_state, rooms):
 
-    # iterate certain number of times per day
-    for it in range(200):
 
-        # move each person
-        for i in people:
-            i.move(people=people)
-        update_position_state(position_state, people)
+    # move each person
+    for i in people:
+        i.move(people=people)
+    update_position_state(position_state, people)
 
-        # update heat maps
-        for map in heat_maps:
-            map.position_state = position_state
-            map.calculate_heat_new()
+    # update heat maps
+    for map in heat_maps:
+        map.position_state = position_state
+        map.calculate_heat_new()
 
-            # introduce some transmission function to infect new people
-            transmission(map.occupants, map.heat_old)
-
-
+        # introduce some transmission function to infect new people
+        transmission(map.occupants, map.heat_old)
 
     fig, axes = plt.subplots(1, rooms, figsize=(15, 5))
     for map in heat_maps:
-        sns.heatmap(map.show_map(), ax=axes[map.node-1], cbar=False, cmap='icefire', center=0)
+        sns.heatmap(map.show_map(),
+                    ax=axes[map.node-1],
+                    cbar=False,
+                    cmap='icefire',
+                    center=0,
+                    vmin =0,
+                    vmax=100,
+                    )
         axes[map.node-1].set_title(f'Room {map.node} Heat Map')
     plt.show()
 
