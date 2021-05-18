@@ -47,7 +47,7 @@ def main(*args):
     #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=10,
+    parser.add_argument('--number', metavar='N', type=int, default=20,
                         help='Size of population')
     parser.add_argument('--cases', metavar='N', type=int, default=2,
                         help='Number of initial infected people')
@@ -73,6 +73,8 @@ def main(*args):
                         help='y coordinate of table')
     parser.add_argument('--days', metavar='R', type=int, default=5,
                         help='number of days simulated')
+    parser.add_argument('--limit', metavar='L', type=int, default=1,
+                        help='Limits on number of people in each room - 1: on, 0:off')
     args = parser.parse_args(args)
 
     edgelist = create_edgelist(args.rooms)
@@ -125,7 +127,7 @@ def main(*args):
     # Update the position state for new nodes.
     nodes = possible_paths(position_state, G)
 
-    position_state = update_node_travel_prob(position_state, nodes)
+    position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Draw updated node graph after simulation
     draw_network(position_state, G, number_nodes)
@@ -195,12 +197,22 @@ def possible_paths(position_state, G):
         nodes.append(possible_nodes)
     return(nodes)
 
-def update_node_travel_prob(position_state, nodes):
+def update_node_travel_prob(position_state, nodes, limit,number_nodes):
     """Update position_state dependant on connected nodes and travel probability"""
-    for i in range(0, len(position_state),1):
-        if position_state.iloc[i,7] ==1:
-            position_state.iloc[i,2] = random.choice(nodes[i])
+    if limit == 0:
+        random_node_choice(position_state, nodes)
+    if limit == 1:
+        while max(node_count_individuals(position_state, number_nodes))>11:
+            random_node_choice(position_state, nodes)
+            print('too many people in room')
     return position_state
+
+def random_node_choice(position_state, nodes):
+    for i in range(0, len(position_state), 1):
+        if position_state.iloc[i, 7] == 1:
+            position_state.iloc[i, 2] = random.choice(nodes[i])
+    return(position_state)
+
 
 def node_count_individuals(position_state, number_nodes):
     """Count the number of individual at each node"""
