@@ -89,6 +89,11 @@ def main(*args):
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
 
+    # check nodes are within limits
+    nodes = possible_paths(position_state, G)
+    position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
+
+
     # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room1 = people_array_room(position_state, 1)
     room2 = people_array_room(position_state, 2)
@@ -125,7 +130,7 @@ def main(*args):
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Draw updated node graph after simulation
-    draw_network(position_state, G, number_nodes)
+    #draw_network(position_state, G, number_nodes)
 
 
 def create_edgelist(rooms):
