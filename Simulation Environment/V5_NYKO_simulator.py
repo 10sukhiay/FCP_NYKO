@@ -117,7 +117,11 @@ def main(*args):
 
 
 
-    simulate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+    simulate(it = 0, people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+
+
+    #use animate function instead of simulate. Simulate is nested!!!
+    #animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
     # Drawing a node graph
     #draw_network(position_state, G, number_nodes)
@@ -479,8 +483,16 @@ class Room_map(object):
 
 #REPLACE THIS WITH YAZ CODE
 # animation function.  This is called sequentially
-def animate():
-    plt.show()
+def animate(people, heat_maps, position_state, rooms):
+
+    grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
+    fig, axes = plt.subplots(1, rooms, figsize=(15, 5))
+    anim = FuncAnimation(fig=fig, func=simulate,
+                         frames=200,
+                         fargs=(people, heat_maps, position_state, rooms),
+                         interval=50,
+                         blit=False,
+                         repeat=False)
 
 
 def update_position_state(position_state,people):
@@ -499,7 +511,7 @@ def update_position_state(position_state,people):
     return (position_state)
 
 # placeholder simulate function
-def simulate(people, heat_maps, position_state, rooms):
+def simulate(it, people, heat_maps, position_state, rooms):
 
 
     # move each person
@@ -515,9 +527,9 @@ def simulate(people, heat_maps, position_state, rooms):
         # introduce some transmission function to infect new people
         transmission(map.occupants, map.heat_old)
 
-    fig, axes = plt.subplots(1, rooms, figsize=(15, 5))
+    fig, axes = plt.subplots(1, rooms, )
     for map in heat_maps:
-        sns.heatmap(map.show_map(),
+        sns.heatmap(map.show_map()[it, ...],
                     ax=axes[map.node-1],
                     cbar=False,
                     cmap='icefire',
