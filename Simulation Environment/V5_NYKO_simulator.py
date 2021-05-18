@@ -488,10 +488,11 @@ def update_position_state(position_state,people):
 # placeholder simulate function
 def simulate(people, heat_maps, position_state):
 
-    for it in range(200):
+    for it in range(10):
         for i in people:
             i.move(people=people)
         update_position_state(position_state, people)
+        #print(position_state)
 
         for map in heat_maps:
             map.position_state = position_state
