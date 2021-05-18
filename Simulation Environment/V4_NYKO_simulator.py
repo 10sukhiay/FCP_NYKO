@@ -1,3 +1,28 @@
+#!/usr/bin/env python3
+"""
+
+XXXXXX.py
+Nathan Wooster, Kaelan Melville, Oscar Bond, Yazad Sukhia
+May 2021
+
+This script runs simulations of an epidemic (e.g. coronavirus) for the
+air borne spreading of the virus through a network, taking.
+The script can be used to:
+
+    1. XXXXX
+
+This is all done using the same simulation code which can also be imported
+from this file and used in other ways.
+
+The command line interface to the script makes it possible to run different
+simulations without needing to edit the code e.g.:
+
+    $ python simulator.py               # run simulation with default settings
+    $ python simulator.py --number=10   # sets size of population to 10
+    $ python simulator.py --help        # show all command line options
+
+"""
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
@@ -9,6 +34,17 @@ from numpy.random import randint
 import argparse
 
 def main(*args):
+    """Command line entry point.
+    ## Currently these are just examples, to be finalised at the end of the code #######
+            $ python simulator.py                        # show animation on screen
+            $ python simulator.py --file=video.mp4       # save animation to video
+            $ python simulator.py --plot                 # show plot on screen
+
+            """
+    #
+    # Argparse has been used to handle parsing the command line arguments.
+    #   https://docs.python.org/3/library/argparse.html
+    #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
     parser.add_argument('--number', metavar='N', type=int, default=10,
@@ -23,6 +59,8 @@ def main(*args):
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=2,
                         help='Number of rooms to simulate')
+    parser.add_argument('--travel', metavar='T', type=float, default=0.5,
+                        help='Proportion of people that move between rooms')
     parser.add_argument('--size_x', metavar='R', type=int, default=20,
                         help='size of room along x axis')
     parser.add_argument('--size_y', metavar='R', type=int, default=15,
@@ -46,7 +84,7 @@ def main(*args):
     # Create array to track people
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
-                                         args.table, args.mask)
+                                         args.table, args.mask, args.travel)
 
     # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
     room1 = people_array_room(position_state, 1)
@@ -79,8 +117,13 @@ def main(*args):
     heat_new = np.zeros((args.size_y, args.size_x))
     heat_maps = [Room_map(heat_new=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y) for i in range(args.rooms)]
 
-
     simulate(days=args.days)
+
+    nodes = possible_paths(position_state, G)
+
+    update_node_travel_prob(position_state, nodes)
+
+    # update_node_prob(position_state, nodes, args.travel)
 
 def create_edgelist(rooms):
     # Define the edge list dependant on number of rooms. Could also look at connectivity such as:
@@ -105,7 +148,8 @@ def network_number_nodes(G):
     #print(number_nodes)
     return(number_nodes)
 
-def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter, gravitate_table, using_mask):
+def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infected, following_two_meter, gravitate_table, using_mask, travel):
+    """Set-up the array of people dependant on inputs. """
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
@@ -122,15 +166,39 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     masked = round(N*using_mask)
     no_masked = round(N*(1-using_mask))
     number_masked = np.concatenate((([1]*masked), ([0]*no_masked)))
-
-    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked), axis=1)
-    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask'])
+    # travelling round
+    travelling = round(N*travel)
+    no_travelling = round(N*(1-travel))
+    number_travelling = np.concatenate((([1]*masked), ([0]*no_masked)))
+    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling), axis=1)
+    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask', 'travelling'])
     return(position_state)
 
 def people_array_room(position_state,i):
     room = position_state[position_state["node"] == i]
     return(room)
 
+def possible_paths(position_state, G):
+    """Creates a list of the possible nodes that people can travel to"""
+    # need to be careful so that people can only travel to connected nodes.
+    nodes =[]
+    for i in range(0, len(position_state),1):
+        possible_nodes = list(nx.single_source_shortest_path(G, source=position_state.iloc[i,2], cutoff=1))
+        nodes.append(possible_nodes)
+    return(nodes)
+
+def update_node(position_state, nodes):
+    """Update position_state dependant on connected nodes for each person"""
+    for i in range(0, len(position_state),1):
+        position_state.iloc[i,2] = random.choice(nodes[i])
+    return position_state
+
+def update_node_travel_prob(position_state, nodes):
+    """Update position_state dependant on connected nodes and travel probability"""
+    for i in range(0, len(position_state),1):
+        if position_state.iloc[i,7] ==1:
+            position_state.iloc[i,2] = random.choice(nodes[i])
+    return position_state
 
 #----------------------------------------------------------------------------#
 #                  Simulation classes                                        #
