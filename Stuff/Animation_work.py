@@ -26,6 +26,7 @@ simulations without needing to edit the code e.g.:
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
+from matplotlib.animation import FuncAnimation
 import math
 import networkx as nx
 import pandas as pd
