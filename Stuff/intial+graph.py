@@ -4,11 +4,12 @@ import random
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.animation as animation
+from matplotlib.animation import FuncAnimation
 import math
 
 #CREATE STARTING CONDITIONS
 iter=100
-pop_size = 10 # total number of individuals
+pop_size = 40 # total number of individuals
 xsize = 50  # number of cell or pixels in the xaxis
 ysize = 50  # number of cells or pixels in the yaxis
 heat = np.zeros((xsize,ysize)) # heat map array, currently all cold
@@ -92,15 +93,17 @@ class COVID_MAP:
         # create matplot figure with subplots
         fig, axs = plt.subplots(2, 2,figsize=(15,8))
 
-        sns.heatmap(np.transpose(heat_map), ax=axs[0,0], cbar=False, cmap='icefire', center=0).invert_yaxis()  # heatmap
         axs[0,0].set_title("Heat Map")
         axs[0,0].set_xlim(0, self.xsize)
         axs[0,0].set_ylim(0, self.ysize)
+        sns.heatmap(np.transpose(heat_map), ax=axs[0,0], cbar=False, cmap='icefire', center=0).invert_yaxis()  # heatmap
+
         axs[0,1].set_title("Position Map")
         axs[0,1].set_xlim(0, self.xsize)
         axs[0,1].set_ylim(0, self.ysize)
         sns.scatterplot(x=self.position_state[:, 0], y=self.position_state[:, 1], data=self.position_state, ax=axs[0,1],
                         hue=self.position_state[:, 2], legend=False, palette='coolwarm')  # position scatterplot
+
         axs[1,0].plot(iter_array,inf_count)
         axs[1,0].set_title('Infected per iteration')
         axs[1,0].set(xlabel='number of iterations', ylabel='population')
