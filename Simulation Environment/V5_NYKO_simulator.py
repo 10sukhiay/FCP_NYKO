@@ -109,7 +109,7 @@ def main(*args):
 
     #initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
-    heat_maps = [Room_map(heat_old=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
+    heat_maps = [Room_map(heat_old=heat_new, occupants=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
     for map in heat_maps:
         map.position_state = position_state
         map.heat_new = map.calculate_heat_new()
@@ -247,6 +247,16 @@ def draw_network(position_state, G, number_nodes):
     nx.draw_networkx_labels(G, pos, labels=node_labels)
     plt.legend(['Room - Number of People in the Room'])
     plt.show()
+
+def transmission(position_state, heat):
+    for x in range(0, len(position_state)):
+
+        if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
+
+                if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > np.random.randint(0,101):
+
+                    position_state.iloc[x]['status'] = 2 # stands for infected
+    return position_state
 
 #----------------------------------------------------------------------------#
 #                  Simulation classes                                        #
@@ -412,19 +422,18 @@ class person(object):
 #----------------------------------------------------------------------------#
 
 class Room_map(object):
-    def __init__(self, heat_old, position_state, xsize, ysize, node):
+    def __init__(self, heat_old, occupants, xsize, ysize, node):
         self.heat_old = heat_old
-        self.position_state = position_state
         self.node = node
+        self.occupants = occupants[occupants['node'] == self.node]
         self.xsize = xsize+1
         self.ysize = ysize+1
 
     def map_position_states(self):
         pos_map = np.zeros((self.ysize, self.xsize))
-        occupants = self.position_state[self.position_state['node'] == self.node]
 
-        for row in range(0, len(occupants)):
-            pos_map[round(occupants['y'].iloc[row]), round(occupants['x'].iloc[row])] = occupants['status'].iloc[row]
+        for row in range(0, len(self.occupants)):
+            pos_map[round(self.occupants['y'].iloc[row]), round(self.occupants['x'].iloc[row])] = self.occupants['status'].iloc[row]
         return pos_map
 
     def heat_source(self):  # will add heat source to map based on individuals new position
@@ -492,14 +501,23 @@ def update_position_state(position_state,people):
 # placeholder simulate function
 def simulate(people, heat_maps, position_state, rooms):
 
+    # iterate certain number of times per day
     for it in range(200):
+
+        # move each person
         for i in people:
             i.move(people=people)
         update_position_state(position_state, people)
 
+        # update heat maps
         for map in heat_maps:
             map.position_state = position_state
             map.calculate_heat_new()
+
+            # introduce some transmission function to infect new people
+            transmission(map.occupants, map.heat_old)
+
+
 
     fig, axes = plt.subplots(1, rooms, figsize=(15, 5))
     for map in heat_maps:
