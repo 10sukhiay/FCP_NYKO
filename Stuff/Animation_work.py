@@ -114,6 +114,7 @@ def main(*args):
         i.move(size_x=args.size_x, size_y=args.size_y, people=people)
     update_position_state(position_state, people)
 
+    fig = plt.figure(figsize=(6, 3))
     x = position_state.x
     y = position_state.y
     plt.scatter(x,y)
