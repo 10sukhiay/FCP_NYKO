@@ -143,8 +143,10 @@ def create_edgelist(rooms):
         edgelist = [(1, 2)]
     if rooms == 3:
         edgelist = [(1, 2), (1,3), (2,3)]
+    if rooms == 4:
+        edgelist = [(1, 2), (1,3), (1,4), (2,3), (2,4), (3,4)]
     if rooms == 5:
-        edgelist = [(1, 2), (1, 4), (2, 5), (3, 5), (2, 3)]
+        edgelist = [(1, 2), (1,3), (1,4), (1,5), (2,3), (2,4), (2,5), (3,4), (3,5)]
 
     return(edgelist)
 
