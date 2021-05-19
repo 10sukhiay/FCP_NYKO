@@ -64,4 +64,11 @@ def update(it, people, heat_maps, position_state, axes, colour_dict):
                     ).invert_yaxis()
         axes[1, map.node-1].set_title(f'Room {map.node} Heat Map')
 
-    # call function to record statuses (plotting infections etc...)
+
+
+    # the network image uses this plot axes
+    # axes[0, 0]
+
+    # the line graph uses this plot axes
+    # axes[1, 0]
+

@@ -141,7 +141,7 @@ def transmission(position_state, heat, node):
         if position_state.iloc[x]['node'] == node: # checks person is in correct room
             if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
 
-                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 40:
+                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
 
                         if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0,201))/2:
 
