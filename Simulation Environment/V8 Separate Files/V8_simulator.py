@@ -74,6 +74,8 @@ def main(*args):
                         help='number of days simulated')
     parser.add_argument('--limit', metavar='L', type=int, default=0,
                         help='Limits on number of people in each room - 1: on, 0:off')
+    parser.add_argument('--decay', metavar='L', type=int, default=1,
+                        help='The "heat" decay per iteration, represents the settling rate of particles')
     args = parser.parse_args(args)
 
 
@@ -100,7 +102,10 @@ def main(*args):
 
     #initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
-    heat_maps = [Room_map(heat_old=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
+    heat_maps = [Room_map(heat_old=heat_new, position_state=position_state,
+                          xsize=args.size_x, ysize=args.size_y,
+                          node=i, decay=args.decay)
+                 for i in range(1,args.rooms+1)]
 
 
 
