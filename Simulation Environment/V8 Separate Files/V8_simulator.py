@@ -90,7 +90,6 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
-    print(position_state)
 
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
