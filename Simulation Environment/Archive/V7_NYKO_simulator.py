@@ -59,7 +59,7 @@ def main(*args):
                         help='Probability of gravitating to the table')
     parser.add_argument('--mask', metavar='M', type=float, default=0.5,
                         help='Probability of wearing a mask')
-    parser.add_argument('--rooms', metavar='R', type=int, default=2,
+    parser.add_argument('--rooms', metavar='R', type=int, default=5,
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=0.5,
                         help='Proportion of people that move between rooms')
