@@ -143,6 +143,7 @@ def draw_network(position_state, G, number_nodes):
     plt.show()
 
 def update_position_state(position_state,people):
+    """Update position_state array with locations of people at the end of a day."""
     position_state.iloc[:, :2] = 0  # array emptied for x y only
     # this code adds values from people objects back into array
     k = 0
@@ -158,6 +159,7 @@ def update_position_state(position_state,people):
     return (position_state)
 
 def update_people_nodes(position_state,people):
+    """Update node for people based on position_state array."""
     position_state.iloc[:, :2] = 0  # array emptied for x y only
     # this code adds values from people objects back into array
     k = 0
@@ -182,6 +184,7 @@ def transmission(position_state, heat, node):
     return position_state
 
 def check_general_inputs(number, cases, distance, table, mask, decay, rooms):
+    """Check general inputs to the code from command line."""
     if number/rooms < 5:
         raise Exception('For the number of rooms set, please enter a number of people greater than: {}'.format(rooms*5))
     if cases == 0:
@@ -198,6 +201,7 @@ def check_general_inputs(number, cases, distance, table, mask, decay, rooms):
         #raise Exception('Please enter probability between 0 and 1')
 
 def check_room_setup_inputs(size_x, size_y, table_r, table_x, table_y):
+    """Check room setup inputs to the code from command line."""
     if table_x > size_x:
         raise Exception('Table must be within room. Enter value smaller than: {}'.format(size_x))
     if table_y > size_y:
@@ -206,6 +210,7 @@ def check_room_setup_inputs(size_x, size_y, table_r, table_x, table_y):
         raise Exception('Table is too large. Enter value smaller radius')
 
 def check_network_inputs(rooms, travel, days, limit):
+    """Check network inputs to the code from command line."""
     if rooms > 5 or rooms < 2:
         raise Exception('Number of rooms must be between 2 and 5 inclusive')
     if travel < 0 or travel > 1:
