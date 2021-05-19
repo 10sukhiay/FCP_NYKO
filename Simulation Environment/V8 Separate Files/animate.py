@@ -26,7 +26,7 @@ def animate(people, heat_maps, position_state, rooms):
                        4: 'blue',
                        5: 'black'})
     grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
-    fig, axes = plt.subplots(2, rooms, figsize=(10, 10), sharey=True, sharex=True)
+    fig, axes = plt.subplots(2, rooms+1, figsize=(16, 8), sharey=False, sharex=False)
     anim = FuncAnimation(fig=fig, func=update,
                          frames=50,
                          fargs=(people, heat_maps, position_state, axes, colour_dict),
