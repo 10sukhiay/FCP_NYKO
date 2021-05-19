@@ -76,8 +76,9 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     travelling = round(N*travel)
     no_travelling = round(N*(1-travel))
     number_travelling = np.concatenate((([1]*masked), ([0]*no_masked)))
-    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling), axis=1)
-    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask', 'travelling'])
+    counter = ([0]*N)
+    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling, counter), axis=1)
+    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask', 'travelling', 'counter'])
     return(position_state)
 
 def people_array_room(position_state,i):

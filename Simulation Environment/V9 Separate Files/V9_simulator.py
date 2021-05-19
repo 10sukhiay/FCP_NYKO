@@ -58,7 +58,7 @@ def main(*args):
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=2,
                         help='Number of rooms to simulate')
-    parser.add_argument('--travel', metavar='T', type=float, default=0.5,
+    parser.add_argument('--travel', metavar='T', type=float, default=1,
                         help='Proportion of people that move between rooms')
     parser.add_argument('--size_x', metavar='R', type=int, default=8,
                         help='size of room along x axis')
@@ -94,7 +94,7 @@ def main(*args):
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-
+    print(position_state)
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
 
