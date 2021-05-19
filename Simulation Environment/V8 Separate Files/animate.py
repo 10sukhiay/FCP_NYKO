@@ -33,4 +33,7 @@ def animate(people, heat_maps, position_state, rooms):
                          interval=0,
                          blit=False,
                          repeat=False)
+
+
+
     plt.show()
