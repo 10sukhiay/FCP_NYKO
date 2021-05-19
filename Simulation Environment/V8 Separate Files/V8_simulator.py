@@ -60,9 +60,9 @@ def main(*args):
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=0.5,
                         help='Proportion of people that move between rooms')
-    parser.add_argument('--size_x', metavar='R', type=int, default=25,
+    parser.add_argument('--size_x', metavar='R', type=int, default=8,
                         help='size of room along x axis')
-    parser.add_argument('--size_y', metavar='R', type=int, default=20,
+    parser.add_argument('--size_y', metavar='R', type=int, default=10,
                         help='size of room along y axis')
     parser.add_argument('--table_r', metavar='R', type=int, default=0.5,
                         help='radius of table')
@@ -70,7 +70,7 @@ def main(*args):
                         help='x coordinate of table')
     parser.add_argument('--table_y', metavar='R', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='R', type=int, default=2,
+    parser.add_argument('--days', metavar='R', type=int, default=1,
                         help='number of days simulated')
     parser.add_argument('--limit', metavar='L', type=int, default=1,
                         help='Limits on number of people in each room - 1: on, 0:off')
@@ -120,7 +120,6 @@ def main(*args):
 
         # Draw updated node graph after simulation
         #draw_network(position_state, G, number_nodes)
-
 
 
 
