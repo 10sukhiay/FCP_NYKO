@@ -23,11 +23,7 @@ simulations without needing to edit the code e.g.:
 
 """
 #standard imports
-import numpy as np
-from matplotlib import pyplot as plt
-import pandas as pd
 import argparse
-import seaborn as sns
 
 # custom imports
 from Heat_Mapping import Room_map
