@@ -506,11 +506,17 @@ class Room_map(object):
 # animation function.  This is called sequentially
 def animate(people, heat_maps, position_state, rooms):
 
+    # colours for statuses in scatter plot
+    colour_dict = dict({1: 'green',
+                       2: 'yellow',
+                       3: 'red',
+                       4: 'blue',
+                       5: 'black'})
     grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
-    fig, axes = plt.subplots(1, rooms, figsize=(15, 5))
+    fig, axes = plt.subplots(2, rooms, figsize=(10, 10), sharey=True, sharex=True)
     anim = FuncAnimation(fig=fig, func=simulate,
                          frames=100,
-                         fargs=(people, heat_maps, position_state, axes),
+                         fargs=(people, heat_maps, position_state, axes, colour_dict),
                          interval=10,
                          blit=False,
                          repeat=False)
@@ -532,7 +538,8 @@ def update_position_state(position_state,people):
     return (position_state)
 
 # placeholder simulate function
-def simulate(it, people, heat_maps, position_state, axes):
+def simulate(it, people, heat_maps, position_state, axes, colour_dict):
+
 
     # move each person
     for i in people:
@@ -548,15 +555,33 @@ def simulate(it, people, heat_maps, position_state, axes):
             transmission(position_state, map.heat_old, map.node)
 
     for map in heat_maps:
+        # clear data from old plots
+        axes[0, map.node - 1].clear()
+        axes[1, map.node - 1].clear()
+
+        # plot positions
+
+        sns.scatterplot(x=map.occupants['x'],
+                        y=map.occupants['y'],
+                        hue=map.occupants['status'],
+                        palette= colour_dict,
+                        ax=axes[0, map.node - 1],
+                        legend=False)
+        axes[0, map.node - 1].set_title(f'Room {map.node} Position Map')
+
+
+        # plot heat maps
         sns.heatmap(map.show_map(),
-                    ax=axes[map.node-1],
+                    ax=axes[1,map.node-1],
                     cbar=False,
                     cmap='icefire',
                     center=0,
                     vmin =0,
                     vmax=100,
                     ).invert_yaxis()
-        axes[map.node-1].set_title(f'Room {map.node} Heat Map')
+        axes[1, map.node-1].set_title(f'Room {map.node} Heat Map')
+
+    # call function to record statuses (plotting infections etc...)
 
 if __name__ == "__main__":
 
