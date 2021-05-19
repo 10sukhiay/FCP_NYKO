@@ -28,7 +28,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
     if (it/day_length).is_integer() == True and it !=0: #checks if first iteration of any day!
 
         # draw node graph
-        draw_network(position_state, G, number_nodes)
+        #draw_network(position_state, G, number_nodes)
         # change nodes of individuals
         nodes = possible_paths(position_state, G)
         position_state = update_node_travel_prob(position_state, nodes, limit, number_nodes)
