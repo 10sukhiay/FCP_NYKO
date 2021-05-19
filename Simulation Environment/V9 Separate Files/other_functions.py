@@ -159,18 +159,15 @@ def update_people_nodes(position_state,people):
     position_state.iloc[:, :2] = 0  # array emptied for x y only
     # this code adds values from people objects back into array
     k = 0
-    print('nodes looked')
     for t in people:
         t.node = position_state['node'].iloc[k]
-        t.x = random.randint(0, t.size_x)
-        t.y = random.randint(0, t.size_y)
         k += 1  # iterator for picking the correct row
     # check
     print('nodes replaced')
     #print(position_state)  # array refilled with people
     return people
 
-def transmission(position_state, heat, node, day_length):
+def transmission(position_state, heat, node):
     for x in range(0, len(position_state)):
         if position_state.iloc[x]['node'] == node: # checks person is in correct room
             if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
@@ -180,30 +177,4 @@ def transmission(position_state, heat, node, day_length):
                         if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0,201))/2:
 
                             position_state.iloc[x]['status'] = 2 # stands for infected
-                            position_state.iloc[x]['counter'] = round((1-((random.random() - 0.5) / 2.5)) * day_length * 2) # 2 day incubation period +- 20%
     return position_state
-
-def status_change(position_state, day_length):
-    for x in range(0, len(position_state)):
-        if position_state.iloc[x]['counter'] == 0:  # check if status requires changing
-
-            if position_state.iloc[x]['status'] == 2:  # infected individuals
-                position_state.iloc[x]['status'] = 3  # now infectious
-                position_state.iloc[x]['counter'] = round((1-((random.random()-0.5)/2.5))*day_length*3)  # 3 day infectious period give or take 20%
-
-            elif position_state.iloc[x]['status'] == 3:  # infectious individuals
-                position_state.iloc[x]['status'] = 4  # now recovered
-                position_state.iloc[x]['counter'] = -1
-
-    return position_state
-
-
-def death_chance(position_state, death_rate):
-    for x in range(0, len(position_state)):
-        if position_state.iloc[x]['status'] == 2 or position_state.iloc[x]['status'] == 3:  # check if status requires changing
-            death_roll = random.random()
-            if death_roll < death_rate:
-                position_state.iloc[x]['status'] = 5  # individual dies
-
-    return position_state
-

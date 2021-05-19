@@ -17,7 +17,7 @@ from matplotlib import pyplot as plt
 #custom imports
 from update import update
 
-def animate(people, heat_maps, position_state, rooms, days, day_length, G, number_nodes, limit, death_rate):
+def animate(people, heat_maps, position_state, rooms, days, day_length, G, number_nodes, limit):
 
     # colours for statuses in scatter plot
     colour_dict = dict({1: 'green',
@@ -29,7 +29,7 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, G, numbe
     fig, axes = plt.subplots(2, rooms, figsize=(5*rooms, 10), sharey=True, sharex=True)
     anim = FuncAnimation(fig=fig, func=update,
                          frames=day_length*days,
-                         fargs=(people, heat_maps, position_state, axes, colour_dict, day_length, G, number_nodes, limit, death_rate),
+                         fargs=(people, heat_maps, position_state, axes, colour_dict, day_length, G, number_nodes, limit),
                          interval=50,
                          blit=False,
                          repeat=False)

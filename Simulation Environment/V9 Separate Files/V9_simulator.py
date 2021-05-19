@@ -48,11 +48,11 @@ def main(*args):
 
     parser.add_argument('--number', metavar='N', type=int, default=20,
                         help='Size of population')
-    parser.add_argument('--cases', metavar='C', type=int, default=1,
+    parser.add_argument('--cases', metavar='N', type=int, default=1,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='SD', type=float, default=1,
+    parser.add_argument('--distance', metavar='D', type=float, default=1,
                         help='Probability of following two meter social distancing')
-    parser.add_argument('--table', metavar='Pt', type=float, default=0.1,
+    parser.add_argument('--table', metavar='T', type=float, default=0.1,
                         help='Probability of gravitating to the table')
     parser.add_argument('--mask', metavar='M', type=float, default=0.5,
                         help='Probability of wearing a mask')
@@ -60,26 +60,24 @@ def main(*args):
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=1,
                         help='Proportion of people that move between rooms')
-    parser.add_argument('--size_x', metavar='X', type=int, default=14,
+    parser.add_argument('--size_x', metavar='R', type=int, default=8,
                         help='size of room along x axis')
-    parser.add_argument('--size_y', metavar='Y', type=int, default=14,
+    parser.add_argument('--size_y', metavar='R', type=int, default=10,
                         help='size of room along y axis')
-    parser.add_argument('--table_r', metavar='Tr', type=int, default=0.5,
+    parser.add_argument('--table_r', metavar='R', type=int, default=0.5,
                         help='radius of table')
-    parser.add_argument('--table_x', metavar='Tx', type=int, default=2,
+    parser.add_argument('--table_x', metavar='R', type=int, default=2,
                         help='x coordinate of table')
-    parser.add_argument('--table_y', metavar='Ty', type=int, default=2,
+    parser.add_argument('--table_y', metavar='R', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='D', type=int, default=20,
+    parser.add_argument('--days', metavar='R', type=int, default=5,
                         help='number of days simulated')
     parser.add_argument('--limit', metavar='L', type=int, default=0,
                         help='Limits on number of people in each room - 1: on, 0:off')
-    parser.add_argument('--decay', metavar='d', type=int, default=0.5,
+    parser.add_argument('--decay', metavar='L', type=int, default=1,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
-    parser.add_argument('--day_length', metavar='Dl', type=int, default=20,
+    parser.add_argument('--day_length', metavar='L', type=int, default=10,
                         help='The number of iterations per day')
-    parser.add_argument('--death_rate', metavar='Rd', type=float, default=0,
-                        help='Likelihood of death 0 to 1')
     args = parser.parse_args(args)
 
 
@@ -93,19 +91,12 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
-    for x in range(0, len(position_state)):  # set counter for any starting infected people
-        if position_state.iloc[x]['status'] == 3:
-            position_state.iloc[x]['counter'] = args.day_length*3
-
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
+    print(position_state)
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2],
-                     status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4],
-                     gravitating=position_state.iloc[i, 5], AREA_X=args.table_x,
-                     AREA_Y=args.table_y, AREA_R=args.table_r,
-                     size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
 
     # Initialise areas
     area1 = area(args.table_x, args.table_y, args.table_r)
@@ -131,8 +122,7 @@ def main(*args):
             day_length=args.day_length,
             G=G,
             number_nodes=number_nodes,
-            limit=args.limit,
-            death_rate=args.death_rate)
+            limit=args.limit)
 
     # Drawing a node graph
     #draw_network(position_state, G, number_nodes)
