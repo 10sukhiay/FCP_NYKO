@@ -80,8 +80,9 @@ def main(*args):
                         help='Limits on number of people in each room - 1: on, 0:off')
     args = parser.parse_args(args)
 
-    edgelist = create_edgelist(args.rooms)
 
+    #create edgelist
+    edgelist = create_edgelist(args.rooms)
     # Create network
     G = create_network(edgelist)
     # Set number of nodes
@@ -90,16 +91,9 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
-
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-
-
-    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
-    room1 = people_array_room(position_state, 1)
-    room2 = people_array_room(position_state, 2)
-    room3 = people_array_room(position_state, 3)
 
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
@@ -114,23 +108,22 @@ def main(*args):
 
 
 
+    # loop for multiple days
+    for day in range(args.days):
+    # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
+        #use animate function instead of update. update is nested!!!
+        animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
-    #simulate(it = 0, people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+        # Drawing a node graph
+        #draw_network(position_state, G, number_nodes)
 
+        # Update the position state for new nodes.
+        #nodes = possible_paths(position_state, G)
 
-    #use animate function instead of simulate. Simulate is nested!!!
-    animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+        position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
-    # Drawing a node graph
-    #draw_network(position_state, G, number_nodes)
-
-    # Update the position state for new nodes.
-    #nodes = possible_paths(position_state, G)
-
-    position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-
-    # Draw updated node graph after simulation
-    #draw_network(position_state, G, number_nodes)
+        # Draw updated node graph after simulation
+        #draw_network(position_state, G, number_nodes)
 
 
 
