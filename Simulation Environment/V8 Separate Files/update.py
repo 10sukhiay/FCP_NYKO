@@ -45,7 +45,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict):
         sns.scatterplot(x=map.occupants['x'],
                         y=map.occupants['y'],
                         hue=map.occupants['status'],
-                        palette= colour_dict,
+                        palette=colour_dict,
                         ax=axes[0, map.node],
                         legend=False)
         axes[0, map.node].set_title(f'Room {map.node} Position Map')
