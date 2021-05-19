@@ -17,7 +17,6 @@ from matplotlib import pyplot as plt
 import random
 import networkx as nx
 from numpy.random import randint
-import math
 
 #custom imports
 
@@ -62,20 +61,20 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     start_status = np.concatenate((([3]*number_infected), ([1]*(N-number_infected))))
     random.shuffle(start_status)
     # following two meter rule
-    follow = math.ceil(N*following_two_meter)
-    no_follow = math.floor(N*(1-following_two_meter))
+    follow = round(N*following_two_meter)
+    no_follow = round(N*(1-following_two_meter))
     two_meter = np.concatenate((([1]*follow), ([0]*no_follow)))
     #gravitating towards the table
-    gravitate = math.ceil(N*gravitate_table)
-    no_gravitate = math.floor(N*(1-gravitate_table))
+    gravitate = round(N*gravitate_table)
+    no_gravitate = round(N*(1-gravitate_table))
     number_gravitating = np.concatenate((([1]*gravitate), ([0]*no_gravitate)))
     #wearing a mask
-    masked = math.ceil(N*using_mask)
-    no_masked = math.floor(N*(1-using_mask))
+    masked = round(N*using_mask)
+    no_masked = round(N*(1-using_mask))
     number_masked = np.concatenate((([1]*masked), ([0]*no_masked)))
     # travelling round
-    travelling = math.ceil(N*travel)
-    no_travelling = math.floor(N*(1-travel))
+    travelling = round(N*travel)
+    no_travelling = round(N*(1-travel))
     number_travelling = np.concatenate((([1]*masked), ([0]*no_masked)))
     data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling), axis=1)
     position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask', 'travelling'])
@@ -100,7 +99,6 @@ def update_node_travel_prob(position_state, nodes, limit,number_nodes):
     if limit == 0:
         random_node_choice(position_state, nodes)
     if limit == 1:
-        random_node_choice(position_state, nodes)
         while max(node_count_individuals(position_state, number_nodes))>((len(position_state)/number_nodes)+1):
             random_node_choice(position_state, nodes)
     return position_state
@@ -156,6 +154,18 @@ def update_position_state(position_state,people):
     #print(position_state)  # array refilled with people
     return (position_state)
 
+def update_people_nodes(position_state,people):
+    position_state.iloc[:, :2] = 0  # array emptied for x y only
+    # this code adds values from people objects back into array
+    k = 0
+    for t in people:
+        t.node = position_state['node'].iloc[k]
+        k += 1  # iterator for picking the correct row
+    # check
+    print('nodes replaced')
+    #print(position_state)  # array refilled with people
+    return people
+
 def transmission(position_state, heat, node):
     for x in range(0, len(position_state)):
         if position_state.iloc[x]['node'] == node: # checks person is in correct room
@@ -167,7 +177,3 @@ def transmission(position_state, heat, node):
 
                             position_state.iloc[x]['status'] = 2 # stands for infected
     return position_state
-
-def check_general_inputs(number, cases, distance, table, mask, decay, rooms):
-    if number/rooms < 5:
-        raise Exception('For the number of rooms set, please enter an even number of people greater than: {}'.format(rooms*5))
