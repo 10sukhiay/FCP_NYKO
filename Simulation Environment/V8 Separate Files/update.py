@@ -36,32 +36,32 @@ def update(it, people, heat_maps, position_state, axes, colour_dict):
 
     for map in heat_maps:
         # clear data from old plots
-        axes[0, map.node].clear()
-        axes[1, map.node].clear()
+        axes[0, map.node - 1].clear()
+        axes[1, map.node - 1].clear()
 
         # plot positions
 
         sns.scatterplot(x=map.occupants['x'],
                         y=map.occupants['y'],
                         hue=map.occupants['status'],
-                        palette=colour_dict,
-                        ax=axes[0, map.node],
+                        palette= colour_dict,
+                        ax=axes[0, map.node - 1],
                         legend=False)
-        axes[0, map.node].set_title(f'Room {map.node} Position Map')
-        axes[0, map.node].set_xlim([0, map.xsize])
-        axes[0, map.node].set_ylim([0, map.ysize])
+        axes[0, map.node - 1].set_title(f'Room {map.node} Position Map')
 
 
         # plot heat maps
         sns.heatmap(map.show_map(),
-                    ax=axes[1,map.node],
+                    ax=axes[1,map.node-1],
                     cbar=False,
                     cmap='icefire',
                     center=0,
                     vmin =0,
                     vmax=100,
                     ).invert_yaxis()
-        axes[1, map.node].set_title(f'Room {map.node} Heat Map')
+        axes[1, map.node-1].set_title(f'Room {map.node} Heat Map')
+
+    # call function to record statuses (plotting infections etc...)
 
 
 
