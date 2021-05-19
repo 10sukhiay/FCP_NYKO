@@ -12,7 +12,6 @@ May 2021
 import numpy as np
 import pandas as pd
 import seaborn as sns
-
 # custom imports
 from Heat_Mapping import Room_map
 from Person_Class import person
