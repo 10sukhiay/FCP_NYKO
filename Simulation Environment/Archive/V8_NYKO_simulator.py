@@ -63,9 +63,9 @@ def main(*args):
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=0.5,
                         help='Proportion of people that move between rooms')
-    parser.add_argument('--size_x', metavar='R', type=int, default=25,
+    parser.add_argument('--size_x', metavar='R', type=int, default=8,
                         help='size of room along x axis')
-    parser.add_argument('--size_y', metavar='R', type=int, default=20,
+    parser.add_argument('--size_y', metavar='R', type=int, default=10,
                         help='size of room along y axis')
     parser.add_argument('--table_r', metavar='R', type=int, default=0.5,
                         help='radius of table')
