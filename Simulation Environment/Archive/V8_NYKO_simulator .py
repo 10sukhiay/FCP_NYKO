@@ -142,11 +142,13 @@ def create_edgelist(rooms):
     if rooms == 2:
         edgelist = [(1, 2)]
     if rooms == 3:
-        edgelist = [(1, 2), (1,3), (2,3)]
+        edgelist = [(1, 2), (1, 3), (2, 3)]
+    if rooms == 4:
+        edgelist = [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
     if rooms == 5:
-        edgelist = [(1, 2), (1, 4), (2, 5), (3, 5), (2, 3)]
+        edgelist = [(1, 2), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5), (3, 4), (3, 5)]
 
-    return(edgelist)
+    return (edgelist)
 
 def create_network(edgelist):
     """Create a networkx graph from the edgelist."""
@@ -515,7 +517,7 @@ def animate(people, heat_maps, position_state, rooms):
     grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
     fig, axes = plt.subplots(2, rooms, figsize=(10, 10), sharey=True, sharex=True)
     anim = FuncAnimation(fig=fig, func=simulate,
-                         frames=100,
+                         frames=200,
                          fargs=(people, heat_maps, position_state, axes, colour_dict),
                          interval=10,
                          blit=False,
