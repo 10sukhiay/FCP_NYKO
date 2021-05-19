@@ -167,6 +167,7 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
+    yaz =3
 
     # SUSCEPTIBLE 1
     # INFECTED    2

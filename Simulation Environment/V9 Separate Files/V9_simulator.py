@@ -80,6 +80,11 @@ def main(*args):
                         help='The number of iterations per day')
     args = parser.parse_args(args)
 
+    check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.rooms)
+
+    check_room_setup_inputs(args.size_x, args.size_y, args.table_r, args.table_x, args.table_y)
+
+    check_network_inputs(args.rooms, args.travel, args.days, args.limit)
 
     #create edgelist
     edgelist = create_edgelist(args.rooms)
@@ -94,7 +99,7 @@ def main(*args):
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-    print(position_state)
+
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
 

@@ -51,7 +51,7 @@ def main(*args):
 
     parser.add_argument('--number', metavar='N', type=int, default=20,
                         help='Size of population')
-    parser.add_argument('--cases', metavar='N', type=int, default=2,
+    parser.add_argument('--cases', metavar='N', type=int, default=1,
                         help='Number of initial infected people')
     parser.add_argument('--distance', metavar='D', type=float, default=1,
                         help='Probability of following two meter social distancing')
@@ -63,9 +63,9 @@ def main(*args):
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=0.5,
                         help='Proportion of people that move between rooms')
-    parser.add_argument('--size_x', metavar='R', type=int, default=20,
+    parser.add_argument('--size_x', metavar='R', type=int, default=8,
                         help='size of room along x axis')
-    parser.add_argument('--size_y', metavar='R', type=int, default=15,
+    parser.add_argument('--size_y', metavar='R', type=int, default=10,
                         help='size of room along y axis')
     parser.add_argument('--table_r', metavar='R', type=int, default=0.5,
                         help='radius of table')
@@ -73,14 +73,15 @@ def main(*args):
                         help='x coordinate of table')
     parser.add_argument('--table_y', metavar='R', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='R', type=int, default=5,
+    parser.add_argument('--days', metavar='R', type=int, default=1,
                         help='number of days simulated')
     parser.add_argument('--limit', metavar='L', type=int, default=1,
                         help='Limits on number of people in each room - 1: on, 0:off')
     args = parser.parse_args(args)
 
-    edgelist = create_edgelist(args.rooms)
 
+    #create edgelist
+    edgelist = create_edgelist(args.rooms)
     # Create network
     G = create_network(edgelist)
     # Set number of nodes
@@ -89,17 +90,9 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
-    print(position_state)
-
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-
-
-    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
-    room1 = people_array_room(position_state, 1)
-    room2 = people_array_room(position_state, 2)
-    room3 = people_array_room(position_state, 3)
 
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
@@ -111,29 +104,26 @@ def main(*args):
     #initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
     heat_maps = [Room_map(heat_old=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
-    for map in heat_maps:
-        map.position_state = position_state
-        map.heat_new = map.calculate_heat_new()
 
 
 
+    # loop for multiple days
+    for day in range(args.days):
+    # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
+        #use animate function instead of update. update is nested!!!
+        animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
-    #simulate(it = 0, people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+        # Drawing a node graph
+        #draw_network(position_state, G, number_nodes)
 
+        # Update the position state for new nodes.
+        #nodes = possible_paths(position_state, G)
 
-    #use animate function instead of simulate. Simulate is nested!!!
-    animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+        position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
-    # Drawing a node graph
-    #draw_network(position_state, G, number_nodes)
+        # Draw updated node graph after simulation
+        #draw_network(position_state, G, number_nodes)
 
-    # Update the position state for new nodes.
-    #nodes = possible_paths(position_state, G)
-
-    position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-
-    # Draw updated node graph after simulation
-    #draw_network(position_state, G, number_nodes)
 
 
 def create_edgelist(rooms):
@@ -255,6 +245,21 @@ def draw_network(position_state, G, number_nodes):
     plt.legend(['Room - Number of People in the Room'])
     plt.show()
 
+def update_position_state(position_state,people):
+    position_state.iloc[:, :2] = 0  # array emptied for x y only
+    # this code adds values from people objects back into array
+    k = 0
+    for t in people:
+        position_state.iloc[k, 0] = t.x
+        position_state.iloc[k, 1] = t.y
+        position_state.iloc[k, 2] = t.node
+        position_state.iloc[k, 5] = t.gravitating
+        k += 1  # iterator for picking the correct row
+    # check
+    #print('iteration finished and this is new position_state array:')
+    #print(position_state)  # array refilled with people
+    return (position_state)
+
 def transmission(position_state, heat, node):
     for x in range(0, len(position_state)):
         if position_state.iloc[x]['node'] == node: # checks person is in correct room
@@ -262,10 +267,84 @@ def transmission(position_state, heat, node):
 
                 if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
 
-                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > np.random.randint(0,101):
+                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0,201))/2:
 
                             position_state.iloc[x]['status'] = 2 # stands for infected
     return position_state
+
+def animate(people, heat_maps, position_state, rooms):
+
+    # colours for statuses in scatter plot
+    colour_dict = dict({1: 'green',
+                       2: 'yellow',
+                       3: 'red',
+                       4: 'blue',
+                       5: 'black'})
+    grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
+    fig, axes = plt.subplots(2, rooms, figsize=(10, 10), sharey=True, sharex=True)
+    anim = FuncAnimation(fig=fig, func=update,
+                         frames=100,
+                         fargs=(people, heat_maps, position_state, axes, colour_dict),
+                         interval=10,
+                         blit=False,
+                         repeat=False)
+    plt.show()
+
+# placeholder simulate function
+def update(it, people, heat_maps, position_state, axes, colour_dict):
+
+
+    # move each person
+    for i in people:
+        i.move(people=people)
+    position_state = update_position_state(position_state, people)
+
+    # update heat maps
+    for x in range(2):
+        for map in heat_maps:
+            map.update_occupants(position_state)
+            map.calculate_heat_new()
+            # introduce some transmission function to infect new people
+            transmission(position_state, map.heat_old, map.node)
+
+    for map in heat_maps:
+        # clear data from old plots
+        axes[0, map.node - 1].clear()
+        axes[1, map.node - 1].clear()
+
+        # plot positions
+
+        sns.scatterplot(x=map.occupants['x'],
+                        y=map.occupants['y'],
+                        hue=map.occupants['status'],
+                        palette= colour_dict,
+                        ax=axes[0, map.node - 1],
+                        legend=False)
+        axes[0, map.node - 1].set_title(f'Room {map.node} Position Map')
+
+
+        # plot heat maps
+        sns.heatmap(map.show_map(),
+                    ax=axes[1,map.node-1],
+                    cbar=False,
+                    cmap='icefire',
+                    center=0,
+                    vmin =0,
+                    vmax=100,
+                    ).invert_yaxis()
+        axes[1, map.node-1].set_title(f'Room {map.node} Heat Map')
+
+    # call function to record statuses (plotting infections etc...)
+
+
+
+    # the network image uses this plot axes
+    # axes[0, 0]
+    axes[0, 0].set_title(f'Network Map')
+
+    # the line graph uses this plot axes
+    # axes[1, 0]
+    axes[1, 0].set_title(f'Population Line Chart')
 
 #----------------------------------------------------------------------------#
 #                  Simulation classes                                        #
@@ -425,11 +504,7 @@ class person(object):
             if min_dist_to_someone < 2: #if closer than 2meters to someone
                 move_away(self, closest_person.x, closest_person.y)
 
-
-#----------------------------------------------------------------------------#
-#                  Kaelan Room Heatmap classes                               #
-#----------------------------------------------------------------------------#
-
+#create heat maps
 class Room_map(object):
     def __init__(self, heat_old, position_state, xsize, ysize, node):
         self.heat_old = heat_old
@@ -477,7 +552,7 @@ class Room_map(object):
         heat_left = np.roll(heat, 1, axis=1)
         heat_right = np.roll(heat, -1, axis=1)
         heat_up = np.roll(heat, -1, axis=0)
-        heat_down = np.roll(heat, 1, axis=1)
+        heat_down = np.roll(heat, 1, axis=0)
 
         heat_new = 0.25 * (heat_left + heat_right + heat_up + heat_down)  # cell heat is the average of adjacent cells
         heat_new[self.heat_source() == 100] = 100
@@ -506,84 +581,7 @@ class Room_map(object):
 
 #REPLACE THIS WITH YAZ CODE
 # animation function.  This is called sequentially
-def animate(people, heat_maps, position_state, rooms):
 
-    # colours for statuses in scatter plot
-    colour_dict = dict({1: 'green',
-                       2: 'yellow',
-                       3: 'red',
-                       4: 'blue',
-                       5: 'black'})
-    grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
-    fig, axes = plt.subplots(2, rooms, figsize=(10, 10), sharey=True, sharex=True)
-    anim = FuncAnimation(fig=fig, func=simulate,
-                         frames=100,
-                         fargs=(people, heat_maps, position_state, axes, colour_dict),
-                         interval=10,
-                         blit=False,
-                         repeat=False)
-    plt.show()
-
-def update_position_state(position_state,people):
-    position_state.iloc[:, :2] = 0  # array emptied for x y only
-    # this code adds values from people objects back into array
-    k = 0
-    for t in people:
-        position_state.iloc[k, 0] = t.x
-        position_state.iloc[k, 1] = t.y
-        position_state.iloc[k, 2] = t.node
-        position_state.iloc[k, 5] = t.gravitating
-        k += 1  # iterator for picking the correct row
-    # check
-    #print('iteration finished and this is new position_state array:')
-    #print(position_state)  # array refilled with people
-    return (position_state)
-
-# placeholder simulate function
-def simulate(it, people, heat_maps, position_state, axes, colour_dict):
-
-
-    # move each person
-    for i in people:
-        i.move(people=people)
-    position_state = update_position_state(position_state, people)
-
-    # update heat maps
-    for x in range(2):
-        for map in heat_maps:
-            map.update_occupants(position_state)
-            map.calculate_heat_new()
-            # introduce some transmission function to infect new people
-            transmission(position_state, map.heat_old, map.node)
-
-    for map in heat_maps:
-        # clear data from old plots
-        axes[0, map.node - 1].clear()
-        axes[1, map.node - 1].clear()
-
-        # plot positions
-
-        sns.scatterplot(x=map.occupants['x'],
-                        y=map.occupants['y'],
-                        hue=map.occupants['status'],
-                        palette= colour_dict,
-                        ax=axes[0, map.node - 1],
-                        legend=False)
-        axes[0, map.node - 1].set_title(f'Room {map.node} Position Map')
-
-
-        # plot heat maps
-        sns.heatmap(map.show_map(),
-                    ax=axes[1,map.node-1],
-                    cbar=False,
-                    cmap='icefire',
-                    center=0,
-                    vmin =0,
-                    vmax=100,
-                    ).invert_yaxis()
-        axes[1, map.node-1].set_title(f'Room {map.node} Heat Map')
-
-    # call function to record statuses (plotting infections etc...)
 
 if __name__ == "__main__":
 
