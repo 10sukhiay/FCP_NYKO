@@ -17,6 +17,7 @@ from matplotlib import pyplot as plt
 import random
 import networkx as nx
 from numpy.random import randint
+import math
 
 #custom imports
 
@@ -61,20 +62,20 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     start_status = np.concatenate((([3]*number_infected), ([1]*(N-number_infected))))
     random.shuffle(start_status)
     # following two meter rule
-    follow = round(N*following_two_meter)
-    no_follow = round(N*(1-following_two_meter))
+    follow = math.ceil(N*following_two_meter)
+    no_follow = math.floor(N*(1-following_two_meter))
     two_meter = np.concatenate((([1]*follow), ([0]*no_follow)))
     #gravitating towards the table
-    gravitate = round(N*gravitate_table)
-    no_gravitate = round(N*(1-gravitate_table))
+    gravitate = math.ceil(N*gravitate_table)
+    no_gravitate = math.floor(N*(1-gravitate_table))
     number_gravitating = np.concatenate((([1]*gravitate), ([0]*no_gravitate)))
     #wearing a mask
-    masked = round(N*using_mask)
-    no_masked = round(N*(1-using_mask))
+    masked = math.ceil(N*using_mask)
+    no_masked = math.floor(N*(1-using_mask))
     number_masked = np.concatenate((([1]*masked), ([0]*no_masked)))
     # travelling round
-    travelling = round(N*travel)
-    no_travelling = round(N*(1-travel))
+    travelling = math.ceil(N*travel)
+    no_travelling = math.floor(N*(1-travel))
     number_travelling = np.concatenate((([1]*masked), ([0]*no_masked)))
     counter = ([0]*N)
     data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling, counter), axis=1)
@@ -100,6 +101,7 @@ def update_node_travel_prob(position_state, nodes, limit,number_nodes):
     if limit == 0:
         random_node_choice(position_state, nodes)
     if limit == 1:
+        random_node_choice(position_state, nodes)
         while max(node_count_individuals(position_state, number_nodes))>((len(position_state)/number_nodes)+1):
             random_node_choice(position_state, nodes)
     return position_state
