@@ -56,9 +56,9 @@ def main(*args):
                         help='Probability of gravitating to the table')
     parser.add_argument('--mask', metavar='M', type=float, default=0.5,
                         help='Probability of wearing a mask')
-    parser.add_argument('--rooms', metavar='R', type=int, default=2,
+    parser.add_argument('--rooms', metavar='R', type=int, default=3,
                         help='Number of rooms to simulate')
-    parser.add_argument('--travel', metavar='T', type=float, default=0.5,
+    parser.add_argument('--travel', metavar='T', type=float, default=1,
                         help='Proportion of people that move between rooms')
     parser.add_argument('--size_x', metavar='R', type=int, default=8,
                         help='size of room along x axis')
@@ -70,9 +70,9 @@ def main(*args):
                         help='x coordinate of table')
     parser.add_argument('--table_y', metavar='R', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='R', type=int, default=1,
+    parser.add_argument('--days', metavar='R', type=int, default=3,
                         help='number of days simulated')
-    parser.add_argument('--limit', metavar='L', type=int, default=1,
+    parser.add_argument('--limit', metavar='L', type=int, default=0,
                         help='Limits on number of people in each room - 1: on, 0:off')
     args = parser.parse_args(args)
 
@@ -108,16 +108,19 @@ def main(*args):
     for day in range(args.days):
     # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
         #use animate function instead of update. update is nested!!!
+
         animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
         # Drawing a node graph
-        #draw_network(position_state, G, number_nodes)
+        draw_network(position_state, G, number_nodes)
 
         # Update the position state for new nodes.
-        #nodes = possible_paths(position_state, G)
+        nodes = possible_paths(position_state, G)
 
         position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
+        people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
 
+        print(position_state)
         # Draw updated node graph after simulation
         #draw_network(position_state, G, number_nodes)
 
