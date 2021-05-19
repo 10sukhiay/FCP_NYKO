@@ -13,11 +13,13 @@ import numpy as np
 import pandas as pd
 from Heat_Mapping import Room_map
 from Person_Class import person
+from matplotlib import pyplot as plt
 import random
 import networkx as nx
 from numpy.random import randint
 
 #custom imports
+
 
 def create_edgelist(rooms):
     """Define the edge list dependant on number of rooms."""
@@ -26,8 +28,10 @@ def create_edgelist(rooms):
         edgelist = [(1, 2)]
     if rooms == 3:
         edgelist = [(1, 2), (1,3), (2,3)]
+    if rooms == 4:
+        edgelist = [(1, 2), (1,3), (1,4), (2,3), (2,4), (3,4)]
     if rooms == 5:
-        edgelist = [(1, 2), (1, 4), (2, 5), (3, 5), (2, 3)]
+        edgelist = [(1, 2), (1,3), (1,4), (1,5), (2,3), (2,4), (2,5), (3,4), (3,5)]
 
     return(edgelist)
 
@@ -106,7 +110,6 @@ def random_node_choice(position_state, nodes):
             position_state.iloc[i, 2] = random.choice(nodes[i])
     return(position_state)
 
-
 def node_count_individuals(position_state, number_nodes):
     """Count the number of individual at each node"""
     node_count = []
@@ -136,18 +139,6 @@ def draw_network(position_state, G, number_nodes):
     plt.legend(['Room - Number of People in the Room'])
     plt.show()
 
-def transmission(position_state, heat, node):
-    for x in range(0, len(position_state)):
-        if position_state.iloc[x]['node'] == node: # checks person is in correct room
-            if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
-
-                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
-
-                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0,201))/2:
-
-                            position_state.iloc[x]['status'] = 2 # stands for infected
-    return position_state
-
 def update_position_state(position_state,people):
     position_state.iloc[:, :2] = 0  # array emptied for x y only
     # this code adds values from people objects back into array
@@ -162,3 +153,15 @@ def update_position_state(position_state,people):
     #print('iteration finished and this is new position_state array:')
     #print(position_state)  # array refilled with people
     return (position_state)
+
+def transmission(position_state, heat, node):
+    for x in range(0, len(position_state)):
+        if position_state.iloc[x]['node'] == node: # checks person is in correct room
+            if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
+
+                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
+
+                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0,201))/2:
+
+                            position_state.iloc[x]['status'] = 2 # stands for infected
+    return position_state
