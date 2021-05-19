@@ -14,12 +14,13 @@ import pandas as pd
 import random
 
 class Room_map(object):
-    def __init__(self, heat_old, position_state, xsize, ysize, node):
+    def __init__(self, heat_old, position_state, xsize, ysize, node, decay):
         self.heat_old = heat_old
         self.node = node
         self.xsize = xsize+1
         self.ysize = ysize+1
         self.update_occupants(position_state)
+        self.decay = decay
 
     def update_occupants(self, position_state):
         self.occupants = position_state[position_state["node"] == self.node]
@@ -45,7 +46,8 @@ class Room_map(object):
     def calculate_heat_new(self):  # will calculate single step of heat dispersion
         #add zeros all around
         boundary = np.zeros((self.ysize+2, self.xsize+2))
-        boundary[1:-1, 1:-1] = self.heat_old
+        boundary[1:-1, 1:-1] = self.heat_old - self.decay # minus 1 is the decay
+        boundary[boundary < 0] = 0
 
         # boundary conditions no windows
         boundary[:, 0] = boundary[:, 1]
