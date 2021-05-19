@@ -30,7 +30,7 @@ class person(object):
         self.size_x = size_x
         self.size_y = size_y
 
-    def make_new_step_size(self, max_step=10):
+    def make_new_step_size(self, max_step=2.5):
         return (np.random.random_sample() - 0.5)*max_step / 5 #creates random number for step size 0 to 0.1
 
     def move(self, people):

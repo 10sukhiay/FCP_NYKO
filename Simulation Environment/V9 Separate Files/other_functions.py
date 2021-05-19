@@ -154,6 +154,18 @@ def update_position_state(position_state,people):
     #print(position_state)  # array refilled with people
     return (position_state)
 
+def update_people_nodes(position_state,people):
+    position_state.iloc[:, :2] = 0  # array emptied for x y only
+    # this code adds values from people objects back into array
+    k = 0
+    for t in people:
+        t.node = position_state['node'].iloc[k]
+        k += 1  # iterator for picking the correct row
+    # check
+    print('nodes replaced')
+    #print(position_state)  # array refilled with people
+    return people
+
 def transmission(position_state, heat, node):
     for x in range(0, len(position_state)):
         if position_state.iloc[x]['node'] == node: # checks person is in correct room

@@ -56,7 +56,7 @@ def main(*args):
                         help='Probability of gravitating to the table')
     parser.add_argument('--mask', metavar='M', type=float, default=0.5,
                         help='Probability of wearing a mask')
-    parser.add_argument('--rooms', metavar='R', type=int, default=4,
+    parser.add_argument('--rooms', metavar='R', type=int, default=3,
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=0.5,
                         help='Proportion of people that move between rooms')
@@ -72,11 +72,11 @@ def main(*args):
                         help='y coordinate of table')
     parser.add_argument('--days', metavar='R', type=int, default=5,
                         help='number of days simulated')
-    parser.add_argument('--limit', metavar='L', type=int, default=1,
+    parser.add_argument('--limit', metavar='L', type=int, default=0,
                         help='Limits on number of people in each room - 1: on, 0:off')
     parser.add_argument('--decay', metavar='L', type=int, default=1,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
-    parser.add_argument('--day_length', metavar='L', type=int, default=5,
+    parser.add_argument('--day_length', metavar='L', type=int, default=10,
                         help='The number of iterations per day')
     args = parser.parse_args(args)
 

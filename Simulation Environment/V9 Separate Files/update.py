@@ -32,7 +32,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
         # change nodes of individuals
         nodes = possible_paths(position_state, G)
         position_state = update_node_travel_prob(position_state, nodes, limit, number_nodes)
-
+        people = update_people_nodes(position_state, people)
         # clear heat maps
         for map in heat_maps:
             map.heat_old[:, :] = 0
