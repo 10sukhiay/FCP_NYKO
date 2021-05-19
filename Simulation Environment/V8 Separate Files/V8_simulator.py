@@ -107,7 +107,6 @@ def main(*args):
     heat_maps = [Room_map(heat_old=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
 
 
-
     # loop for multiple days
     for day in range(args.days):
     # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
