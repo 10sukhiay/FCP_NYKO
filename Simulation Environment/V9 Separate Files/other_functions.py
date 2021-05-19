@@ -180,3 +180,37 @@ def transmission(position_state, heat, node):
 
                             position_state.iloc[x]['status'] = 2 # stands for infected
     return position_state
+
+def check_general_inputs(number, cases, distance, table, mask, decay, rooms):
+    if number/rooms < 5:
+        raise Exception('For the number of rooms set, please enter a number of people greater than: {}'.format(rooms*5))
+    if cases == 0:
+        raise Exception('Please add at least one case')
+    if cases > number:
+        raise Exception('Number of cases must be less than: {}'.format(rooms*5))
+    if distance < 0 or distance > 1:
+        raise Exception('Please enter probability between 0 and 1')
+    if table < 0 or table > 1:
+        raise Exception('Please enter probability between 0 and 1')
+    if mask < 0 or mask > 1:
+        raise Exception('Please enter probability between 0 and 1')
+    #if decay < 0 or decay > 1:
+        #raise Exception('Please enter probability between 0 and 1')
+
+def check_room_setup_inputs(size_x, size_y, table_r, table_x, table_y):
+    if table_x > size_x:
+        raise Exception('Table must be within room. Enter value smaller than: {}'.format(size_x))
+    if table_y > size_y:
+        raise Exception('Table must be within room. Enter value smaller than: {}'.format(size_y))
+    if table_r > size_y or table_r > size_x:
+        raise Exception('Table is too large. Enter value smaller radius')
+
+def check_network_inputs(rooms, travel, days, limit):
+    if rooms > 5 or rooms < 2:
+        raise Exception('Number of rooms must be between 2 and 5 inclusive')
+    if travel < 0 or travel > 1:
+        raise Exception('Please enter probability between 0 and 1')
+    if limit not in [0,1]:
+        raise Exception('Please enter 0 for limit off, 1 for limit on')
+
+

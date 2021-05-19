@@ -46,7 +46,7 @@ def main(*args):
     #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=17,
+    parser.add_argument('--number', metavar='N', type=int, default=20,
                         help='Size of population')
     parser.add_argument('--cases', metavar='N', type=int, default=1,
                         help='Number of initial infected people')
@@ -80,6 +80,11 @@ def main(*args):
                         help='The number of iterations per day')
     args = parser.parse_args(args)
 
+    check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.rooms)
+
+    check_room_setup_inputs(args.size_x, args.size_y, args.table_r, args.table_x, args.table_y)
+
+    check_network_inputs(args.rooms, args.travel, args.days, args.limit)
 
     #create edgelist
     edgelist = create_edgelist(args.rooms)
