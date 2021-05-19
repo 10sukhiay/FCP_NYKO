@@ -51,7 +51,7 @@ def main(*args):
 
     parser.add_argument('--number', metavar='N', type=int, default=20,
                         help='Size of population')
-    parser.add_argument('--cases', metavar='N', type=int, default=2,
+    parser.add_argument('--cases', metavar='N', type=int, default=1,
                         help='Number of initial infected people')
     parser.add_argument('--distance', metavar='D', type=float, default=1,
                         help='Probability of following two meter social distancing')
@@ -63,9 +63,9 @@ def main(*args):
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=0.5,
                         help='Proportion of people that move between rooms')
-    parser.add_argument('--size_x', metavar='R', type=int, default=20,
+    parser.add_argument('--size_x', metavar='R', type=int, default=8,
                         help='size of room along x axis')
-    parser.add_argument('--size_y', metavar='R', type=int, default=15,
+    parser.add_argument('--size_y', metavar='R', type=int, default=10,
                         help='size of room along y axis')
     parser.add_argument('--table_r', metavar='R', type=int, default=0.5,
                         help='radius of table')
@@ -73,14 +73,15 @@ def main(*args):
                         help='x coordinate of table')
     parser.add_argument('--table_y', metavar='R', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='R', type=int, default=5,
+    parser.add_argument('--days', metavar='R', type=int, default=2,
                         help='number of days simulated')
     parser.add_argument('--limit', metavar='L', type=int, default=1,
                         help='Limits on number of people in each room - 1: on, 0:off')
     args = parser.parse_args(args)
 
-    edgelist = create_edgelist(args.rooms)
 
+    #create edgelist
+    edgelist = create_edgelist(args.rooms)
     # Create network
     G = create_network(edgelist)
     # Set number of nodes
@@ -89,17 +90,9 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
-    print(position_state)
-
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-
-
-    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
-    room1 = people_array_room(position_state, 1)
-    room2 = people_array_room(position_state, 2)
-    room3 = people_array_room(position_state, 3)
 
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
@@ -111,29 +104,26 @@ def main(*args):
     #initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
     heat_maps = [Room_map(heat_old=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
-    for map in heat_maps:
-        map.position_state = position_state
-        map.heat_new = map.calculate_heat_new()
 
 
 
+    # loop for multiple days
+    for day in range(args.days):
+    # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
+        #use animate function instead of update. update is nested!!!
+        animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
-    #simulate(it = 0, people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+        # Drawing a node graph
+        #draw_network(position_state, G, number_nodes)
 
+        # Update the position state for new nodes.
+        #nodes = possible_paths(position_state, G)
 
-    #use animate function instead of simulate. Simulate is nested!!!
-    animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+        position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
-    # Drawing a node graph
-    #draw_network(position_state, G, number_nodes)
+        # Draw updated node graph after simulation
+        #draw_network(position_state, G, number_nodes)
 
-    # Update the position state for new nodes.
-    #nodes = possible_paths(position_state, G)
-
-    position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-
-    # Draw updated node graph after simulation
-    #draw_network(position_state, G, number_nodes)
 
 
 def create_edgelist(rooms):
@@ -142,13 +132,11 @@ def create_edgelist(rooms):
     if rooms == 2:
         edgelist = [(1, 2)]
     if rooms == 3:
-        edgelist = [(1, 2), (1, 3), (2, 3)]
-    if rooms == 4:
-        edgelist = [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
+        edgelist = [(1, 2), (1,3), (2,3)]
     if rooms == 5:
-        edgelist = [(1, 2), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5), (3, 4), (3, 5)]
+        edgelist = [(1, 2), (1, 4), (2, 5), (3, 5), (2, 3)]
 
-    return (edgelist)
+    return(edgelist)
 
 def create_network(edgelist):
     """Create a networkx graph from the edgelist."""
@@ -262,10 +250,25 @@ def transmission(position_state, heat, node):
 
                 if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
 
-                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > np.random.randint(0,101):
+                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0,201))/2:
 
                             position_state.iloc[x]['status'] = 2 # stands for infected
     return position_state
+
+def update_position_state(position_state,people):
+    position_state.iloc[:, :2] = 0  # array emptied for x y only
+    # this code adds values from people objects back into array
+    k = 0
+    for t in people:
+        position_state.iloc[k, 0] = t.x
+        position_state.iloc[k, 1] = t.y
+        position_state.iloc[k, 2] = t.node
+        position_state.iloc[k, 5] = t.gravitating
+        k += 1  # iterator for picking the correct row
+    # check
+    #print('iteration finished and this is new position_state array:')
+    #print(position_state)  # array refilled with people
+    return (position_state)
 
 #----------------------------------------------------------------------------#
 #                  Simulation classes                                        #
@@ -477,7 +480,7 @@ class Room_map(object):
         heat_left = np.roll(heat, 1, axis=1)
         heat_right = np.roll(heat, -1, axis=1)
         heat_up = np.roll(heat, -1, axis=0)
-        heat_down = np.roll(heat, 1, axis=1)
+        heat_down = np.roll(heat, 1, axis=0)
 
         heat_new = 0.25 * (heat_left + heat_right + heat_up + heat_down)  # cell heat is the average of adjacent cells
         heat_new[self.heat_source() == 100] = 100
@@ -515,13 +518,14 @@ def animate(people, heat_maps, position_state, rooms):
                        4: 'blue',
                        5: 'black'})
     grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
-    fig, axes = plt.subplots(2, rooms, figsize=(10, 10), sharey=True, sharex=True)
-    anim = FuncAnimation(fig=fig, func=simulate,
-                         frames=200,
+    fig, axes = plt.subplots(2, rooms+1, figsize=(16, 8), sharey=False, sharex=False)
+    anim = FuncAnimation(fig=fig, func=update,
+                         frames=50,
                          fargs=(people, heat_maps, position_state, axes, colour_dict),
-                         interval=10,
+                         interval=0,
                          blit=False,
                          repeat=False)
+
     plt.show()
 
 def update_position_state(position_state,people):
@@ -540,7 +544,7 @@ def update_position_state(position_state,people):
     return (position_state)
 
 # placeholder simulate function
-def simulate(it, people, heat_maps, position_state, axes, colour_dict):
+def update(it, people, heat_maps, position_state, axes, colour_dict):
 
 
     # move each person
@@ -558,32 +562,42 @@ def simulate(it, people, heat_maps, position_state, axes, colour_dict):
 
     for map in heat_maps:
         # clear data from old plots
-        axes[0, map.node - 1].clear()
-        axes[1, map.node - 1].clear()
+        axes[0, map.node].clear()
+        axes[1, map.node].clear()
 
         # plot positions
 
         sns.scatterplot(x=map.occupants['x'],
                         y=map.occupants['y'],
                         hue=map.occupants['status'],
-                        palette= colour_dict,
-                        ax=axes[0, map.node - 1],
+                        palette=colour_dict,
+                        ax=axes[0, map.node],
                         legend=False)
-        axes[0, map.node - 1].set_title(f'Room {map.node} Position Map')
+        axes[0, map.node].set_title(f'Room {map.node} Position Map')
+        axes[0, map.node].set_xlim([0, map.xsize])
+        axes[0, map.node].set_ylim([0, map.ysize])
 
 
         # plot heat maps
         sns.heatmap(map.show_map(),
-                    ax=axes[1,map.node-1],
+                    ax=axes[1,map.node],
                     cbar=False,
                     cmap='icefire',
                     center=0,
                     vmin =0,
                     vmax=100,
                     ).invert_yaxis()
-        axes[1, map.node-1].set_title(f'Room {map.node} Heat Map')
+        axes[1, map.node].set_title(f'Room {map.node} Heat Map')
 
-    # call function to record statuses (plotting infections etc...)
+
+
+    # the network image uses this plot axes
+    # axes[0, 0]
+    axes[0, 0].set_title(f'Network Map')
+
+    # the line graph uses this plot axes
+    # axes[1, 0]
+    axes[1, 0].set_title(f'Population Line Chart')
 
 if __name__ == "__main__":
 
