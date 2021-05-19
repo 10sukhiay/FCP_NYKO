@@ -200,7 +200,7 @@ map1.show_map()
 
 
 #plt.plot(i,np.count_nonzero(position_state[:, 2] == 2))
-#plt.title('position map')
+plt.title('position map')
 plt.show()
 
 
