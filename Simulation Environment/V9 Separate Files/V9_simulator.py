@@ -56,7 +56,7 @@ def main(*args):
                         help='Probability of gravitating to the table')
     parser.add_argument('--mask', metavar='M', type=float, default=0.5,
                         help='Probability of wearing a mask')
-    parser.add_argument('--rooms', metavar='R', type=int, default=2,
+    parser.add_argument('--rooms', metavar='R', type=int, default=4,
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=0.5,
                         help='Proportion of people that move between rooms')
@@ -70,13 +70,13 @@ def main(*args):
                         help='x coordinate of table')
     parser.add_argument('--table_y', metavar='R', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='R', type=int, default=2,
+    parser.add_argument('--days', metavar='R', type=int, default=5,
                         help='number of days simulated')
     parser.add_argument('--limit', metavar='L', type=int, default=1,
                         help='Limits on number of people in each room - 1: on, 0:off')
     parser.add_argument('--decay', metavar='L', type=int, default=1,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
-    parser.add_argument('--day_length', metavar='L', type=int, default=50,
+    parser.add_argument('--day_length', metavar='L', type=int, default=5,
                         help='The number of iterations per day')
     args = parser.parse_args(args)
 
@@ -115,7 +115,14 @@ def main(*args):
     # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
 
     #use animate function instead of update. update is nested!!!
-    animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms, days=args.days, day_length=args.day_length)
+    animate(people=people,
+            heat_maps=heat_maps,
+            position_state=position_state,
+            rooms=args.rooms, days=args.days,
+            day_length=args.day_length,
+            G=G,
+            number_nodes=number_nodes,
+            limit=args.limit)
 
     # Drawing a node graph
     #draw_network(position_state, G, number_nodes)
@@ -123,7 +130,7 @@ def main(*args):
     # Update the position state for new nodes.
     #nodes = possible_paths(position_state, G)
 
-    position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
+    #position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Draw updated node graph after simulation
     #draw_network(position_state, G, number_nodes)

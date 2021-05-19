@@ -20,19 +20,28 @@ from Person_Class import person
 from other_functions import *
 import update
 
-def update(it, people, heat_maps, position_state, axes, colour_dict, day_length):
+def update(it, people, heat_maps, position_state, axes, colour_dict, day_length, G, number_nodes, limit):
 
     day = math.floor(it/day_length) +1
 
 
-    if (it/day_length).is_integer() == True: #checks if first iteration of any day!
+    if (it/day_length).is_integer() == True and it !=0: #checks if first iteration of any day!
+
+        # draw node graph
+        draw_network(position_state, G, number_nodes)
+        # change nodes of individuals
+        nodes = possible_paths(position_state, G)
+        position_state = update_node_travel_prob(position_state, nodes, limit, number_nodes)
+
+        # clear heat maps
         for map in heat_maps:
             map.heat_old[:, :] = 0
 
+
     # move each person
-    #for i in people:
-        #i.move(people=people)
-    #position_state = update_position_state(position_state, people)
+    for i in people:
+        i.move(people=people)
+    position_state = update_position_state(position_state, people)
 
     # update heat maps
     for x in range(2):
@@ -55,7 +64,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length)
                         palette= colour_dict,
                         ax=axes[0, map.node - 1],
                         legend=False)
-        axes[0, map.node - 1].set_title(f'Room {map.node} Position Map (Day {day})')
+        axes[0, map.node - 1].set_title(f'Room {map.node} Position Map (Day {day})', fontsize=8)
 
 
         # plot heat maps
@@ -65,9 +74,8 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length)
                     cmap='icefire',
                     center=0,
                     vmin =0,
-                    vmax=100,
-                    ).invert_yaxis()
-        axes[1, map.node-1].set_title(f'Room {map.node} Heat Map (Day {day})')
+                    vmax=100).invert_yaxis()
+        axes[1, map.node-1].set_title(f'Room {map.node} Heat Map (Day {day})', fontsize=8)
 
     # call function to record statuses (plotting infections etc...)
 
