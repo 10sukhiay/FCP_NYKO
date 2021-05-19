@@ -46,7 +46,7 @@ def main(*args):
     #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=20,
+    parser.add_argument('--number', metavar='N', type=int, default=17,
                         help='Size of population')
     parser.add_argument('--cases', metavar='N', type=int, default=1,
                         help='Number of initial infected people')
@@ -70,14 +70,19 @@ def main(*args):
                         help='x coordinate of table')
     parser.add_argument('--table_y', metavar='R', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='R', type=int, default=3,
+    parser.add_argument('--days', metavar='R', type=int, default=4,
                         help='number of days simulated')
-    parser.add_argument('--limit', metavar='L', type=int, default=0,
+    parser.add_argument('--limit', metavar='L', type=int, default=1,
                         help='Limits on number of people in each room - 1: on, 0:off')
     parser.add_argument('--decay', metavar='L', type=int, default=1,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
     args = parser.parse_args(args)
 
+    check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.rooms)
+
+    #check_room_setup_inputs(args.size_x, args.size_y, args.table_r, args.table_x, args.table_y)
+
+    #check_network_inputs(args.rooms, args.travel, args.days, args.limit)
 
     #create edgelist
     edgelist = create_edgelist(args.rooms)
