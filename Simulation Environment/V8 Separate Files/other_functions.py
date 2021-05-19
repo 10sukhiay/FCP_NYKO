@@ -100,6 +100,7 @@ def update_node_travel_prob(position_state, nodes, limit,number_nodes):
     if limit == 0:
         random_node_choice(position_state, nodes)
     if limit == 1:
+        random_node_choice(position_state, nodes)
         while max(node_count_individuals(position_state, number_nodes))>((len(position_state)/number_nodes)+1):
             random_node_choice(position_state, nodes)
     return position_state

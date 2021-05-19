@@ -70,9 +70,9 @@ def main(*args):
                         help='x coordinate of table')
     parser.add_argument('--table_y', metavar='R', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='R', type=int, default=2,
+    parser.add_argument('--days', metavar='R', type=int, default=4,
                         help='number of days simulated')
-    parser.add_argument('--limit', metavar='L', type=int, default=0,
+    parser.add_argument('--limit', metavar='L', type=int, default=1,
                         help='Limits on number of people in each room - 1: on, 0:off')
     parser.add_argument('--decay', metavar='L', type=int, default=1,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
