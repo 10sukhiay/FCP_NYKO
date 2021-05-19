@@ -184,7 +184,7 @@ def transmission(position_state, heat, node, day_length):
                         if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0,201))/2:
 
                             position_state.iloc[x]['status'] = 2 # stands for infected
-<<<<<<< HEAD
+
                             position_state.iloc[x]['counter'] = round((1-((random.random() - 0.5) / 2.5)) * day_length * 2) # 2 day incubation period +- 20%
     return position_state
 
@@ -211,8 +211,7 @@ def death_chance(position_state, death_rate):
                 position_state.iloc[x]['status'] = 5  # individual dies
 
     return position_state
-=======
-    return position_state
+
 
 def check_general_inputs(number, cases, distance, table, mask, decay, rooms):
     """Check general inputs to the code from command line."""
@@ -249,5 +248,4 @@ def check_network_inputs(rooms, travel, days, limit):
     if limit not in [0,1]:
         raise Exception('Please enter 0 for limit off, 1 for limit on')
 
->>>>>>> fc53be2a416cebf3624519b20c85002b7b9f2941
 

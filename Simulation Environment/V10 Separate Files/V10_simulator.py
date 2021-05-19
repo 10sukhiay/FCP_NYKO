@@ -105,10 +105,7 @@ def main(*args):
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-<<<<<<< HEAD
-=======
 
->>>>>>> fc53be2a416cebf3624519b20c85002b7b9f2941
     # Initialise people using the position_state array (array -> person class instances)
     people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2],
                      status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4],
