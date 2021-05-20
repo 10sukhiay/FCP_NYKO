@@ -238,9 +238,9 @@ class person(object):
 
             return (dist_from_other_people,closest_person)
 
+
+
         # Actual movement now implemented each iteration using functions given above
-
-
 
         # %Chance the speed of person stays the same
         if np.random.random_sample() < 0.50:
