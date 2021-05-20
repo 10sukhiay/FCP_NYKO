@@ -50,15 +50,15 @@ def main(*args):
                         help='Size of population')
     parser.add_argument('--cases', metavar='C', type=int, default=1,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='SD', type=float, default=0,
+    parser.add_argument('--distance', metavar='SD', type=float, default=0.5,
                         help='Probability of following two meter social distancing')
     parser.add_argument('--table', metavar='Pt', type=float, default=0.1,
                         help='Probability of gravitating to the table')
-    parser.add_argument('--mask', metavar='M', type=float, default=0.5,
+    parser.add_argument('--mask', metavar='M', type=float, default=0.6,
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=3,
                         help='Number of rooms to simulate')
-    parser.add_argument('--travel', metavar='T', type=float, default=0.5,
+    parser.add_argument('--travel', metavar='T', type=float, default=0.8,
                         help='Proportion of people that can move between rooms')
     parser.add_argument('--size_x', metavar='X', type=int, default=14,
                         help='size of room along x axis')
@@ -72,11 +72,11 @@ def main(*args):
                         help='y coordinate of table')
     parser.add_argument('--days', metavar='D', type=int, default=15,
                         help='number of days simulated')
-    parser.add_argument('--limit', metavar='L', type=int, default=0,
+    parser.add_argument('--limit', metavar='L', type=int, default=1,
                         help='Limits on number of people in each room 1: on, 0:off')
     parser.add_argument('--decay', metavar='d', type=int, default=0.25,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
-    parser.add_argument('--day_length', metavar='Dl', type=int, default=10,
+    parser.add_argument('--day_length', metavar='Dl', type=int, default=50,
                         help='The number of iterations per day')
     parser.add_argument('--death_rate', metavar='Rd', type=float, default=0.0003,
                         help='Likelihood of death 0 to 1')
@@ -113,7 +113,6 @@ def main(*args):
                      gravitating=position_state.iloc[i, 5], AREA_X=args.table_x,
                      AREA_Y=args.table_y, AREA_R=args.table_r,
                      size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
-
     # Initialise areas
     area1 = area(args.table_x, args.table_y, args.table_r)
     circle = area1.draw()

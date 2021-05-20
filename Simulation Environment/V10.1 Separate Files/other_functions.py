@@ -179,12 +179,12 @@ def transmission(position_state, heat, node, day_length):
         if position_state.iloc[x]['node'] == node: # checks person is in correct room
             if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
 
-                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
+                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 10:
 
                         if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0, 151))/1.5:
 
-                            position_state.iloc[x]['status'] = 2 # stands for infected
-                            position_state.iloc[x]['counter'] = round((1-((random.random() - 0.5) / 2.5)) * day_length * 2) # 2 day incubation period +- 20%
+                            position_state.iloc[x, 3]= 2 # stands for infected
+                            position_state.iloc[x, 8] = round((1-((random.random() - 0.5) / 2.5)) * day_length * 2) # 2 day incubation period +- 20%
     return position_state
 
 def status_change(position_state, day_length):
