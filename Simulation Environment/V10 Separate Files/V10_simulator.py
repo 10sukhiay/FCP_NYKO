@@ -82,10 +82,9 @@ def main(*args):
                         help='Likelihood of death 0 to 1')
     args = parser.parse_args(args)
 
+    # check user inputs with exceptions
     check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.rooms)
-
     check_room_setup_inputs(args.size_x, args.size_y, args.table_r, args.table_x, args.table_y)
-
     check_network_inputs(args.rooms, args.travel, args.days, args.limit)
 
     #create edgelist
@@ -128,7 +127,6 @@ def main(*args):
 
 
     # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
-
     #use animate function instead of update. update is nested!!!
     animate(people=people,
             heat_maps=heat_maps,
