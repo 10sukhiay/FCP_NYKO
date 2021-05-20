@@ -76,7 +76,9 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
                         legend=False)
         axes[0, map.node].set_title(f'Room {map.node} Position Map (Day {day})', fontsize=8)
         axes[0, map.node].set_xlim(0, map.xsize)
-        axes[0, map.node].set_xlim(0, map.ysize)
+        axes[0, map.node].set_ylim(0, map.ysize)
+        axes[0, map.node].set_xlabel('x', fontsize=6)
+        axes[0, map.node].set_ylabel('y', fontsize=6)
 
         # plot heat maps
         sns.heatmap(map.show_map(),
