@@ -11,6 +11,7 @@ May 2021
 #standard imports
 import numpy as np
 import pandas as pd
+from matplotlib import animation
 from matplotlib.animation import FuncAnimation
 from matplotlib import pyplot as plt
 
@@ -44,8 +45,6 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, G, numbe
                          interval=50,
                          blit=False,
                          repeat=False)
-    f = r"./animation.mp4"
-    writervideo = animation.FFMpegWriter(fps=60)
-    anim.save(f, writer=writervideo)
+
 
     plt.show()
