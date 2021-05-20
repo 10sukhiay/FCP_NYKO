@@ -44,8 +44,6 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, G, numbe
     Room1 = []
     Room2 = []
     Room3 = []
-    Room4 = []
-    Room5 = []
 
     anim = FuncAnimation(fig=fig, func=update,
                          frames=day_length*days,
