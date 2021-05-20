@@ -195,15 +195,15 @@ def transmission(position_state, heat, node, day_length):
 
 def status_change(position_state, day_length):
     for x in range(0, len(position_state)):
-        if position_state.iloc[x]['counter'] == 0:  # check if status requires changing
+        if position_state.iloc[x, 8] == 0:  # check if status requires changing
 
-            if position_state.iloc[x]['status'] == 2:  # infected individuals
-                position_state.iloc[x]['status'] = 3  # now infectious
-                position_state.iloc[x]['counter'] = round((1-((random.random()-0.5)/2.5))*day_length*3)  # 3 day infectious period give or take 20%
+            if position_state.iloc[x, 3] == 2:  # infected individuals
+                position_state.iloc[x, 3] = 3  # now infectious
+                position_state.iloc[x, 8] = round((1-((random.random()-0.5)/2.5))*day_length*3)  # 3 day infectious period give or take 20%
 
-            elif position_state.iloc[x]['status'] == 3:  # infectious individuals
-                position_state.iloc[x]['status'] = 4  # now recovered
-                position_state.iloc[x]['counter'] = -1
+            elif position_state.iloc[x, 3] == 3:  # infectious individuals
+                position_state.iloc[x, 3] = 4  # now recovered
+                position_state.iloc[x, 8] = -1
 
     return position_state
 
