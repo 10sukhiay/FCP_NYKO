@@ -28,7 +28,7 @@ class Room_map(object):
     def map_position_states(self):
         pos_map = np.zeros((self.ysize, self.xsize))
         for row in range(0, len(self.occupants)):
-            if self.occupants['mask'] == 1: # masked individual
+            if self.occupants['mask'].iloc[row] == 1: # masked individual
                 pos_map[round(self.occupants['y'].iloc[row]), round(self.occupants['x'].iloc[row])] = self.occupants['status'].iloc[row] + 0.5
             else:
                 pos_map[round(self.occupants['y'].iloc[row]), round(self.occupants['x'].iloc[row])] = self.occupants['status'].iloc[row]
