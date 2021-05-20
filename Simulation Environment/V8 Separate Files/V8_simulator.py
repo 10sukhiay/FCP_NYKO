@@ -113,7 +113,6 @@ def main(*args):
                  for i in range(1,args.rooms+1)]
 
 
-
     # loop for multiple days
     for day in range(args.days):
     # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
