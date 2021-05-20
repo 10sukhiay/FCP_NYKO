@@ -46,15 +46,15 @@ def main(*args):
     #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=50,
+    parser.add_argument('--number', metavar='N', type=int, default=60,
                         help='Size of population')
     parser.add_argument('--cases', metavar='C', type=int, default=1,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='SD', type=float, default=0,
+    parser.add_argument('--distance', metavar='SD', type=float, default=0.75,
                         help='Probability of following two meter social distancing')
     parser.add_argument('--table', metavar='Pt', type=float, default=0.1,
                         help='Probability of gravitating to the table')
-    parser.add_argument('--mask', metavar='M', type=float, default=0.5,
+    parser.add_argument('--mask', metavar='M', type=float, default=0.75,
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=3,
                         help='Number of rooms to simulate')
