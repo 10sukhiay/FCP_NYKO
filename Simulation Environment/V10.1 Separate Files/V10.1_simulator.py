@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 
-XXXXXX.py
+V10.1_simulator.py
 Nathan Wooster, Kaelan Melville, Oscar Bond, Yazad Sukhia
 May 2021
 
@@ -22,15 +22,16 @@ simulations without needing to edit the code e.g.:
     $ python simulator.py --help        # show all command line options
 
 """
-#standard imports
+# standard imports
 import argparse
 
 # custom imports
-from Heat_Mapping import Room_map
-from Person_Class import person
+from Heat_Mapping import RoomMap
+from Person_Class import Person
 from animate import animate
 from other_functions import *
-from area import area
+# from area import area
+
 
 def main(*args):
     """Command line entry point.
@@ -85,16 +86,17 @@ def main(*args):
     args = parser.parse_args(args)
 
     # check user inputs with exceptions
-    check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.rooms, args.mask_ratio)
+    check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.days,
+                         args.rooms, args.mask_ratio)
     check_room_setup_inputs(args.size_x, args.size_y, args.table_r, args.table_x, args.table_y)
-    check_network_inputs(args.rooms, args.travel, args.days, args.limit)
+    check_network_inputs(args.rooms, args.travel, args.limit)
 
-    #create edgelist
+    # create edgelist
     edgelist = create_edgelist(args.rooms)
     # Create network
-    G = create_network(edgelist)
+    g = create_network(edgelist)
     # Set number of nodes
-    number_nodes = network_number_nodes(G)
+    number_nodes = network_number_nodes(g)
     # Create array to track people
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
@@ -104,53 +106,51 @@ def main(*args):
             position_state.iloc[x]['counter'] = args.day_length*3
 
     # check nodes are within limits
-    nodes = possible_paths(position_state, G)
+    nodes = possible_paths(position_state, g)
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2],
+    people = [Person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2],
                      status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4],
-                     gravitating=position_state.iloc[i, 5], AREA_X=args.table_x,
-                     AREA_Y=args.table_y, AREA_R=args.table_r,
+                     gravitating=position_state.iloc[i, 5], area_x=args.table_x,
+                     area_y=args.table_y, area_r=args.table_r,
                      size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
     # Initialise areas
-    area1 = area(args.table_x, args.table_y, args.table_r)
-    circle = area1.draw()
+    # area1 = area(args.table_x, args.table_y, args.table_r)
+    # circle = area1.draw()
 
-    #initialise heat maps for each room
+    # initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
-    heat_maps = [Room_map(heat_old=heat_new, position_state=position_state,
-                          xsize=args.size_x, ysize=args.size_y,
-                          node=i, decay=args.decay, mask_ratio=args.mask_ratio)
-                 for i in range(1,args.rooms+1)]
-
+    heat_maps = [RoomMap(heat_old=heat_new, position_state=position_state,
+                         xsize=args.size_x, ysize=args.size_y,
+                         node=i, decay=args.decay, mask_ratio=args.mask_ratio)
+                 for i in range(1, args.rooms+1)]
 
     # Drawing a node graph
-    #draw_network(position_state, G, number_nodes)
+    # draw_network(position_state, G, number_nodes)
 
     # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
-    #use animate function instead of update. update is nested!!!
+    # use animate function instead of update. update is nested!!!
     animate(people=people,
             heat_maps=heat_maps,
             position_state=position_state,
             rooms=args.rooms, days=args.days,
             day_length=args.day_length,
-            G=G,
+            g=g,
             number_nodes=number_nodes,
             limit=args.limit,
             death_rate=args.death_rate)
 
     # Drawing a node graph
-    #draw_network(position_state, G, number_nodes)
+    # draw_network(position_state, G, number_nodes)
 
     # Update the position state for new nodes.
-    #nodes = possible_paths(position_state, G)
+    # nodes = possible_paths(position_state, G)
 
-    #position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
+    # position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Draw updated node graph after simulation
-    #draw_network(position_state, G, number_nodes)
-
+    # draw_network(position_state, G, number_nodes)
 
 
 if __name__ == "__main__":
@@ -158,19 +158,3 @@ if __name__ == "__main__":
     # Command line entry point
     import sys
     main(*sys.argv[1:])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

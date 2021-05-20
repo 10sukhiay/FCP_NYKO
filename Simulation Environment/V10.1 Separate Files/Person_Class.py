@@ -18,7 +18,8 @@ import pandas as pd
 import random
 import math
 
-class person(object):
+
+class Person(object):
 
     """
     Creates individual people which move in specific ways.
@@ -72,7 +73,7 @@ class person(object):
 
     """
 
-    def __init__(self, x, y, node, status, two_meter, gravitating, AREA_X, AREA_Y, AREA_R, size_x, size_y):
+    def __init__(self, x, y, node, status, two_meter, gravitating, area_x, area_y, area_r, size_x, size_y):
         # Parameters used from people_array to initialise each person instance
         self.x = x
         self.y = y
@@ -86,9 +87,9 @@ class person(object):
         self.step_y = self.make_new_step_size()
 
         # Table area parameters
-        self.AREA_X = AREA_X
-        self.AREA_Y = AREA_Y
-        self.AREA_R = AREA_R
+        self.area_x = area_x
+        self.area_y = area_y
+        self.area_r = area_r
 
         # Size of room
         self.size_x = size_x
@@ -125,7 +126,6 @@ class person(object):
             # Set step size to zero movement
             self.step_x = 0
             self.step_y = 0
-            return
 
         def direction(self):
             """Outputs general movement direction of person"""
@@ -133,18 +133,19 @@ class person(object):
             # Output string saying what general direction the dot is moving
             if self.step_x > 0:
                 x_direction = 'right'
-            if self.step_x < 0:
+            elif self.step_x < 0:
                 x_direction = 'left'
+            else:
+                x_direction = 'stationary'
+
             if self.step_y > 0:
                 y_direction = 'up'
-            if self.step_y < 0:
+            elif self.step_y < 0:
                 y_direction = 'down'
-            if self.step_x == 0:
-                x_direction = 'stationary'
-            if self.step_y == 0:
+            else:
                 y_direction = 'stationary'
 
-            return (x_direction, y_direction)
+            return x_direction, y_direction
 
         def position_compared_to_object(self, cx, cy):
             """Outputs relative position of person compared to another person or object"""
@@ -173,7 +174,7 @@ class person(object):
             else:
                 y_position = 0
 
-            return (x_position, y_position)
+            return x_position, y_position
 
         def move_towards(self, cx, cy):
             """Makes a person move towards specific coordinate"""
@@ -220,6 +221,7 @@ class person(object):
 
             # Initialise distance as large number
             dist_from_other_people = 999
+            closest_person = []
 
             # Loop through all people
             for n in people:
@@ -236,7 +238,7 @@ class person(object):
                             dist_from_other_people = dist_from_person_n
                             closest_person = n
 
-            return (dist_from_other_people,closest_person)
+            return dist_from_other_people, closest_person
 
         # Actual movement now implemented each iteration using functions given above
 
@@ -270,7 +272,7 @@ class person(object):
             self.step_y = -1 * self.step_y
 
         # If inside table area and meant to be sat at table, stop person moving
-        if inside(self.x, self.y, self.AREA_X, self.AREA_Y, self.AREA_R):
+        if inside(self.x, self.y, self.area_x, self.area_y, self.area_r):
             if self.gravitating == 1:
                 stop(self)
 
@@ -278,13 +280,9 @@ class person(object):
             if np.random.random_sample() < 0.5:
                 self.gravitating = 0
 
-        # If person is dead make them not move
-        if self.status == 5:
-            stop(self)
-
         # If 'gravitate' towards table specified, move towards it
         if self.gravitating == 1:
-            move_towards(self, self.AREA_X, self.AREA_Y)
+            move_towards(self, self.area_x, self.area_y)
 
         # If 2meter social distancing specified implement it
         if self.two_meter == 1:

@@ -15,7 +15,7 @@ towards and sit at.
 from matplotlib import pyplot as plt
 
 
-class area(object):
+class Area(object):
     """ Creates an area representing a table for people to move towards if specified by a user input.
         The person moves towards the specified area if and only if 'gravitate' is 1 (ON) in their
         description.
@@ -35,4 +35,5 @@ class area(object):
         """Function to be called from animator if wanting to draw the table on the axis"""
 
         # Draw the circle in blue
-        return plt.Circle((self.cx, self.cy), self.r, color='b', fill=False) #creates circle coords cx cy and radius r (built in function)
+        # creates circle coords cx cy and radius r (built in function)
+        return plt.Circle((self.cx, self.cy), self.r, color='b', fill=False)
