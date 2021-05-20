@@ -27,12 +27,14 @@ def create_edgelist(rooms):
     # #edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
     if rooms == 2:
         edgelist = [(1, 2)]
-    if rooms == 3:
+    elif rooms == 3:
         edgelist = [(1, 2), (1, 3), (2, 3)]
-    if rooms == 4:
+    elif rooms == 4:
         edgelist = [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
-    if rooms == 5:
+    elif rooms == 5:
         edgelist = [(1, 2), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5), (3, 4), (3, 5)]
+    else:
+        edgelist = []
 
     return edgelist
 
@@ -195,11 +197,8 @@ def transmission(position_state, heat, node, day_length):
     for x in range(0, len(position_state)):
         if position_state.iloc[x]['node'] == node:  # checks person is in correct room
             if position_state.iloc[x]['status'] == 1:  # transmission only occurs on healthy individuals
-
-                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 10:
-
-                    if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > (np.random.randint(0, 151))/1.5:
-
+                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 10:  # check the concentration is above minimum threshold (10)
+                    if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > (np.random.randint(0, 151))/1.5:  # if they randomly should be infected
                         position_state.iloc[x, 3] = 2  # stands for infected
                         position_state.iloc[x, 8] = round((1-((random.random() - 0.5) / 2.5)) * day_length * 2)  # 2 day incubation period +- 20%
     return position_state
@@ -208,11 +207,9 @@ def transmission(position_state, heat, node, day_length):
 def status_change(position_state, day_length):
     for x in range(0, len(position_state)):
         if position_state.iloc[x, 8] == 0:  # check if status requires changing
-
             if position_state.iloc[x, 3] == 2:  # infected individuals
                 position_state.iloc[x, 3] = 3  # now infectious
                 position_state.iloc[x, 8] = round((1-((random.random()-0.5)/2.5))*day_length*3)  # 3 day infectious period give or take 20%
-
             elif position_state.iloc[x, 3] == 3:  # infectious individuals
                 position_state.iloc[x, 3] = 4  # now recovered
                 position_state.iloc[x, 8] = -1
