@@ -24,7 +24,6 @@ import math
 
 def create_edgelist(rooms):
     """Define the edge list dependant on number of rooms."""
-    # #edgelist=[(1,2),(1,4),(2,5),(3,5),(2,3)]
     if rooms == 2:
         edgelist = [(1, 2)]
     elif rooms == 3:
