@@ -68,6 +68,7 @@ class RoomMap(object):
     3) heat_source():   This function takes the
 
     4) calculate_heat_new():
+
     The Person class outputs the updated positions to the data frame to then input to the Heat_Mapping.py.
 
     """
