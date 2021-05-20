@@ -278,6 +278,10 @@ class person(object):
             if np.random.random_sample() < 0.5:
                 self.gravitating = 0
 
+        # If person is dead make them not move
+        if self.status == 5:
+            stop(self)
+
         # If 'gravitate' towards table specified, move towards it
         if self.gravitating == 1:
             move_towards(self, self.AREA_X, self.AREA_Y)
