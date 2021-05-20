@@ -119,7 +119,7 @@ def update_node_travel_prob(position_state, nodes, limit, number_nodes):
         random_node_choice(position_state, nodes)
     if limit == 1:
         random_node_choice(position_state, nodes)
-        while max(node_count_individuals(position_state, number_nodes))>((len(position_state)/number_nodes)+3):
+        while max(node_count_individuals(position_state, number_nodes)) > ((len(position_state)/number_nodes)+3):
             random_node_choice(position_state, nodes)
     return position_state
 
@@ -194,34 +194,44 @@ def update_people_nodes(position_state, people):
 
 
 def transmission(position_state, heat, node, day_length):
+    """Checks each individual for chance of infection"""
+
     for x in range(0, len(position_state)):
-        if position_state.iloc[x]['node'] == node:  # checks person is in correct room
-            if position_state.iloc[x]['status'] == 1:  # transmission only occurs on healthy individuals
-                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 10:  # check the concentration is above minimum threshold (10)
-                    if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > (np.random.randint(0, 151))/1.5:  # if they randomly should be infected
-                        position_state.iloc[x, 3] = 2  # stands for infected
-                        position_state.iloc[x, 8] = round((1-((random.random() - 0.5) / 2.5)) * day_length * 2)  # 2 day incubation period +- 20%
+        # checks individual is in correct room and checks individual is susceptible
+        if position_state.iloc[x]['node'] == node and position_state.iloc[x]['status'] == 1:
+
+            # check the concentration is above minimum threshold (10)
+            if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 10:
+
+                # if they randomly should be infected, temperature at cell greater than random value
+                if heat[round(position_state.iloc[x, 0]), round(position_state.iloc[x, 1])] > (random.random()*100):
+                    position_state.iloc[x, 3] = 2  # change status to infected
+                    # 2 day incubation countdown +- 20%
+                    position_state.iloc[x, 8] = round((1-((random.random() - 0.5) / 2.5)) * day_length * 2)
     return position_state
 
 
 def status_change(position_state, day_length):
+    """Checks each individual for disease progression"""
+
     for x in range(0, len(position_state)):
-        if position_state.iloc[x, 8] == 0:  # check if status requires changing
+        if position_state.iloc[x, 8] == 0:  # check if status requires changing (counter reaches zero)
             if position_state.iloc[x, 3] == 2:  # infected individuals
                 position_state.iloc[x, 3] = 3  # now infectious
                 position_state.iloc[x, 8] = round((1-((random.random()-0.5)/2.5))*day_length*3)  # 3 day infectious period give or take 20%
             elif position_state.iloc[x, 3] == 3:  # infectious individuals
                 position_state.iloc[x, 3] = 4  # now recovered
-                position_state.iloc[x, 8] = -1
+                position_state.iloc[x, 8] = -1  # set counter negative, will no longer trip if statement
 
     return position_state
 
 
 def death_chance(position_state, death_rate):
+    """Randomly changes infected and infectious individuals to deceased"""
+
     for x in range(0, len(position_state)):
-        if position_state.iloc[x, 3] == 2 or position_state.iloc[x, 3] == 3:  # check if status requires changing
-            death_roll = random.random()
-            if death_roll < death_rate:
+        if position_state.iloc[x, 3] == 2 or position_state.iloc[x, 3] == 3:  # check if individual is sick
+            if random.random() < death_rate:  # random chance of death
                 position_state.iloc[x, 3] = 5  # individual dies
 
     return position_state

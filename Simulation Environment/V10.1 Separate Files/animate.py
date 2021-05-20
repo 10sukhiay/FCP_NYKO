@@ -5,6 +5,10 @@ animate.py
 Kaelan Melville, Yazad Sukhia
 May 2021
 
+This script contains the animate function used in the model simulation.
+It is not interacted with directly from the command line. It is called by the simulator
+and calls the update function to move the simulation forward a certain number of iterations.
+This function produces an animation alongside the simulation performed.
 
 """
 
@@ -29,26 +33,34 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, g, numbe
                        4: 'blue',
                        5: 'black'})
 
+    # set plot fonts
     font = {'family': 'DejaVu Sans',
             'weight': 'normal',
             'size': 6}
-
     plt.rc('font', **font)
 
+    # initialise plot with subplots for each room
     fig, axes = plt.subplots(2, rooms+1, figsize=(3.5*(rooms+1), 7))
 
-    # initialising empty lists for updated animation information to append to
+    # ----------------------------------------------------------------------------- #
+    # initialising empty lists for updated animation information to append to       #
+    # ----------------------------------------------------------------------------- #
+
+    # Population status tracking
     susceptible = []
     infected = []
     infectious = []
     recovered = []
     deceased = []
 
+    # Room population tracking
     room1 = []
     room2 = []
     room3 = []
 
-    # animation function taking in all necessary arguments
+    # ----------------------------------------------------------------------------- #
+    # FuncAnimation function taking in all necessary arguments                      #
+    # ----------------------------------------------------------------------------- #
     anim = FuncAnimation(fig=fig, func=update,
                          frames=day_length*days,
                          fargs=(people, heat_maps, position_state, axes, colour_dict, day_length, g, number_nodes,
