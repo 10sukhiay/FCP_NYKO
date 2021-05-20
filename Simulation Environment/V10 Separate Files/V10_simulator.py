@@ -46,7 +46,7 @@ def main(*args):
     #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=20,
+    parser.add_argument('--number', metavar='N', type=int, default=50,
                         help='Size of population')
     parser.add_argument('--cases', metavar='C', type=int, default=1,
                         help='Number of initial infected people')
@@ -76,9 +76,9 @@ def main(*args):
                         help='Limits on number of people in each room - 1: on, 0:off')
     parser.add_argument('--decay', metavar='d', type=int, default=0.25,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
-    parser.add_argument('--day_length', metavar='Dl', type=int, default=20,
+    parser.add_argument('--day_length', metavar='Dl', type=int, default=50,
                         help='The number of iterations per day')
-    parser.add_argument('--death_rate', metavar='Rd', type=float, default=0.0001,
+    parser.add_argument('--death_rate', metavar='Rd', type=float, default=0.0005,
                         help='Likelihood of death 0 to 1')
     args = parser.parse_args(args)
 
