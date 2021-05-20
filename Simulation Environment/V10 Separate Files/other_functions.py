@@ -163,14 +163,14 @@ def update_people_nodes(position_state,people):
     position_state.iloc[:, :2] = 0  # array emptied for x y only
     # this code adds values from people objects back into array
     k = 0
-    print('nodes looked')
+    #print('nodes looked')
     for t in people:
         t.node = position_state['node'].iloc[k]
         t.x = random.randint(0, t.size_x)
         t.y = random.randint(0, t.size_y)
         k += 1  # iterator for picking the correct row
     # check
-    print('nodes replaced')
+    #print('nodes replaced')
     #print(position_state)  # array refilled with people
     return people
 

@@ -44,6 +44,8 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, G, numbe
                          interval=50,
                          blit=False,
                          repeat=False)
-
+    f = r"./animation.mp4"
+    writervideo = animation.FFMpegWriter(fps=60)
+    anim.save(f, writer=writervideo)
 
     plt.show()
