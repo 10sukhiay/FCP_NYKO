@@ -50,15 +50,15 @@ def main(*args):
                         help='Size of population')
     parser.add_argument('--cases', metavar='C', type=int, default=1,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='SD', type=float, default=0.5,
+    parser.add_argument('--distance', metavar='SD', type=float, default=0.8,
                         help='Probability of following two meter social distancing')
     parser.add_argument('--table', metavar='Pt', type=float, default=0.1,
                         help='Probability of gravitating to the table')
-    parser.add_argument('--mask', metavar='M', type=float, default=0.6,
+    parser.add_argument('--mask', metavar='M', type=float, default=0.95,
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=3,
                         help='Number of rooms to simulate')
-    parser.add_argument('--travel', metavar='T', type=float, default=0.8,
+    parser.add_argument('--travel', metavar='T', type=float, default=0.4,
                         help='Proportion of people that can move between rooms')
     parser.add_argument('--size_x', metavar='X', type=int, default=14,
                         help='size of room along x axis')
@@ -76,11 +76,11 @@ def main(*args):
                         help='Limits on number of people in each room 1: on, 0:off')
     parser.add_argument('--decay', metavar='d', type=int, default=0.25,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
-    parser.add_argument('--day_length', metavar='Dl', type=int, default=50,
+    parser.add_argument('--day_length', metavar='Dl', type=int, default=24,
                         help='The number of iterations per day')
     parser.add_argument('--death_rate', metavar='Rd', type=float, default=0.0003,
                         help='Likelihood of death 0 to 1')
-    parser.add_argument('--mask_ratio', metavar='Rd', type=float, default=0.7,
+    parser.add_argument('--mask_ratio', metavar='Rd', type=float, default=0.5,
                         help='Ratio of particles a masked person creates in comparison to unmasked')
     args = parser.parse_args(args)
 
