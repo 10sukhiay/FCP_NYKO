@@ -75,7 +75,8 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
                         ax=axes[0, map.node],
                         legend=False)
         axes[0, map.node].set_title(f'Room {map.node} Position Map (Day {day})', fontsize=8)
-
+        axes[0, map.node].set_xlim(0, map.xsize)
+        axes[0, map.node].set_xlim(0, map.ysize)
 
         # plot heat maps
         sns.heatmap(map.show_map(),
@@ -86,6 +87,8 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
                     vmin =0,
                     vmax=100).invert_yaxis()
         axes[1, map.node].set_title(f'Room {map.node} Heat Map (Day {day})', fontsize=8)
+        axes[1, map.node].set_xlabel('x', fontsize=6)
+        axes[1, map.node].set_ylabel('y', fontsize=6)
 
         position_state = death_chance(position_state=position_state, death_rate=death_rate)
         position_state = status_change(position_state=position_state, day_length=day_length)  # check for disease progression
