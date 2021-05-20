@@ -1,19 +1,12 @@
 #!/usr/bin/env python3
 """
 
-V10.1_simulator.py
+simulator_NYKO.py
 Oscar Bond, Kaelan Melville, Yazad Sukhia, Nathan Wooster
 May 2021
 
 This script runs simulations of an epidemic (e.g. coronavirus) for the
 air borne spreading of the virus through a network.
-
-The command line interface to the script makes it possible to run different
-simulations without needing to edit the code e.g.:
-
-    $ python simulator.py               # run simulation with default settings
-    $ python simulator.py --number=10   # sets size of population to 10
-    $ python simulator.py --help        # show all command line options
 
 """
 # standard imports
@@ -32,9 +25,9 @@ def main(*args):
     The file can be run from the command line thanks to the command line
     interface. This allows parameters to be changes without editing the code. e.g.:
 
-    $ python simulator.py               # run simulation with default settings
-    $ python simulator.py --number=50   # have 50 people in the room network
-    $ python simulator.py --help        # show all command line options
+    $ python simulator_NYKO.py               # run simulation with default settings
+    $ python simulator_NYKO.py --number=10   # sets size of population to 10
+    $ python simulator_NYKO.py --help        # show all command line options
     """
     #
     # Argparse has been used to handle parsing the command line arguments.
@@ -44,7 +37,7 @@ def main(*args):
 
     parser.add_argument('--number', metavar='N', type=int, default=50,
                         help='Size of population')
-    parser.add_argument('--cases', metavar='C', type=int, default=3,
+    parser.add_argument('--cases', metavar='C', type=int, default=1,
                         help='Number of initial infected people')
     parser.add_argument('--distance', metavar='SD', type=float, default=0.8,
                         help='Probability of following two meter social distancing')
