@@ -74,11 +74,11 @@ def main(*args):
                         help='number of days simulated')
     parser.add_argument('--limit', metavar='L', type=int, default=0,
                         help='Limits on number of people in each room - 1: on, 0:off')
-    parser.add_argument('--decay', metavar='d', type=int, default=0.5,
+    parser.add_argument('--decay', metavar='d', type=int, default=0.25,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
     parser.add_argument('--day_length', metavar='Dl', type=int, default=20,
                         help='The number of iterations per day')
-    parser.add_argument('--death_rate', metavar='Rd', type=float, default=0,
+    parser.add_argument('--death_rate', metavar='Rd', type=float, default=0.0001,
                         help='Likelihood of death 0 to 1')
     args = parser.parse_args(args)
 
