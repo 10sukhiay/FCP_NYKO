@@ -26,7 +26,13 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, G, numbe
                        3: 'red',
                        4: 'blue',
                        5: 'black'})
-    grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
+
+    font = {'family': 'DejaVu Sans',
+            'weight': 'normal',
+            'size': 6}
+
+    plt.rc('font', **font)
+
     fig, axes = plt.subplots(2, rooms+1, figsize=(3.5*(rooms+1), 7), sharey=False, sharex=False)
 
     Susceptible = []
@@ -38,6 +44,8 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, G, numbe
     Room1 = []
     Room2 = []
     Room3 = []
+    Room4 = []
+    Room5 = []
 
     anim = FuncAnimation(fig=fig, func=update,
                          frames=day_length*days,

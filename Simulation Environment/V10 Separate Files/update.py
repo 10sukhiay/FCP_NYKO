@@ -77,8 +77,8 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
         axes[0, map.node].set_title(f'Room {map.node} Position Map (Day {day})', fontsize=8)
         axes[0, map.node].set_xlim(0, map.xsize)
         axes[0, map.node].set_ylim(0, map.ysize)
-        axes[0, map.node].set_xlabel('x', fontsize=6)
-        axes[0, map.node].set_ylabel('y', fontsize=6)
+        axes[0, map.node].set_xlabel('x')
+        axes[0, map.node].set_ylabel('y')
 
         # plot heat maps
         sns.heatmap(map.show_map(),
@@ -89,8 +89,8 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
                     vmin =0,
                     vmax=100).invert_yaxis()
         axes[1, map.node].set_title(f'Room {map.node} Heat Map (Day {day})', fontsize=8)
-        axes[1, map.node].set_xlabel('x', fontsize=6)
-        axes[1, map.node].set_ylabel('y', fontsize=6)
+        axes[1, map.node].set_xlabel('x')
+        axes[1, map.node].set_ylabel('y')
 
         position_state = death_chance(position_state=position_state, death_rate=death_rate)
         position_state = status_change(position_state=position_state, day_length=day_length)  # check for disease progression
@@ -103,19 +103,31 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
     line3 = axes[0, 0].plot(Infectious, color="red")
     line4 = axes[0, 0].plot(Recovered, color="blue")
     line5 = axes[0, 0].plot(Deceased, color="black")
+<<<<<<< HEAD
     axes[0, 0].set_title(f'Population Status (Day {day})', fontsize=8)
     axes[0, 0].set_xlabel('Time', fontsize=6)
     axes[0, 0].set_ylabel('Number of People', fontsize=6)
     axes[0,0].legend(labels=['Susceptible', 'Infected', 'Infectious', 'Recovered', 'Deceased'], loc='upper center', bbox_to_anchor=(1.7, 1.3), ncol=3)
+=======
+    axes[0, 0].set_title(f'Population Status', fontsize=8)
+    axes[0, 0].set_xlabel('Time')
+    axes[0, 0].set_ylabel('# of People')
+>>>>>>> 970676b5f54a40a52c7a072ae9d9f3a68909a2f6
     #axes[0, 0].set(xlabel='Number of iterations', ylabel='Number of people')
 
     # Creates the line-graph tracking the number of people in each room
     line1 = axes[1, 0].plot(Room1, alpha=0.5, linestyle='--', color='black')
     line2 = axes[1, 0].plot(Room2, alpha=0.5, linestyle='-', color='red')
     line3 = axes[1, 0].plot(Room3, alpha=0.5, linestyle='-', color='black')
+<<<<<<< HEAD
     axes[1, 0].set_title(f'Room Tracking Plot (Day {day})', fontsize=8)
     axes[1, 0].set_xlabel('Time', fontsize=6)
     axes[1, 0].set_ylabel('Number of People', fontsize=6)
+=======
+    axes[1, 0].set_title(f'Room Tracking Plot', fontsize=8)
+    axes[1, 0].set_xlabel('Time')
+    axes[1, 0].set_ylabel('# of People')
+>>>>>>> 970676b5f54a40a52c7a072ae9d9f3a68909a2f6
 
 
 
