@@ -105,7 +105,8 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
     line5 = axes[0, 0].plot(Deceased, color="black")
     axes[0, 0].set_title(f'Population Status (Day {day})', fontsize=8)
     axes[0, 0].set_xlabel('Time', fontsize=6)
-    axes[0, 0].set_ylabel('# of People', fontsize=6)
+    axes[0, 0].set_ylabel('Number of People', fontsize=6)
+    axes[0,0].legend(labels=['Susceptible', 'Infected', 'Infectious', 'Recovered', 'Deceased'], loc='upper center', bbox_to_anchor=(1.7, 1.3), ncol=3)
     #axes[0, 0].set(xlabel='Number of iterations', ylabel='Number of people')
 
     # Creates the line-graph tracking the number of people in each room
@@ -114,7 +115,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
     line3 = axes[1, 0].plot(Room3, alpha=0.5, linestyle='-', color='black')
     axes[1, 0].set_title(f'Room Tracking Plot (Day {day})', fontsize=8)
     axes[1, 0].set_xlabel('Time', fontsize=6)
-    axes[1, 0].set_ylabel('# of People', fontsize=6)
+    axes[1, 0].set_ylabel('Number of People', fontsize=6)
 
 
 
