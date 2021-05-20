@@ -27,7 +27,7 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, G, numbe
                        4: 'blue',
                        5: 'black'})
     grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
-    fig, axes = plt.subplots(2, rooms+1, figsize=(5*(rooms+1), 10), sharey=False, sharex=False)
+    fig, axes = plt.subplots(2, rooms+1, figsize=(3.5*(rooms+1), 7), sharey=False, sharex=False)
 
     Susceptible = []
     Infected = []

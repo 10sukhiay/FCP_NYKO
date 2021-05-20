@@ -46,7 +46,7 @@ def main(*args):
     #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=50,
+    parser.add_argument('--number', metavar='N', type=int, default=20,
                         help='Size of population')
     parser.add_argument('--cases', metavar='C', type=int, default=1,
                         help='Number of initial infected people')
@@ -80,6 +80,8 @@ def main(*args):
                         help='The number of iterations per day')
     parser.add_argument('--death_rate', metavar='Rd', type=float, default=0.0005,
                         help='Likelihood of death 0 to 1')
+    parser.add_argument('--mask_ratio', metavar='Rd', type=float, default=0.7,
+                        help='Ratio of particles a masked person creates in comparison to unmasked')
     args = parser.parse_args(args)
 
     # check user inputs with exceptions
@@ -120,7 +122,7 @@ def main(*args):
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
     heat_maps = [Room_map(heat_old=heat_new, position_state=position_state,
                           xsize=args.size_x, ysize=args.size_y,
-                          node=i, decay=args.decay)
+                          node=i, decay=args.decay, mask_ratio=args.mask_ratio)
                  for i in range(1,args.rooms+1)]
 
 
