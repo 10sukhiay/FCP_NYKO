@@ -118,7 +118,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
     axes[1, 0].set_title(f'Room Tracking Plot (Day {day})', fontsize=8)
     axes[1, 0].set_xlabel('Time', fontsize=6)
     axes[1, 0].set_ylabel('Number of People', fontsize=6)
-    axes[1,0].legend(labels=['Room1', 'Room2(Hub)', 'Room3'], loc='lower center', bbox_to_anchor=(0.5, -0.2), ncol=3, fontsize= 8)
+    axes[1,0].legend(labels=['Room1', 'Room2(Hub)', 'Room3'], loc='lower center', bbox_to_anchor=(0.5, -0.25), ncol=3, fontsize= 8)
 
 
 
