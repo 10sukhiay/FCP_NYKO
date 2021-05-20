@@ -18,9 +18,8 @@ import math
 from Heat_Mapping import Room_map
 from Person_Class import person
 from other_functions import *
-import update
 
-def update(it, people, heat_maps, position_state, axes, colour_dict, day_length, G, number_nodes, limit, death_rate):
+def update(it, people, heat_maps, position_state, axes, colour_dict, day_length, G, number_nodes, limit, death_rate, Susceptible, Infected, Infectious, Recovered, Deceased):
 
     day = math.floor(it/day_length) +1
 
@@ -52,10 +51,17 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
             # introduce some transmission function to infect new people
             transmission(position_state=position_state, heat=map.heat_old, node=map.node, day_length=day_length)
 
+    Susceptible.append(len(position_state[position_state['status']==1]))
+    Infected.append(len(position_state[position_state['status']==2]))
+    Infectious.append(len(position_state[position_state['status']==3]))
+    Recovered.append(len(position_state[position_state['status']==4]))
+    Deceased.append(len(position_state[position_state['status']==5]))
+
+
     for map in heat_maps:
         # clear data from old plots
-        axes[0, map.node - 1].clear()
-        axes[1, map.node - 1].clear()
+        axes[0, map.node].clear()
+        axes[1, map.node].clear()
 
         # plot positions
 
@@ -63,24 +69,34 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
                         y=map.occupants['y'],
                         hue=map.occupants['status'],
                         palette= colour_dict,
-                        ax=axes[0, map.node - 1],
+                        ax=axes[0, map.node],
                         legend=False)
-        axes[0, map.node - 1].set_title(f'Room {map.node} Position Map (Day {day})', fontsize=8)
+        axes[0, map.node].set_title(f'Room {map.node} Position Map (Day {day})', fontsize=8)
 
 
         # plot heat maps
         sns.heatmap(map.show_map(),
-                    ax=axes[1,map.node-1],
+                    ax=axes[1,map.node],
                     cbar=False,
                     cmap='icefire',
                     center=0,
                     vmin =0,
                     vmax=100).invert_yaxis()
-        axes[1, map.node-1].set_title(f'Room {map.node} Heat Map (Day {day})', fontsize=8)
+        axes[1, map.node].set_title(f'Room {map.node} Heat Map (Day {day})', fontsize=8)
 
         position_state = death_chance(position_state=position_state, death_rate=death_rate)
         position_state = status_change(position_state=position_state, day_length=day_length)  # check for disease progression
 
     # call function to record statuses (plotting infections etc...)
+
+    line1 = axes[0, 0].plot(Susceptible, color='green')
+    line2 = axes[0, 0].plot(Infected, color="yellow")
+    line3 = axes[0, 0].plot(Infectious, color="red")
+    line4 = axes[0, 0].plot(Recovered, color="blue")
+    line5 = axes[0, 0].plot(Deceased, color="black")
+
+    #line2, = axes[0, 0].plot(pop, data=Susceptible, color="r")
+
+    #axes[0, 0].plot('susceptible', data = Susceptible)# x, Infected, 'infected', x, Infectious, 'infectious', x, Recovered, 'recovered', x, Deceased, 'deceased')
 
 
