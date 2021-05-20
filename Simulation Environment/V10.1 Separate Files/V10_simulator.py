@@ -50,7 +50,7 @@ def main(*args):
                         help='Size of population')
     parser.add_argument('--cases', metavar='C', type=int, default=1,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='SD', type=float, default=0.8,
+    parser.add_argument('--distance', metavar='SD', type=float, default=1,
                         help='Probability of following two meter social distancing')
     parser.add_argument('--table', metavar='Pt', type=float, default=0.1,
                         help='Probability of gravitating to the table')
@@ -58,7 +58,7 @@ def main(*args):
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=3,
                         help='Number of rooms to simulate')
-    parser.add_argument('--travel', metavar='T', type=float, default=0.4,
+    parser.add_argument('--travel', metavar='T', type=float, default=0.3,
                         help='Proportion of people that can move between rooms')
     parser.add_argument('--size_x', metavar='X', type=int, default=14,
                         help='size of room along x axis')
@@ -70,7 +70,7 @@ def main(*args):
                         help='x coordinate of table')
     parser.add_argument('--table_y', metavar='Ty', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='D', type=int, default=15,
+    parser.add_argument('--days', metavar='D', type=int, default=18,
                         help='number of days simulated')
     parser.add_argument('--limit', metavar='L', type=int, default=1,
                         help='Limits on number of people in each room 1: on, 0:off')
