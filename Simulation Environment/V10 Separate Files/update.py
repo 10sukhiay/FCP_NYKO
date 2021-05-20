@@ -107,7 +107,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
     axes[0, 0].set_title(f'Population Status (Day {day})', fontsize=8)
     axes[0, 0].set_xlabel('Time', fontsize=6)
     axes[0, 0].set_ylabel('Number of People', fontsize=6)
-    axes[0,0].legend(labels=['Susceptible', 'Infected', 'Infectious', 'Recovered', 'Deceased'], loc='upper center', bbox_to_anchor=(1.7, 1.3), ncol=3, fontsize= 10)
+    axes[0,0].legend(labels=['Susceptible', 'Infected', 'Infectious', 'Recovered', 'Deceased'], loc='upper center', bbox_to_anchor=(0.5, 1.3), ncol=3, fontsize= 10)
 
 
     # Creates the line-graph tracking the number of people in each room
@@ -118,7 +118,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
     axes[1, 0].set_title(f'Room Tracking Plot (Day {day})', fontsize=8)
     axes[1, 0].set_xlabel('Time', fontsize=6)
     axes[1, 0].set_ylabel('Number of People', fontsize=6)
-    axes[1,0].legend(labels=['Room1', 'Room2(Hub)', 'Room3'], loc='lower center', bbox_to_anchor=(0.5, -0.25), ncol=3, fontsize= 8)
+    axes[1,0].legend(labels=['Room1', 'Room2(Hub)', 'Room3'], loc='lower center', bbox_to_anchor=(0.5, -0.3), ncol=3, fontsize= 10)
 
 
 
