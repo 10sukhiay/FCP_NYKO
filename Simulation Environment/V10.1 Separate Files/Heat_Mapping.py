@@ -31,9 +31,6 @@ class RoomMap(object):
     Each room map is initialised using an array of zeros of dimensions xsize and ysize as passed by the _simulator
     script:
 
-    Example
-    =======
-
      0 | 0 | 0 | 0 | 0 | 0
     -----------------------
      0 | 0 | 0 | 0 | 0 | 0
@@ -44,48 +41,36 @@ class RoomMap(object):
     -----------------------
      0 | 0 | 0 | 0 | 0 | 0
 
+    From here the RoomMap class will update the array based on the location of individuals passed by simulator script
+    in the position_state variable.
 
-    x  |  y  |  node   |  status  |  two_meter  |  gravitating
-    -----------------------------------------------------
-    2  |  1  |    1    |    0     |      1      |       1
+    To implement this dynamic heat array the class has four built-in functions:
 
+    1) update_occupants():  When each instance of RoomMap is initialised it is given a unique 'node' number. This
+                            function uses a mask on the position_state dataframe where the 'node' matches, returning
+                            a subsection of this dataframe called occupants.
 
+    2) map_position_states():   This function places individuals in the occupants dataframe onto an array of zeros by
+                                using the 'x' and 'y' values as an index. The value at these indices is dependent on the
+                                'status' all non-zero value representing an occupied cell.
 
+                                Example:
+                                     0 | 1 | 0 | 0 | 0 | 0
+                                    -----------------------
+                                     0 | 0 | 0 | 1 | 0 | 0
+                                    -----------------------
+                                     0 | 0 | 0 | 0 | 0 | 0
+                                    -----------------------
+                                     0 | 3 | 0 | 0 | 2 | 0
+                                    -----------------------
+                                     0 | 0 | 0 | 4 | 0 | 0
 
+    3) heat_source():   This function takes the
 
+    4) calculate_heat_new():
+    The Person class outputs the updated positions to the data frame to then input to the Heat_Mapping.py.
 
-        Here the Person class will then create a person class instance that starts moving from
-        position (2,1) in room 1. They will be non-infected. They will follow the 2meter
-        social distancing rule and will move towards ('gravitate') and sit (stop) at the table.
-
-        To implement the movement of each person, the Person Class has these key functions:
-
-        1) make_new_step_size(): When each person is initialised it gives them a random step size
-                                 they take every iteration. This allows them to move. Each iteration
-                                 a person has 50% chance of changing step size (movement speed). Also,
-                                 the move() function makes sure the person does not go out of the
-                                 room boundaries.
-
-        2) move():  This function contains nested functions that are called to allow it to work.
-                    It also contains the 'if' statements that are run each iteration and dictate
-                    how each person moves using the functions in the class: They key movements are:
-
-                a)   If specified the person follows a 2meter social distancing rule. This uses functions
-                     distance(), direction(), position_compared_to_object(), move_away() and
-                     calc_dist_to_other_people(). If the closest person is <2m from them, they will move
-                     away from that individual.
-
-                b)   If specified the person moves towards ('gravitates to') the table and stops to 'sit' at
-                     the table. The table is a user input to say where it is located and the radius size.
-                     The table is designed to simulate the impact of infection if people move to congregate
-                     in room. This uses the functions direction(), position_compared_to_object(),
-                     move_towards(), inside() and stop(). A person moves towards the designated table area,
-                     and once inside the area the person stops moving. Every iteration they then have a 50%
-                     chance of leaving the table.
-
-        The Person class outputs the updated positions to the data frame to then input to the Heat_Mapping.py.
-
-        """
+    """
 
     def __init__(self, heat_old, position_state, xsize, ysize, node, decay, mask_ratio):
         self.heat_old = heat_old
