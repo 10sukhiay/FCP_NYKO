@@ -14,13 +14,14 @@ import pandas as pd
 import random
 
 class Room_map(object):
-    def __init__(self, heat_old, position_state, xsize, ysize, node, decay):
+    def __init__(self, heat_old, position_state, xsize, ysize, node, decay, mask_ratio):
         self.heat_old = heat_old
         self.node = node
         self.xsize = xsize+1
         self.ysize = ysize+1
         self.update_occupants(position_state)
         self.decay = decay
+        self.mask_ratio = mask_ratio*100
 
     def update_occupants(self, position_state):
         self.occupants = position_state[position_state["node"] == self.node]
@@ -39,8 +40,8 @@ class Room_map(object):
         boundary = np.zeros((self.ysize+2, self.xsize+2))
         sources += self.map_position_states()
         sources[sources == 3] = 100
-        sources[sources == 3.5] = 50
-        sources[sources < 50] = 0
+        sources[sources == 3.5] = self.mask_ratio
+        sources[sources < self.mask_ratio] = 0
         boundary[1:-1,1:-1] = sources
         sources = boundary
 
@@ -69,10 +70,10 @@ class Room_map(object):
 
         heat_new = 0.25 * (heat_left + heat_right + heat_up + heat_down)  # cell heat is the average of adjacent cells
         heat_new[self.heat_source() == 100] = 100
-        mask_1 = self.heat_source() == 50
-        mask_2 = heat_new < 50
+        mask_1 = self.heat_source() == self.mask_ratio
+        mask_2 = heat_new < self.mask_ratio
         mask_3 = np.logical_and(mask_1, mask_2)
-        heat_new[mask_3] = 50
+        heat_new[mask_3] = self.mask_ratio
         heat_new = heat_new[1:-1, 1:-1]
 
         self.heat_old = heat_new
