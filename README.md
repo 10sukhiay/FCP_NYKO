@@ -24,12 +24,19 @@ and at a room level for a number of iterations every day.
 These common python libraries need to be installed. They are imported at the beginning of the scripts:
 
 argparse
+
 numpy
+
 pandas
+
 random
+
 math
+
 matplotlib
+
 networkx
+
 seaborn
 
 
@@ -52,14 +59,9 @@ interface. This allows parameters to be changes without editing the code. e.g.:
 
     $ python simulator.py               # run simulation with default settings
     $ python simulator.py --number=50    # have 50 people in the room network
-
-
-### Help
-
-Run this for help info:
-
     $ python simulator.py --help        # show all command line options
 
+ 
 ### Acknowledgments
 
 We would like to acknowledge Perla Jazmin Mayo Diaz de Leon for her help and guidance with this unit.
