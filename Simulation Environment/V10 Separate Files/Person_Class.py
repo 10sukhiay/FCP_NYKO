@@ -5,6 +5,10 @@ Person_Class.py
 Nathan Wooster
 May 2021
 
+This script contains the Person Class used in the model simulation.
+It is not interacted with directly from the command line as takes
+inputs from the 'people_array' that is used to interface with the
+command line.
 
 """
 
