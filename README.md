@@ -47,13 +47,14 @@ The file can be run from the command line thanks to the command line
 interface. This allows parameters to be changes without editing the code. e.g.:
 
     $ python simulator.py               # run simulation with default settings
-    $ python simulator.py --cases=10    # have 10 initial cases
-    $ python simulator.py --help        # show all command line options
+    $ python simulator.py --number=50    # have 50 people in the room network
+
 
 ### Help
 
 Run this for help info:
-XXX
+
+    $ python simulator.py --help        # show all command line options
 
 ### Acknowledgments
 
