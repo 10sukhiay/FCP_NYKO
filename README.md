@@ -41,7 +41,23 @@ seaborn
 
 
 ### Installing
-The main script to be downloaded is simulation.py and the modules that also must be downloaded that it calls are XXXX
+The main script to be downloaded is:
+
+simulation.py
+
+The modules that also must be downloaded that it calls are:
+
+Person_Class.py
+
+animate.py
+
+area.py
+
+Heat_Mapping.py
+
+other_functions.py
+
+update.py
 
 
 ### Executing Program
