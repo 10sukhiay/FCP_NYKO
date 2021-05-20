@@ -26,13 +26,20 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, G, numbe
                        4: 'blue',
                        5: 'black'})
     grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
-    fig, axes = plt.subplots(2, rooms+1, figsize=(5*(rooms+1), 10), sharey=False, sharex=False)
-
     Susceptible = []
     Infected = []
     Infectious = []
     Recovered = []
     Deceased = []
+
+    fig, axes = plt.subplots(2, rooms+1, figsize=(5*(rooms+1), 10), sharey=False, sharex=False)
+
+    Susceptible, = axes[0, 0].plot(Susceptible, color='green')
+    #line2 = axes[0, 0].plot(Infected, color="yellow")
+    #line3 = axes[0, 0].plot(Infectious, color="red")
+    #line4 = axes[0, 0].plot(Recovered, color="blue")
+    #line5 = axes[0, 0].plot(Deceased, color="black")
+
 
     anim = FuncAnimation(fig=fig, func=update,
                          frames=day_length*days,

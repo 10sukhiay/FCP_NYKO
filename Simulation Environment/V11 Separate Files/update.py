@@ -89,11 +89,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
 
     # call function to record statuses (plotting infections etc...)
 
-    line1 = axes[0, 0].plot(Susceptible, color='green')
-    line2 = axes[0, 0].plot(Infected, color="yellow")
-    line3 = axes[0, 0].plot(Infectious, color="red")
-    line4 = axes[0, 0].plot(Recovered, color="blue")
-    line5 = axes[0, 0].plot(Deceased, color="black")
+
 
     #line2, = axes[0, 0].plot(pop, data=Susceptible, color="r")
 

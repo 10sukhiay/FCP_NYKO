@@ -181,7 +181,7 @@ def transmission(position_state, heat, node, day_length):
 
                 if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
 
-                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0,201))/2:
+                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0, 151))/1.5:
 
                             position_state.iloc[x]['status'] = 2 # stands for infected
                             position_state.iloc[x]['counter'] = round((1-((random.random() - 0.5) / 2.5)) * day_length * 2) # 2 day incubation period +- 20%
