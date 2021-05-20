@@ -20,7 +20,8 @@ import math
 
 class person(object):
 
-    """Creates individual people which move in specific ways.
+    """
+    Creates individual people which move in specific ways.
 
     In the class there are numerous functions that define the movement and
     interaction of each person in a room.
