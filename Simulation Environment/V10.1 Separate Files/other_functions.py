@@ -2,7 +2,7 @@
 """
 
 other_functions.py
-Kaelan Melville
+Kaelan Melville, Oscar Bond
 May 2021
 
 
