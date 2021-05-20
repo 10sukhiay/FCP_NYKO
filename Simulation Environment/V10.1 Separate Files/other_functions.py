@@ -65,19 +65,25 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     follow = math.ceil(N*following_two_meter)
     no_follow = N - follow
     two_meter = np.concatenate((([1]*follow), ([0]*no_follow)))
+    random.shuffle(two_meter)
     #gravitating towards the table
     gravitate = math.ceil(N*gravitate_table)
     no_gravitate = N - gravitate
     number_gravitating = np.concatenate((([1]*gravitate), ([0]*no_gravitate)))
+    random.shuffle(number_gravitating)
     #wearing a mask
     masked = math.ceil(N*using_mask)
     no_masked = N - masked
     number_masked = np.concatenate((([1]*masked), ([0]*no_masked)))
+    random.shuffle(number_masked)
     # travelling round
     travelling = math.ceil(N*travel)
     no_travelling = N - travelling
     number_travelling = np.concatenate((([1]*travelling), ([0]*no_travelling)))
+    random.shuffle(number_travelling)
+    # infection progress counter
     counter = ([0]*N)
+    # compile dataframe
     data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling, counter), axis=1)
     position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask', 'travelling', 'counter'])
     return(position_state)
