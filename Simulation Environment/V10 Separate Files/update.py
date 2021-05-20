@@ -89,11 +89,9 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
 
     # call function to record statuses (plotting infections etc...)
 
-    print(Susceptible)
-    pop = range(0,it)
-    line1, = axes[0, 0].plot(ydata= np.array(Susceptible), color = "r")
+    line1 = axes[0, 0].plot(Susceptible, color = "r")
     #line2, = axes[0, 0].plot(pop, data=Susceptible, color="r")
 
-    axes[0, 0].plot('susceptible', data = Susceptible)# x, Infected, 'infected', x, Infectious, 'infectious', x, Recovered, 'recovered', x, Deceased, 'deceased')
+    #axes[0, 0].plot('susceptible', data = Susceptible)# x, Infected, 'infected', x, Infectious, 'infectious', x, Recovered, 'recovered', x, Deceased, 'deceased')
 
 
