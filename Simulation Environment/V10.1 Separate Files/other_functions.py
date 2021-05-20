@@ -210,10 +210,10 @@ def status_change(position_state, day_length):
 
 def death_chance(position_state, death_rate):
     for x in range(0, len(position_state)):
-        if position_state.iloc[x]['status'] == 2 or position_state.iloc[x]['status'] == 3:  # check if status requires changing
+        if position_state.iloc[x, 3] == 2 or position_state.iloc[x, 3] == 3:  # check if status requires changing
             death_roll = random.random()
             if death_roll < death_rate:
-                position_state.iloc[x]['status'] = 5  # individual dies
+                position_state.iloc[x, 3] = 5  # individual dies
 
     return position_state
 
