@@ -50,7 +50,7 @@ def main(*args):
                         help='Size of population')
     parser.add_argument('--cases', metavar='C', type=int, default=1,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='SD', type=float, default=0.75,
+    parser.add_argument('--distance', metavar='SD', type=float, default=0.5,
                         help='Probability of following two meter social distancing')
     parser.add_argument('--table', metavar='Pt', type=float, default=0.1,
                         help='Probability of gravitating to the table')
