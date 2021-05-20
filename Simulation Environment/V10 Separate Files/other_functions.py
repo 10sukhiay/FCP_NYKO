@@ -227,7 +227,7 @@ def check_general_inputs(number, cases, distance, table, mask, decay, rooms, mas
     if mask < 0 or mask > 1:
         raise Exception('Please enter probability between 0 and 1')
     if mask_ratio < 0 or mask_ratio > 1:
-        raise Exception('Please enter probability between 0 and 1')
+        raise Exception('Please enter transmission rate between 0 and 1')
 
 def check_room_setup_inputs(size_x, size_y, table_r, table_x, table_y):
     """Check room setup inputs to the code from command line."""
