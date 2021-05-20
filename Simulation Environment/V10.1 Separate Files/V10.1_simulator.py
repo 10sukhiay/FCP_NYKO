@@ -26,8 +26,8 @@ simulations without needing to edit the code e.g.:
 import argparse
 
 # custom imports
-from Heat_Mapping import Room_map
-from Person_Class import person
+from Heat_Mapping import RoomMap
+from Person_Class import Person
 from animate import animate
 from other_functions import *
 # from area import area
@@ -86,10 +86,10 @@ def main(*args):
     args = parser.parse_args(args)
 
     # check user inputs with exceptions
-    check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay,
+    check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.days,
                          args.rooms, args.mask_ratio)
     check_room_setup_inputs(args.size_x, args.size_y, args.table_r, args.table_x, args.table_y)
-    check_network_inputs(args.rooms, args.travel, args.days, args.limit)
+    check_network_inputs(args.rooms, args.travel, args.limit)
 
     # create edgelist
     edgelist = create_edgelist(args.rooms)
@@ -110,10 +110,10 @@ def main(*args):
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2],
+    people = [Person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2],
                      status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4],
-                     gravitating=position_state.iloc[i, 5], AREA_X=args.table_x,
-                     AREA_Y=args.table_y, AREA_R=args.table_r,
+                     gravitating=position_state.iloc[i, 5], area_x=args.table_x,
+                     area_y=args.table_y, area_r=args.table_r,
                      size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
     # Initialise areas
     # area1 = area(args.table_x, args.table_y, args.table_r)
@@ -121,9 +121,9 @@ def main(*args):
 
     # initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
-    heat_maps = [Room_map(heat_old=heat_new, position_state=position_state,
-                          xsize=args.size_x, ysize=args.size_y,
-                          node=i, decay=args.decay, mask_ratio=args.mask_ratio)
+    heat_maps = [RoomMap(heat_old=heat_new, position_state=position_state,
+                         xsize=args.size_x, ysize=args.size_y,
+                         node=i, decay=args.decay, mask_ratio=args.mask_ratio)
                  for i in range(1, args.rooms+1)]
 
     # Drawing a node graph
@@ -136,7 +136,7 @@ def main(*args):
             position_state=position_state,
             rooms=args.rooms, days=args.days,
             day_length=args.day_length,
-            G=g,
+            g=g,
             number_nodes=number_nodes,
             limit=args.limit,
             death_rate=args.death_rate)

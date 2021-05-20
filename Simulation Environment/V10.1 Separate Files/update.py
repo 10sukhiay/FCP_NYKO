@@ -15,8 +15,8 @@ import seaborn as sns
 import math
 
 # custom imports
-from Heat_Mapping import Room_map
-from Person_Class import person
+from Heat_Mapping import RoomMap
+from Person_Class import Person
 from other_functions import *
 
 
@@ -52,15 +52,15 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
             # introduce some transmission function to infect new people
             transmission(position_state=position_state, heat=m.heat_old, node=m.node, day_length=day_length)
 
-    Susceptible.append(len(position_state[position_state['status'] == 1]))
-    Infected.append(len(position_state[position_state['status'] == 2]))
-    Infectious.append(len(position_state[position_state['status'] == 3]))
-    Recovered.append(len(position_state[position_state['status'] == 4]))
-    Deceased.append(len(position_state[position_state['status'] == 5]))
+    susceptible.append(len(position_state[position_state['status'] == 1]))
+    infected.append(len(position_state[position_state['status'] == 2]))
+    infectious.append(len(position_state[position_state['status'] == 3]))
+    recovered.append(len(position_state[position_state['status'] == 4]))
+    deceased.append(len(position_state[position_state['status'] == 5]))
 
-    Room1.append(len(position_state[position_state["node"] == 1]))
-    Room2.append(len(position_state[position_state["node"] == 2]))
-    Room3.append(len(position_state[position_state["node"] == 3]))
+    room1.append(len(position_state[position_state["node"] == 1]))
+    room2.append(len(position_state[position_state["node"] == 2]))
+    room3.append(len(position_state[position_state["node"] == 3]))
 
     for m in heat_maps:
         # clear data from old plots
@@ -82,7 +82,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
         axes[0, m.node].set_ylabel('y')
 
         # plot heat maps
-        sns.heatmap(m.show_map(),
+        sns.heatmap(m.heat_old,
                     ax=axes[1, m.node],
                     cbar=False,
                     cmap='icefire',
