@@ -77,8 +77,9 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     travelling = math.ceil(N*travel)
     no_travelling = math.floor(N*(1-travel))
     number_travelling = np.concatenate((([1]*masked), ([0]*no_masked)))
-    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling), axis=1)
-    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask', 'travelling'])
+    counter = ([0]*N)
+    data_in = np.stack((x_position, y_position, start_nodes, start_status, two_meter, number_gravitating, number_masked, number_travelling, counter), axis=1)
+    position_state = pd.DataFrame(data=data_in, columns=['x', 'y', 'node', 'status', 'two_meter', 'gravitating', 'mask', 'travelling', 'counter'])
     return(position_state)
 
 def people_array_room(position_state,i):
@@ -142,6 +143,7 @@ def draw_network(position_state, G, number_nodes):
     plt.show()
 
 def update_position_state(position_state,people):
+    """Update position_state array with locations of people at the end of a day."""
     position_state.iloc[:, :2] = 0  # array emptied for x y only
     # this code adds values from people objects back into array
     k = 0
@@ -156,6 +158,19 @@ def update_position_state(position_state,people):
     #print(position_state)  # array refilled with people
     return (position_state)
 
+def update_people_nodes(position_state,people):
+    """Update node for people based on position_state array."""
+    position_state.iloc[:, :2] = 0  # array emptied for x y only
+    # this code adds values from people objects back into array
+    k = 0
+    for t in people:
+        t.node = position_state['node'].iloc[k]
+        k += 1  # iterator for picking the correct row
+    # check
+    print('nodes replaced')
+    #print(position_state)  # array refilled with people
+    return people
+
 def transmission(position_state, heat, node):
     for x in range(0, len(position_state)):
         if position_state.iloc[x]['node'] == node: # checks person is in correct room
@@ -169,5 +184,38 @@ def transmission(position_state, heat, node):
     return position_state
 
 def check_general_inputs(number, cases, distance, table, mask, decay, rooms):
+    """Check general inputs to the code from command line."""
     if number/rooms < 5:
-        raise Exception('For the number of rooms set, please enter an even number of people greater than: {}'.format(rooms*5))
+        raise Exception('For the number of rooms set, please enter a number of people greater than: {}'.format(rooms*5))
+    if cases == 0:
+        raise Exception('Please add at least one case')
+    if cases > number:
+        raise Exception('Number of cases must be less than: {}'.format(rooms*5))
+    if distance < 0 or distance > 1:
+        raise Exception('Please enter probability between 0 and 1')
+    if table < 0 or table > 1:
+        raise Exception('Please enter probability between 0 and 1')
+    if mask < 0 or mask > 1:
+        raise Exception('Please enter probability between 0 and 1')
+    #if decay < 0 or decay > 1:
+        #raise Exception('Please enter probability between 0 and 1')
+
+def check_room_setup_inputs(size_x, size_y, table_r, table_x, table_y):
+    """Check room setup inputs to the code from command line."""
+    if table_x > size_x:
+        raise Exception('Table must be within room. Enter value smaller than: {}'.format(size_x))
+    if table_y > size_y:
+        raise Exception('Table must be within room. Enter value smaller than: {}'.format(size_y))
+    if table_r > size_y or table_r > size_x:
+        raise Exception('Table is too large. Enter value smaller radius')
+
+def check_network_inputs(rooms, travel, days, limit):
+    """Check network inputs to the code from command line."""
+    if rooms > 5 or rooms < 2:
+        raise Exception('Number of rooms must be between 2 and 5 inclusive')
+    if travel < 0 or travel > 1:
+        raise Exception('Please enter probability between 0 and 1')
+    if limit not in [0,1]:
+        raise Exception('Please enter 0 for limit off, 1 for limit on')
+
+

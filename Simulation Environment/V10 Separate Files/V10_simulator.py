@@ -46,43 +46,46 @@ def main(*args):
     #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=17,
+    parser.add_argument('--number', metavar='N', type=int, default=20,
                         help='Size of population')
-    parser.add_argument('--cases', metavar='N', type=int, default=1,
+    parser.add_argument('--cases', metavar='C', type=int, default=1,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='D', type=float, default=1,
+    parser.add_argument('--distance', metavar='SD', type=float, default=1,
                         help='Probability of following two meter social distancing')
-    parser.add_argument('--table', metavar='T', type=float, default=0.1,
+    parser.add_argument('--table', metavar='Pt', type=float, default=0.1,
                         help='Probability of gravitating to the table')
     parser.add_argument('--mask', metavar='M', type=float, default=0.5,
                         help='Probability of wearing a mask')
-    parser.add_argument('--rooms', metavar='R', type=int, default=3,
+    parser.add_argument('--rooms', metavar='R', type=int, default=2,
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=1,
                         help='Proportion of people that move between rooms')
-    parser.add_argument('--size_x', metavar='R', type=int, default=8,
+    parser.add_argument('--size_x', metavar='X', type=int, default=14,
                         help='size of room along x axis')
-    parser.add_argument('--size_y', metavar='R', type=int, default=10,
+    parser.add_argument('--size_y', metavar='Y', type=int, default=14,
                         help='size of room along y axis')
-    parser.add_argument('--table_r', metavar='R', type=int, default=0.5,
+    parser.add_argument('--table_r', metavar='Tr', type=int, default=0.5,
                         help='radius of table')
-    parser.add_argument('--table_x', metavar='R', type=int, default=2,
+    parser.add_argument('--table_x', metavar='Tx', type=int, default=2,
                         help='x coordinate of table')
-    parser.add_argument('--table_y', metavar='R', type=int, default=2,
+    parser.add_argument('--table_y', metavar='Ty', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='R', type=int, default=4,
+    parser.add_argument('--days', metavar='D', type=int, default=20,
                         help='number of days simulated')
-    parser.add_argument('--limit', metavar='L', type=int, default=1,
+    parser.add_argument('--limit', metavar='L', type=int, default=0,
                         help='Limits on number of people in each room - 1: on, 0:off')
-    parser.add_argument('--decay', metavar='L', type=int, default=1,
+    parser.add_argument('--decay', metavar='d', type=int, default=0.5,
                         help='The "heat" decay per iteration, represents the settling rate of particles')
+    parser.add_argument('--day_length', metavar='Dl', type=int, default=20,
+                        help='The number of iterations per day')
+    parser.add_argument('--death_rate', metavar='Rd', type=float, default=0,
+                        help='Likelihood of death 0 to 1')
     args = parser.parse_args(args)
 
+    # check user inputs with exceptions
     check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.rooms)
-
-    #check_room_setup_inputs(args.size_x, args.size_y, args.table_r, args.table_x, args.table_y)
-
-    #check_network_inputs(args.rooms, args.travel, args.days, args.limit)
+    check_room_setup_inputs(args.size_x, args.size_y, args.table_r, args.table_x, args.table_y)
+    check_network_inputs(args.rooms, args.travel, args.days, args.limit)
 
     #create edgelist
     edgelist = create_edgelist(args.rooms)
@@ -94,12 +97,20 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
+    for x in range(0, len(position_state)):  # set counter for any starting infected people
+        if position_state.iloc[x]['status'] == 3:
+            position_state.iloc[x]['counter'] = args.day_length*3
+
     # check nodes are within limits
     nodes = possible_paths(position_state, G)
     position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2],
+                     status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4],
+                     gravitating=position_state.iloc[i, 5], AREA_X=args.table_x,
+                     AREA_Y=args.table_y, AREA_R=args.table_r,
+                     size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
 
     # Initialise areas
     area1 = area(args.table_x, args.table_y, args.table_r)
@@ -113,25 +124,30 @@ def main(*args):
                  for i in range(1,args.rooms+1)]
 
 
-    # loop for multiple days
-    for day in range(args.days):
+
+
     # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
-        #use animate function instead of update. update is nested!!!
+    #use animate function instead of update. update is nested!!!
+    animate(people=people,
+            heat_maps=heat_maps,
+            position_state=position_state,
+            rooms=args.rooms, days=args.days,
+            day_length=args.day_length,
+            G=G,
+            number_nodes=number_nodes,
+            limit=args.limit,
+            death_rate=args.death_rate)
 
-        animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
+    # Drawing a node graph
+    #draw_network(position_state, G, number_nodes)
 
-        # Drawing a node graph
-        draw_network(position_state, G, number_nodes)
+    # Update the position state for new nodes.
+    #nodes = possible_paths(position_state, G)
 
-        # Update the position state for new nodes.
-        nodes = possible_paths(position_state, G)
+    #position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
-        position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-        people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
-
-        print(position_state)
-        # Draw updated node graph after simulation
-        #draw_network(position_state, G, number_nodes)
+    # Draw updated node graph after simulation
+    #draw_network(position_state, G, number_nodes)
 
 
 

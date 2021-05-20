@@ -26,14 +26,14 @@ simulations without needing to edit the code e.g.:
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
-from matplotlib.animation import FuncAnimation #########
 import math
 import networkx as nx
 import pandas as pd
-import seaborn as sns
 import random
 from numpy.random import randint
 import argparse
+import seaborn as sns
+from matplotlib.animation import FuncAnimation
 
 def main(*args):
     """Command line entry point.
@@ -49,11 +49,11 @@ def main(*args):
     #
     parser = argparse.ArgumentParser(description='Animate an epidemic')
 
-    parser.add_argument('--number', metavar='N', type=int, default=10,
+    parser.add_argument('--number', metavar='N', type=int, default=20,
                         help='Size of population')
-    parser.add_argument('--cases', metavar='N', type=int, default=2,
+    parser.add_argument('--cases', metavar='N', type=int, default=1,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='D', type=float, default=0.5,
+    parser.add_argument('--distance', metavar='D', type=float, default=1,
                         help='Probability of following two meter social distancing')
     parser.add_argument('--table', metavar='T', type=float, default=0.1,
                         help='Probability of gravitating to the table')
@@ -63,9 +63,9 @@ def main(*args):
                         help='Number of rooms to simulate')
     parser.add_argument('--travel', metavar='T', type=float, default=0.5,
                         help='Proportion of people that move between rooms')
-    parser.add_argument('--size_x', metavar='R', type=int, default=20,
+    parser.add_argument('--size_x', metavar='R', type=int, default=8,
                         help='size of room along x axis')
-    parser.add_argument('--size_y', metavar='R', type=int, default=15,
+    parser.add_argument('--size_y', metavar='R', type=int, default=10,
                         help='size of room along y axis')
     parser.add_argument('--table_r', metavar='R', type=int, default=0.5,
                         help='radius of table')
@@ -73,12 +73,15 @@ def main(*args):
                         help='x coordinate of table')
     parser.add_argument('--table_y', metavar='R', type=int, default=2,
                         help='y coordinate of table')
-    parser.add_argument('--days', metavar='R', type=int, default=5,
+    parser.add_argument('--days', metavar='R', type=int, default=1,
                         help='number of days simulated')
+    parser.add_argument('--limit', metavar='L', type=int, default=1,
+                        help='Limits on number of people in each room - 1: on, 0:off')
     args = parser.parse_args(args)
 
-    edgelist = create_edgelist(args.rooms)
 
+    #create edgelist
+    edgelist = create_edgelist(args.rooms)
     # Create network
     G = create_network(edgelist)
     # Set number of nodes
@@ -87,48 +90,40 @@ def main(*args):
     position_state = create_people_array(args.size_x, args.size_y, args.number,
                                          number_nodes, args.cases, args.distance,
                                          args.table, args.mask, args.travel)
-
-    # Currently this is hardcoded for a set number of rooms but aim is to allow different numbers to be put in.
-    room1 = people_array_room(position_state, 1)
-    room2 = people_array_room(position_state, 2)
-    room3 = people_array_room(position_state, 3)
-
-    # this loop creates separate arrays per room
-    rooms = []
-    for i in range(1, (args.rooms+1)):
-        rooms.append(people_array_room(position_state, i))
+    # check nodes are within limits
+    nodes = possible_paths(position_state, G)
+    position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
     # Initialise people using the position_state array (array -> person class instances)
-    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r) for i in range(len(position_state))]
-
+    people = [person(x=position_state.iloc[i, 0], y=position_state.iloc[i, 1], node=position_state.iloc[i, 2], status=position_state.iloc[i, 3], two_meter=position_state.iloc[i, 4], gravitating=position_state.iloc[i, 5], AREA_X=args.table_x, AREA_Y=args.table_y, AREA_R=args.table_r, size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
 
     # Initialise areas
     area1 = area(args.table_x, args.table_y, args.table_r)
     circle = area1.draw()
 
-    #check
-    print('room arrays:')
-    print(rooms)
+    #initialise heat maps for each room
+    heat_new = np.zeros((args.size_y+1, args.size_x+1))
+    heat_maps = [Room_map(heat_old=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y, node=i) for i in range(1,args.rooms+1)]
 
-    for i in people:
-        i.move(size_x=args.size_x, size_y=args.size_y, people=people)
-    update_position_state(position_state, people)
 
-    fig = plt.figure(figsize=(6, 3))
-    x = position_state.x
-    y = position_state.y
-    plt.scatter(x,y)
-    plt.show()
+    # loop for multiple days
+    for day in range(args.days):
+    # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
+        #use animate function instead of update. update is nested!!!
+        animate(people=people, heat_maps=heat_maps, position_state=position_state, rooms=args.rooms)
 
-    #create heat maps for each room
-    heat_new = np.zeros((args.size_y, args.size_x))
-    heat_maps = [Room_map(heat_new=heat_new, position_state=position_state, xsize=args.size_x, ysize=args.size_y) for i in range(args.rooms)]
+        # Drawing a node graph
+        #draw_network(position_state, G, number_nodes)
 
-    simulate(days=args.days)
+        # Update the position state for new nodes.
+        #nodes = possible_paths(position_state, G)
 
-    nodes = possible_paths(position_state, G)
+        position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
 
-    update_node_travel_prob(position_state, nodes)
+        # Draw updated node graph after simulation
+        #draw_network(position_state, G, number_nodes)
+
+
 
 def create_edgelist(rooms):
     """Define the edge list dependant on number of rooms."""
@@ -137,13 +132,17 @@ def create_edgelist(rooms):
         edgelist = [(1, 2)]
     if rooms == 3:
         edgelist = [(1, 2), (1,3), (2,3)]
+    if rooms == 4:
+        edgelist = [(1, 2), (1,3), (1,4), (2,3), (2,4), (3,4)]
+    if rooms == 5:
+        edgelist = [(1, 2), (1,3), (1,4), (1,5), (2,3), (2,4), (2,5), (3,4), (3,5)]
 
     return(edgelist)
 
 def create_network(edgelist):
     """Create a networkx graph from the edgelist."""
     G = nx.Graph(edgelist)
-    nx.draw(G, with_labels=True)
+    #nx.draw(G, with_labels=True)
     #plt.show()   # this displays the graph - turn on as required.
     return(G)
 
@@ -157,7 +156,14 @@ def create_people_array(ROOM_SIZE_X, ROOM_SIZE_Y, N, number_nodes, number_infect
     x_position = randint(0,ROOM_SIZE_X+1,N) # randomly assign x values for each person
     y_position = randint(0,ROOM_SIZE_Y+1,N) # randomly assign y values for each person
     start_nodes = randint(1, number_nodes+1, N)
-    start_status = np.concatenate((([1]*number_infected), ([0]*(N-number_infected))))
+
+    # SUSCEPTIBLE 1
+    # INFECTED    2
+    # INFECTIOUS  3
+    # RECOVERED   4
+    # DECEASED    5
+    start_status = np.concatenate((([3]*number_infected), ([1]*(N-number_infected))))
+    random.shuffle(start_status)
     # following two meter rule
     follow = round(N*following_two_meter)
     no_follow = round(N*(1-following_two_meter))
@@ -192,12 +198,152 @@ def possible_paths(position_state, G):
         nodes.append(possible_nodes)
     return(nodes)
 
-def update_node_travel_prob(position_state, nodes):
-    """Update position_state dependant on connected nodes and travel probability"""
-    for i in range(0, len(position_state),1):
-        if position_state.iloc[i,7] ==1:
-            position_state.iloc[i,2] = random.choice(nodes[i])
+def update_node_travel_prob(position_state, nodes, limit,number_nodes):
+    """Update position_state dependant on limited number of people in each room"""
+    if limit == 0:
+        random_node_choice(position_state, nodes)
+    if limit == 1:
+        while max(node_count_individuals(position_state, number_nodes))>((len(position_state)/number_nodes)+1):
+            random_node_choice(position_state, nodes)
     return position_state
+
+def random_node_choice(position_state, nodes):
+    """Update position_state dependant on connected nodes"""
+    for i in range(0, len(position_state), 1):
+        if position_state.iloc[i, 7] == 1:
+            position_state.iloc[i, 2] = random.choice(nodes[i])
+    return(position_state)
+
+
+def node_count_individuals(position_state, number_nodes):
+    """Count the number of individual at each node"""
+    node_count = []
+    for n in range(1, number_nodes + 1):
+        a = 0
+        for i in range(0, len(position_state)):
+            if position_state.iloc[i, 2] == n:
+                a = a + 1
+        node_count.append(a)
+    return(node_count)
+
+def draw_network(position_state, G, number_nodes):
+    """Draw network graph"""
+    node_count = node_count_individuals(position_state, number_nodes)
+
+    for i in range(1, number_nodes+1):
+        G.nodes[i]['Number'] =  node_count[i-1]
+
+    pos = nx.spring_layout(G)
+    # increase size of nodes to be able to see
+    node_count_size = [i * 100 for i in node_count]
+
+    # draw the network with node size dependant on no.people
+    nx.draw(G, pos, node_size=(node_count_size))
+    node_labels = nx.get_node_attributes(G, 'Number')
+    nx.draw_networkx_labels(G, pos, labels=node_labels)
+    plt.legend(['Room - Number of People in the Room'])
+    plt.show()
+
+def update_position_state(position_state,people):
+    position_state.iloc[:, :2] = 0  # array emptied for x y only
+    # this code adds values from people objects back into array
+    k = 0
+    for t in people:
+        position_state.iloc[k, 0] = t.x
+        position_state.iloc[k, 1] = t.y
+        position_state.iloc[k, 2] = t.node
+        position_state.iloc[k, 5] = t.gravitating
+        k += 1  # iterator for picking the correct row
+    # check
+    #print('iteration finished and this is new position_state array:')
+    #print(position_state)  # array refilled with people
+    return (position_state)
+
+def transmission(position_state, heat, node):
+    for x in range(0, len(position_state)):
+        if position_state.iloc[x]['node'] == node: # checks person is in correct room
+            if position_state.iloc[x]['status'] == 1:# transmission only occurs on healthy individuals
+
+                if heat[round(position_state['y'].iloc[x]), round(position_state['x'].iloc[x])] > 20:
+
+                        if heat[round(position_state['y'].iloc[x]),round(position_state['x'].iloc[x])] > (np.random.randint(0,201))/2:
+
+                            position_state.iloc[x]['status'] = 2 # stands for infected
+    return position_state
+
+def animate(people, heat_maps, position_state, rooms):
+
+    # colours for statuses in scatter plot
+    colour_dict = dict({1: 'green',
+                       2: 'yellow',
+                       3: 'red',
+                       4: 'blue',
+                       5: 'black'})
+    grid_kws = {'width_ratios': (0.9, 0.05), 'wspace': 0.2}
+    fig, axes = plt.subplots(2, rooms, figsize=(10, 10), sharey=True, sharex=True)
+    anim = FuncAnimation(fig=fig, func=update,
+                         frames=100,
+                         fargs=(people, heat_maps, position_state, axes, colour_dict),
+                         interval=10,
+                         blit=False,
+                         repeat=False)
+    plt.show()
+
+# placeholder simulate function
+def update(it, people, heat_maps, position_state, axes, colour_dict):
+
+
+    # move each person
+    for i in people:
+        i.move(people=people)
+    position_state = update_position_state(position_state, people)
+
+    # update heat maps
+    for x in range(2):
+        for map in heat_maps:
+            map.update_occupants(position_state)
+            map.calculate_heat_new()
+            # introduce some transmission function to infect new people
+            transmission(position_state, map.heat_old, map.node)
+
+    for map in heat_maps:
+        # clear data from old plots
+        axes[0, map.node - 1].clear()
+        axes[1, map.node - 1].clear()
+
+        # plot positions
+
+        sns.scatterplot(x=map.occupants['x'],
+                        y=map.occupants['y'],
+                        hue=map.occupants['status'],
+                        palette= colour_dict,
+                        ax=axes[0, map.node - 1],
+                        legend=False)
+        axes[0, map.node - 1].set_title(f'Room {map.node} Position Map')
+
+
+        # plot heat maps
+        sns.heatmap(map.show_map(),
+                    ax=axes[1,map.node-1],
+                    cbar=False,
+                    cmap='icefire',
+                    center=0,
+                    vmin =0,
+                    vmax=100,
+                    ).invert_yaxis()
+        axes[1, map.node-1].set_title(f'Room {map.node} Heat Map')
+
+    # call function to record statuses (plotting infections etc...)
+
+
+
+    # the network image uses this plot axes
+    # axes[0, 0]
+    axes[0, 0].set_title(f'Network Map')
+
+    # the line graph uses this plot axes
+    # axes[1, 0]
+    axes[1, 0].set_title(f'Population Line Chart')
 
 #----------------------------------------------------------------------------#
 #                  Simulation classes                                        #
@@ -217,7 +363,7 @@ class area(object):
 
 #create moving person class with original x, y and node inputs
 class person(object):
-    def __init__(self, x, y, node, status, two_meter, gravitating, AREA_X, AREA_Y, AREA_R):
+    def __init__(self, x, y, node, status, two_meter, gravitating, AREA_X, AREA_Y, AREA_R, size_x, size_y):
         self.x = x
         self.y = y
         self.node = node
@@ -229,11 +375,13 @@ class person(object):
         self.AREA_X = AREA_X
         self.AREA_Y = AREA_Y
         self.AREA_R = AREA_R
+        self.size_x = size_x
+        self.size_y = size_y
 
-    def make_new_step_size(self, max_step=1):
+    def make_new_step_size(self, max_step=10):
         return (np.random.random_sample() - 0.5)*max_step / 5 #creates random number for step size 0 to 0.1
 
-    def move(self, size_x, size_y, people):
+    def move(self, people):
 
         def distance(x1, y1, x2, y2):
             return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) #uses coords and calulates distance between two points
@@ -327,24 +475,24 @@ class person(object):
             self.vely = self.make_new_step_size()
             self.x = self.x + self.step_x   # the coord is updated with that new constant (different amount than before so dot looks like it sped up/slowed down)
             self.y = self.y + self.step_y
-        if self.x >= size_x:  # so cannot go outside boundary of 10x10 grid
-            self.x = size_x
+        if self.x >= self.size_x:  # so cannot go outside boundary of 10x10 grid
+            self.x = self.size_x
             self.step_x = -1 * self.step_x
         if self.x <= 0:  # so cannot go outside boundary of 10x10 grid
             self.x = 0
             self.step_x = -1 * self.step_x
-        if self.y >= size_y:  # so cannot go outside boundary of 10x10 grid
-            self.y = size_y
+        if self.y >= self.size_y:  # so cannot go outside boundary of 10x10 grid
+            self.y = self.size_y
             self.step_y = -1 * self.step_y
         if self.y <= 0:  # so cannot go outside boundary of 10x10 grid
             self.y = 0
             self.step_y = -1 * self.step_y
 
         if inside(self.x, self.y, self.AREA_X, self.AREA_Y, self.AREA_R): #if at table area
-            if self.gravitate == 1: #if meant to be at table stay there
+            if self.gravitating == 1: #if meant to be at table stay there
                 stop(self)
             if np.random.random_sample() < 0.5: #have a %chance of leaving the table
-                self.gravitate = 0
+                self.gravitating = 0
 
         if self.gravitating == 1:   # if gravitate on
             move_towards(self, self.AREA_X, self.AREA_Y)
@@ -355,74 +503,75 @@ class person(object):
             if min_dist_to_someone < 2: #if closer than 2meters to someone
                 move_away(self, closest_person.x, closest_person.y)
 
-
-#----------------------------------------------------------------------------#
-#                  Kaelan Room Heatmap classes                               #
-#----------------------------------------------------------------------------#
-
+#create heat maps
 class Room_map(object):
-    def __init__(self, heat_new, position_state, xsize, ysize):
-        self.heat_old = heat_new
-        self.position_state = position_state
-        self.xsize = xsize
-        self.ysize = ysize
+    def __init__(self, heat_old, position_state, xsize, ysize, node):
+        self.heat_old = heat_old
+        self.node = node
+        self.xsize = xsize+1
+        self.ysize = ysize+1
+        self.update_occupants(position_state)
+
+    def update_occupants(self, position_state):
+        self.occupants = position_state[position_state["node"] == self.node]
 
     def map_position_states(self):
-        pos_map = np.zeros((self.xsize, self.ysize))
-
-        for x in self.position_state:
-            pos_map[x[0], x[1]] = x[2]
-
+        pos_map = np.zeros((self.ysize, self.xsize))
+        for row in range(0, len(self.occupants)):
+            pos_map[round(self.occupants['y'].iloc[row]), round(self.occupants['x'].iloc[row])] = self.occupants['status'].iloc[row]
         return pos_map
 
     def heat_source(self):  # will add heat source to map based on individuals new position
-        sources = np.zeros((self.xsize, self.ysize))
+        sources = np.zeros((self.ysize, self.xsize))
+        boundary = np.zeros((self.ysize+2, self.xsize+2))
         sources += self.map_position_states()
-        sources[sources == 2] = 100
-        sources[sources != 100] = 0
+        sources[sources == 3] = 100
+        sources[sources == 3.5] = 50
+        sources[sources < 50] = 0
+        boundary[1:-1,1:-1] = sources
+        sources = boundary
+
         return sources
 
     def calculate_heat_new(self):  # will calculate single step of heat dispersion
+        #add zeros all around
+        boundary = np.zeros((self.ysize+2, self.xsize+2))
+        boundary[1:-1, 1:-1] = self.heat_old
 
-        heat_left = np.roll(self.heat_old, 1, axis=1)
-        heat_right = np.roll(self.heat_old, -1, axis=1)
-        heat_up = np.roll(self.heat_old, -1, axis=0)
-        heat_down = np.roll(self.heat_old, 1, axis=0)
+        # boundary conditions no windows
+        boundary[:, 0] = boundary[:, 1]
+        boundary[:, -1] = boundary[:, -2]
+        boundary[0, :] = boundary[1, :]
+        boundary[-1, :] = boundary[-2, :]
+        #add windows
+        #boundary[5:-5, 0] = 0
+        #boundary[5:-5, -1] = 0
+
+        heat = boundary
+        heat_left = np.roll(heat, 1, axis=1)
+        heat_right = np.roll(heat, -1, axis=1)
+        heat_up = np.roll(heat, -1, axis=0)
+        heat_down = np.roll(heat, 1, axis=0)
 
         heat_new = 0.25 * (heat_left + heat_right + heat_up + heat_down)  # cell heat is the average of adjacent cells
-        heat_new = heat_new + self.heat_source()
-        heat_new[heat_new > 100] = 100
+        heat_new[self.heat_source() == 100] = 100
+        mask_1 = self.heat_source() == 50
+        mask_2 = heat_new < 50
+        mask_3 = np.logical_and(mask_1, mask_2)
+        heat_new[mask_3] = 50
+        heat_new = heat_new[1:-1, 1:-1]
 
-        heat_new[:, 0] = heat_new[:, 1]  # boundary conditions
-        heat_new[:, -1] = heat_new[:, -2]
-        heat_new[0, :] = heat_new[1, :]
-        heat_new[-1, :] = heat_new[-2, :]
-
-        return heat_new
+        self.heat_old = heat_new
 
     def show_map(self):  # creates a heatmap and position map
         # create marker for healthy individuals in heatmap
-        heat_map = self.calculate_heat_new()
-        pos = self.map_position_states()
-        heat_map[pos == 1] = -100
-        # create marker for healthy individuals in pos map
-        pos_map = self.map_position_states()
-        pos_map[pos_map == 1] = -2
+        heat_map = self.heat_old
+        #pos = self.map_position_states()
+        #heat_map[pos == 1] = -100
 
         # create matplot figure with subplots
-        fig, axes = plt.subplots(1, 2, figsize=(15, 5))
 
-        sns.heatmap(np.transpose(heat_map), ax=axes[0], cbar=False, cmap='icefire', center=0).invert_yaxis()  # heatmap
-        axes[0].set_title("Heat Map")
-
-        # sns.heatmap(pos_map, ax=axes[1], cbar=False, cmap='icefire', center = 0).invert_yaxis() #position heatmap
-        # axes[1].set_title("Position Map")
-        sns.scatterplot(x=self.position_state[:, 0], y=self.position_state[:, 1], data=self.position_state, ax=axes[1],
-                        hue=self.position_state[:, 2], legend=False, palette='coolwarm')  # position scatterplot
-        axes[1].set_title("Position Map")
-        axes[1].set_xlim(0, self.xsize)
-        axes[1].set_ylim(0, self.ysize)
-
+        return heat_map # heatmap
 #----------------------------------------------------------------------------#
 #                  End of simulation classes                                        #
 #----------------------------------------------------------------------------#
@@ -431,86 +580,7 @@ class Room_map(object):
 
 #REPLACE THIS WITH YAZ CODE
 # animation function.  This is called sequentially
-def animate():
-    plt.show()
 
-
-def update_position_state(position_state,people):
-    position_state.iloc[:, :2] = 0  # array emptied for x y only
-    # this code adds values from people objects back into array
-    k = 0
-    for t in people:
-        position_state.iloc[k, 0] = t.x
-        position_state.iloc[k, 1] = t.y
-        position_state.iloc[k, 2] = t.node
-        position_state.iloc[k, 5] = t.gravitating
-        k += 1  # iterator for picking the correct row
-    # check
-    print('iteration finished and this is new position_state array:')
-    print(position_state)  # array refilled with people
-    return (position_state)
-
-# placeholder simulate function
-def simulate(days):
-
-    heat_new = np
-
-#----------------------------------------------------------------------------#
-#                  Animation classes                                         #
-#----------------------------------------------------------------------------#
-
-class Animation:
-
-    def __init__(self, simulation, duration):
-        self.simulation = simulation
-        self.duration = duration
-
-        self.figure = plt.figure(figsize=(8, 4))
-        #self.axes_heat = self.figure.add_subplot(1, 3, 1)
-        self.axes_grid = self.figure.add_subplot(1, 3, 2)
-        self.axes_line = self.figure.add_subplot(1, 3, 3)
-
-        #self.heatanimation = HeatAnimation(self.axes_grid, self.simulation)
-        self.gridanimation = GridAnimation(self.axes_grid, self.simulation)
-        self.lineanimation = LineAnimation(self.axes_line, self.simulation, duration)
-
-    def show(self):
-        """Run the animation on screen"""
-        animation = FuncAnimation(self.figure, self.update, frames=range(200),
-                init_func = self.init, blit=True, interval=200)
-        plt.show()
-
-###def save ()
-
-    def init(self):
-        """Initialise the animation (called by FuncAnimation)"""
-        # We could generalise this to a loop and then it would work for any
-        # numer of *animation objects.
-        actors = []
-        #actors += self.heatanimation.init()
-        actors += self.gridanimation.init()
-        actors += self.lineanimation.init()
-        return actors
-
-    def update(self, framenumber):
-        """Update the animation (called by FuncAnimation)"""
-        self.simulation.update()
-        actors = []
-        #actors += self.heatanimation.update(framenumber)
-        actors += self.gridanimation.update(framenumber)
-        actors += self.lineanimation.update(framenumber)
-        return actors
-
-class HeatAnimation:
-    """Animate a grid showing status of people at each position"""
-
-class GridAnimation:
-    """Animate a grid showing status of people at each position"""
-
-
-#----------------------------------------------------------------------------#
-#                  End of Animation classes                                        #
-#----------------------------------------------------------------------------#
 
 if __name__ == "__main__":
 
