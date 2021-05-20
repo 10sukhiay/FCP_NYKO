@@ -34,9 +34,13 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, G, numbe
     Recovered = []
     Deceased = []
 
+    Room1 = []
+    Room2 = []
+    Room3 = []
+
     anim = FuncAnimation(fig=fig, func=update,
                          frames=day_length*days,
-                         fargs=(people, heat_maps, position_state, axes, colour_dict, day_length, G, number_nodes, limit, death_rate, Susceptible, Infected, Infectious, Recovered, Deceased),
+                         fargs=(people, heat_maps, position_state, axes, colour_dict, day_length, G, number_nodes, limit, death_rate, Susceptible, Infected, Infectious, Recovered, Deceased, Room1, Room2, Room3),
                          interval=50,
                          blit=False,
                          repeat=False)

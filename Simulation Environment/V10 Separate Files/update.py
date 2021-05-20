@@ -19,7 +19,7 @@ from Heat_Mapping import Room_map
 from Person_Class import person
 from other_functions import *
 
-def update(it, people, heat_maps, position_state, axes, colour_dict, day_length, G, number_nodes, limit, death_rate, Susceptible, Infected, Infectious, Recovered, Deceased):
+def update(it, people, heat_maps, position_state, axes, colour_dict, day_length, G, number_nodes, limit, death_rate, Susceptible, Infected, Infectious, Recovered, Deceased, Room1, Room2, Room3):
 
     day = math.floor(it/day_length) +1
 
@@ -57,6 +57,9 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
     Recovered.append(len(position_state[position_state['status']==4]))
     Deceased.append(len(position_state[position_state['status']==5]))
 
+    Room1.append(len(position_state[position_state["node"]==1]))
+    Room2.append(len(position_state[position_state["node"]==2]))
+    Room3.append(len(position_state[position_state["node"]==3]))
 
     for map in heat_maps:
         # clear data from old plots
@@ -95,8 +98,10 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
     line4 = axes[0, 0].plot(Recovered, color="blue")
     line5 = axes[0, 0].plot(Deceased, color="black")
 
-    #line2, = axes[0, 0].plot(pop, data=Susceptible, color="r")
+    line1 = axes[1, 0].plot(Room1, alpha=0.5, linestyle='--', color='black')
+    line2 = axes[1, 0].plot(Room2, alpha=0.5, linestyle='-', color='red')
+    line3 = axes[1, 0].plot(Room3, alpha=0.5, linestyle='-', color='black')
 
-    #axes[0, 0].plot('susceptible', data = Susceptible)# x, Infected, 'infected', x, Infectious, 'infectious', x, Recovered, 'recovered', x, Deceased, 'deceased')
+
 
 
