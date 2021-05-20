@@ -2,7 +2,7 @@
 """
 
 animate.py
-Kaelan Melville
+Kaelan Melville, Yazad Sukhia
 May 2021
 
 
@@ -20,6 +20,7 @@ from update import update
 
 
 def animate(people, heat_maps, position_state, rooms, days, day_length, g, number_nodes, limit, death_rate):
+    """" set up animation for heat map, scatter graphs and line graphs of the simulation"""
 
     # colours for statuses in scatter plot
     colour_dict = dict({1: 'green',
@@ -36,6 +37,7 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, g, numbe
 
     fig, axes = plt.subplots(2, rooms+1, figsize=(3.5*(rooms+1), 7))
 
+    # initialising empty lists for updated animation information to append to
     susceptible = []
     infected = []
     infectious = []
@@ -46,6 +48,7 @@ def animate(people, heat_maps, position_state, rooms, days, day_length, g, numbe
     room2 = []
     room3 = []
 
+    # animation function taking in all necessary arguments
     anim = FuncAnimation(fig=fig, func=update,
                          frames=day_length*days,
                          fargs=(people, heat_maps, position_state, axes, colour_dict, day_length, g, number_nodes,

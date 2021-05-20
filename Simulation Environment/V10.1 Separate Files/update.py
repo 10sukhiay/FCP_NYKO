@@ -2,7 +2,7 @@
 """
 
 update.py
-Kaelan Melville
+Kaelan Melville, Yazad Sukhia
 May 2021
 
 
@@ -22,6 +22,7 @@ from other_functions import *
 
 def update(it, people, heat_maps, position_state, axes, colour_dict, day_length, g, number_nodes, limit, death_rate,
            susceptible, infected, infectious, recovered, deceased, room1, room2, room3):
+    """" """
 
     day = math.floor(it/day_length) + 1
 
@@ -52,6 +53,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
             # introduce some transmission function to infect new people
             transmission(position_state=position_state, heat=m.heat_old, node=m.node, day_length=day_length)
 
+    # data fed into the animation lists
     susceptible.append(len(position_state[position_state['status'] == 1]))
     infected.append(len(position_state[position_state['status'] == 2]))
     infectious.append(len(position_state[position_state['status'] == 3]))
@@ -68,7 +70,6 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
         axes[1, m.node].clear()
 
         # plot positions
-
         sns.scatterplot(x=m.occupants['x'],
                         y=m.occupants['y'],
                         hue=m.occupants['status'],
@@ -100,7 +101,7 @@ def update(it, people, heat_maps, position_state, axes, colour_dict, day_length,
 
     # call function to record statuses (plotting infections etc...)
 
-    # Creates the line-graph tracking the status of people in the room
+    # Creates the line-graph tracking the status of people across all rooms
     axes[0, 0].plot(susceptible, color='green')
     axes[0, 0].plot(infected, color="yellow")
     axes[0, 0].plot(infectious, color="red")
