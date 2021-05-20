@@ -66,7 +66,8 @@ The script can be used to:
 
 1. Show an amination of the simulation on screen
 2. Create a simulation over a number of days
-3. Show a plot of the network.
+3. Show a plot of the network
+4. Show a plot of the status of people
 
 This is all run from the XXXX file. 
 
