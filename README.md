@@ -3,13 +3,13 @@
 
 ### Authors
 
-Oscar Bond
+- Oscar Bond
 
-Kaelan Melville
+- Kaelan Melville
 
-Yazad Sukhia
+- Yazad Sukhia
 
-Nathan Wooster
+- Nathan Wooster
 
 
 ### Description
@@ -23,29 +23,29 @@ and at a room level for a number of iterations every day.
 
 These common python libraries need to be installed. They are imported at the beginning of the scripts:
 
-argparse
+- argparse
 
-numpy
+- numpy
 
-pandas
+- pandas
 
-random
+- random
 
-math
+- math
 
-matplotlib
+- matplotlib
 
-networkx
+- networkx
 
-seaborn
+- seaborn
 
 
 ### Installing
-The main script to be downloaded is:
+**The main script to be downloaded is:**
 
-simulation.py
+simulation_NYKO.py
 
-The modules that also must be downloaded that it calls are:
+**The modules that also must be downloaded that it calls are:**
 
 Person_Class.py
 
@@ -69,7 +69,7 @@ The script can be used to:
 3. Show a plot of the network
 4. Show a plot of the status of people
 
-This is all run from the XXXX file. 
+This is all run from the simulation_NYKO.py file. 
 
 The file can be run from the command line thanks to the command line 
 interface. This allows parameters to be changes without editing the code. e.g.:

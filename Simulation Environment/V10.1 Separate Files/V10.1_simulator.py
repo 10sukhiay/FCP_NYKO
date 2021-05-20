@@ -2,17 +2,11 @@
 """
 
 V10.1_simulator.py
-Nathan Wooster, Kaelan Melville, Oscar Bond, Yazad Sukhia
+Oscar Bond, Kaelan Melville, Yazad Sukhia, Nathan Wooster
 May 2021
 
 This script runs simulations of an epidemic (e.g. coronavirus) for the
-air borne spreading of the virus through a network, taking.
-The script can be used to:
-
-    1. XXXXX
-
-This is all done using the same simulation code which can also be imported
-from this file and used in other ways.
+air borne spreading of the virus through a network.
 
 The command line interface to the script makes it possible to run different
 simulations without needing to edit the code e.g.:
@@ -35,12 +29,13 @@ from other_functions import *
 
 def main(*args):
     """Command line entry point.
-    ## Currently these are just examples, to be finalised at the end of the code #######
-            $ python simulator.py                        # show animation on screen
-            $ python simulator.py --file=video.mp4       # save animation to video
-            $ python simulator.py --plot                 # show plot on screen
+    The file can be run from the command line thanks to the command line
+    interface. This allows parameters to be changes without editing the code. e.g.:
 
-            """
+    $ python simulator.py               # run simulation with default settings
+    $ python simulator.py --number=50   # have 50 people in the room network
+    $ python simulator.py --help        # show all command line options
+    """
     #
     # Argparse has been used to handle parsing the command line arguments.
     #   https://docs.python.org/3/library/argparse.html
@@ -51,7 +46,7 @@ def main(*args):
                         help='Size of population')
     parser.add_argument('--cases', metavar='C', type=int, default=3,
                         help='Number of initial infected people')
-    parser.add_argument('--distance', metavar='SD', type=float, default=1,
+    parser.add_argument('--distance', metavar='SD', type=float, default=0.8,
                         help='Probability of following two meter social distancing')
     parser.add_argument('--table', metavar='Pt', type=float, default=0.1,
                         help='Probability of gravitating to the table')
@@ -59,7 +54,7 @@ def main(*args):
                         help='Probability of wearing a mask')
     parser.add_argument('--rooms', metavar='R', type=int, default=3,
                         help='Number of rooms to simulate')
-    parser.add_argument('--travel', metavar='T', type=float, default=0.3,
+    parser.add_argument('--travel', metavar='T', type=float, default=0.5,
                         help='Proportion of people that can move between rooms')
     parser.add_argument('--size_x', metavar='X', type=int, default=14,
                         help='size of room along x axis')
@@ -115,9 +110,6 @@ def main(*args):
                      gravitating=position_state.iloc[i, 5], area_x=args.table_x,
                      area_y=args.table_y, area_r=args.table_r,
                      size_x=args.size_x, size_y=args.size_y) for i in range(len(position_state))]
-    # Initialise areas
-    # area1 = area(args.table_x, args.table_y, args.table_r)
-    # circle = area1.draw()
 
     # initialise heat maps for each room
     heat_new = np.zeros((args.size_y+1, args.size_x+1))
@@ -126,11 +118,8 @@ def main(*args):
                          node=i, decay=args.decay, mask_ratio=args.mask_ratio)
                  for i in range(1, args.rooms+1)]
 
-    # Drawing a node graph
-    # draw_network(position_state, G, number_nodes)
-
     # Use Animate to show/save animations. Create Simulate function that ignores animation requirements???
-    # use animate function instead of update. update is nested!!!
+    # use animate function instead of update. update is nested.
     animate(people=people,
             heat_maps=heat_maps,
             position_state=position_state,
@@ -142,15 +131,8 @@ def main(*args):
             death_rate=args.death_rate)
 
     # Drawing a node graph
-    # draw_network(position_state, G, number_nodes)
+    draw_network(position_state, g, number_nodes)
 
-    # Update the position state for new nodes.
-    # nodes = possible_paths(position_state, G)
-
-    # position_state = update_node_travel_prob(position_state, nodes, args.limit, number_nodes)
-
-    # Draw updated node graph after simulation
-    # draw_network(position_state, G, number_nodes)
 
 
 if __name__ == "__main__":

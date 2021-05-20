@@ -151,13 +151,13 @@ def draw_network(position_state, g, number_nodes):
     for i in range(1, number_nodes+1):
         g.nodes[i]['Number'] = node_count[i-1]
 
-    pos = nx.spring_layout(G)
+    pos = nx.spring_layout(g)
     # increase size of nodes to be able to see
     node_count_size = [i * 100 for i in node_count]
 
     # draw the network with node size dependant on no.people
     nx.draw(g, pos, node_size=node_count_size)
-    node_labels = nx.get_node_attributes(G, 'Number')
+    node_labels = nx.get_node_attributes(g, 'Number')
     nx.draw_networkx_labels(g, pos, labels=node_labels)
     plt.legend(['Room - Number of People in the Room'])
     plt.show()
