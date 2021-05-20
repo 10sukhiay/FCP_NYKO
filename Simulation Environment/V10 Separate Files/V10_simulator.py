@@ -85,7 +85,7 @@ def main(*args):
     args = parser.parse_args(args)
 
     # check user inputs with exceptions
-    check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.rooms)
+    check_general_inputs(args.number, args.cases, args.distance, args.table, args.mask, args.decay, args.rooms, args.mask_ratio)
     check_room_setup_inputs(args.size_x, args.size_y, args.table_r, args.table_x, args.table_y)
     check_network_inputs(args.rooms, args.travel, args.days, args.limit)
 

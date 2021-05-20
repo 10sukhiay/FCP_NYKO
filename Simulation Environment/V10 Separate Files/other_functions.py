@@ -212,7 +212,7 @@ def death_chance(position_state, death_rate):
     return position_state
 
 
-def check_general_inputs(number, cases, distance, table, mask, decay, rooms):
+def check_general_inputs(number, cases, distance, table, mask, decay, rooms, mask_ratio):
     """Check general inputs to the code from command line."""
     if number/rooms < 5:
         raise Exception('For the number of rooms set, please enter a number of people greater than: {}'.format(rooms*5))
@@ -226,8 +226,8 @@ def check_general_inputs(number, cases, distance, table, mask, decay, rooms):
         raise Exception('Please enter probability between 0 and 1')
     if mask < 0 or mask > 1:
         raise Exception('Please enter probability between 0 and 1')
-    #if decay < 0 or decay > 1:
-        #raise Exception('Please enter probability between 0 and 1')
+    if mask_ratio < 0 or mask_ratio > 1:
+        raise Exception('Please enter probability between 0 and 1')
 
 def check_room_setup_inputs(size_x, size_y, table_r, table_x, table_y):
     """Check room setup inputs to the code from command line."""
